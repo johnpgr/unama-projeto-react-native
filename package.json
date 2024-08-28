@@ -9,6 +9,7 @@
         "build": "turbo run build",
         "clean": "git clean -xdf node_modules",
         "clean:workspaces": "turbo run clean",
+        "clean:daemon": "turbo daemon clean",
         "db:generate": "turbo -F @projeto/db dbgen",
         "db:migrate": "turbo -F @projeto/db migrate",
         "db:push": "turbo -F @projeto/db push",
