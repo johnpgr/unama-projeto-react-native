@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next"
 import { GeistMono } from "geist/font/mono"
 import { GeistSans } from "geist/font/sans"
 
-import { cn } from "@acme/web-ui"
-import { ThemeProvider, ThemeToggle } from "@acme/web-ui/theme"
-import { Toaster } from "@acme/web-ui/toast"
+import { cn } from "@projeto/web-ui"
+import { ThemeProvider, ThemeToggle } from "@projeto/web-ui/theme"
+import { Toaster } from "@projeto/web-ui/toast"
 
 import { TRPCReactProvider } from "~/trpc/react"
 
