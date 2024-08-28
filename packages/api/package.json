@@ -21,7 +21,6 @@
     "dependencies": {
         "@acme/auth": "workspace:*",
         "@acme/db": "workspace:*",
-        "@acme/validators": "workspace:*",
         "@trpc/server": "catalog:",
         "superjson": "2.2.1",
         "zod": "catalog:"

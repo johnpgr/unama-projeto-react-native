@@ -1,5 +1,5 @@
 import { Auth } from "@auth/core"
-import Discord from "@auth/core/providers/discord"
+import GOOGLE from "@auth/core/providers/GOOGLE"
 import { eventHandler, toWebRequest } from "h3"
 
 export default eventHandler(async (event) =>
@@ -9,9 +9,9 @@ export default eventHandler(async (event) =>
         trustHost: !!process.env.VERCEL,
         redirectProxyUrl: process.env.AUTH_REDIRECT_PROXY_URL,
         providers: [
-            Discord({
-                clientId: process.env.AUTH_DISCORD_ID,
-                clientSecret: process.env.AUTH_DISCORD_SECRET,
+            GOOGLE({
+                clientId: process.env.AUTH_GOOGLE_ID,
+                clientSecret: process.env.AUTH_GOOGLE_SECRET,
             }),
         ],
     }),

@@ -1,5 +1,5 @@
 import { auth, signIn, signOut } from "@acme/auth"
-import { Button } from "@acme/ui/button"
+import { Button } from "@acme/web-ui/button"
 
 export async function AuthShowcase() {
     const session = await auth()
@@ -11,10 +11,10 @@ export async function AuthShowcase() {
                     size="lg"
                     formAction={async () => {
                         "use server"
-                        await signIn("discord")
+                        await signIn("GOOGLE")
                     }}
                 >
-                    Sign in with Discord
+                    Sign in with GOOGLE
                 </Button>
             </form>
         )
