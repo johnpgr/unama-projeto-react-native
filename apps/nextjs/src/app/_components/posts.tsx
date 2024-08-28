@@ -1,7 +1,7 @@
 "use client"
 
 import type { RouterOutputs } from "@projeto/api"
-import { CreatePostSchema } from "@projeto/db/schema"
+import { CreatePost } from "@projeto/db/schema"
 import { cn } from "@projeto/web-ui"
 import { Button } from "@projeto/web-ui/button"
 import {
@@ -19,7 +19,7 @@ import { api } from "~/trpc/react"
 
 export function CreatePostForm() {
     const form = useForm({
-        schema: CreatePostSchema,
+        schema: CreatePost,
         defaultValues: {
             content: "",
             title: "",

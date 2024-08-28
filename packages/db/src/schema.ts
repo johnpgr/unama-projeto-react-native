@@ -1,11 +1,16 @@
 import { relations } from "drizzle-orm"
 import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { createInsertSchema } from "drizzle-zod"
+import { uuidv7 } from "uuidv7"
 import { z } from "zod"
+
 import { now } from "./utils"
 
 export const Post = sqliteTable("post", {
-    id: text("id").notNull().primaryKey().$defaultFn(crypto.randomUUID),
+    id: text("id")
+        .notNull()
+        .primaryKey()
+        .$defaultFn(() => uuidv7()),
     title: text("name", { length: 256 }).notNull(),
     content: text("content").notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
@@ -26,7 +31,10 @@ export const CreatePost = createInsertSchema(Post, {
 })
 
 export const User = sqliteTable("user", {
-    id: text("id").notNull().primaryKey().$defaultFn(crypto.randomUUID),
+    id: text("id")
+        .notNull()
+        .primaryKey()
+        .$defaultFn(() => uuidv7()),
     name: text("name", { length: 255 }),
     email: text("email", { length: 255 }).notNull(),
     emailVerified: integer("email_verified", {
@@ -72,9 +80,7 @@ export const AccountRelations = relations(Account, ({ one }) => ({
 }))
 
 export const Session = sqliteTable("session", {
-    sessionToken: text("session_token", { length: 255 })
-        .notNull()
-        .primaryKey(),
+    sessionToken: text("session_token", { length: 255 }).notNull().primaryKey(),
     userId: text("user_id")
         .notNull()
         .references(() => User.id, { onDelete: "cascade" }),
