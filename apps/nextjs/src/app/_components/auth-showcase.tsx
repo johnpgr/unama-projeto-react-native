@@ -11,10 +11,10 @@ export async function AuthShowcase() {
                     size="lg"
                     formAction={async () => {
                         "use server"
-                        await signIn("GOOGLE")
+                        await signIn("google")
                     }}
                 >
-                    Sign in with GOOGLE
+                    Sign in with Google
                 </Button>
             </form>
         )
