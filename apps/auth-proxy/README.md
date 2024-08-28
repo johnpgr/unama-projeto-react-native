@@ -24,3 +24,4 @@ The lines below shows what values should match eachother in both deployments.
 For providers that require an origin and a redirect URL, set them to `{AUTH_REDIRECT_PROXY_URL}` and `{AUTH_REDIRECT_PROXY_URL}/r/callback/{provider}` accordingly.
 
 ![Google credentials setup](https://github.com/ahkhanjani/create-t3-turbo/assets/72540492/eaa88685-6fc2-4c23-b7ac-737eb172fa0e)
+
