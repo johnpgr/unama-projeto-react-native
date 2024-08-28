@@ -6,6 +6,7 @@ export const runtime = "edge"
 
 export default eventHandler(async (event) =>
     Auth(toWebRequest(event), {
+        basePath: "/",
         secret: process.env.AUTH_SECRET,
         trustHost: !!process.env.VERCEL,
         redirectProxyUrl: process.env.AUTH_REDIRECT_PROXY_URL,
