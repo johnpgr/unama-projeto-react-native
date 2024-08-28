@@ -64,7 +64,7 @@
         }
     },
     "globalEnv": [
-        "POSTGRES_URL",
+        "TURSO_DB_URL",
         "AUTH_GOOGLE_ID",
         "AUTH_GOOGLE_SECRET",
         "AUTH_REDIRECT_PROXY_URL",

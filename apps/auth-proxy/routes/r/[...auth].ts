@@ -1,5 +1,5 @@
 import { Auth } from "@auth/core"
-import GOOGLE from "@auth/core/providers/GOOGLE"
+import GoogleProvider from "@auth/core/providers/google"
 import { eventHandler, toWebRequest } from "h3"
 
 export default eventHandler(async (event) =>
@@ -9,7 +9,7 @@ export default eventHandler(async (event) =>
         trustHost: !!process.env.VERCEL,
         redirectProxyUrl: process.env.AUTH_REDIRECT_PROXY_URL,
         providers: [
-            GOOGLE({
+            GoogleProvider({
                 clientId: process.env.AUTH_GOOGLE_ID,
                 clientSecret: process.env.AUTH_GOOGLE_SECRET,
             }),
