@@ -1,28 +1,22 @@
-import { relations, sql } from "drizzle-orm"
-import {
-    integer,
-    pgTable,
-    primaryKey,
-    text,
-    timestamp,
-    uuid,
-    varchar,
-} from "drizzle-orm/pg-core"
+import { relations } from "drizzle-orm"
+import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { createInsertSchema } from "drizzle-zod"
 import { z } from "zod"
+import { now } from "./utils"
 
-export const Post = pgTable("post", {
-    id: uuid("id").notNull().primaryKey().defaultRandom(),
-    title: varchar("name", { length: 256 }).notNull(),
+export const Post = sqliteTable("post", {
+    id: text("id").notNull().primaryKey().$defaultFn(crypto.randomUUID),
+    title: text("name", { length: 256 }).notNull(),
     content: text("content").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updatedAt", {
-        mode: "date",
-        withTimezone: true,
-    }).$onUpdateFn(() => sql`now()`),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+        .default(now)
+        .notNull(),
+    updatedAt: integer("updated_at", {
+        mode: "timestamp_ms",
+    }).$onUpdateFn(() => now),
 })
 
-export const CreatePostSchema = createInsertSchema(Post, {
+export const CreatePost = createInsertSchema(Post, {
     title: z.string().max(256),
     content: z.string().max(256),
 }).omit({
@@ -31,41 +25,40 @@ export const CreatePostSchema = createInsertSchema(Post, {
     updatedAt: true,
 })
 
-export const User = pgTable("user", {
-    id: uuid("id").notNull().primaryKey().defaultRandom(),
-    name: varchar("name", { length: 255 }),
-    email: varchar("email", { length: 255 }).notNull(),
-    emailVerified: timestamp("emailVerified", {
-        mode: "date",
-        withTimezone: true,
+export const User = sqliteTable("user", {
+    id: text("id").notNull().primaryKey().$defaultFn(crypto.randomUUID),
+    name: text("name", { length: 255 }),
+    email: text("email", { length: 255 }).notNull(),
+    emailVerified: integer("email_verified", {
+        mode: "timestamp_ms",
     }),
-    image: varchar("image", { length: 255 }),
+    image: text("image", { length: 255 }),
 })
 
 export const UserRelations = relations(User, ({ many }) => ({
     accounts: many(Account),
 }))
 
-export const Account = pgTable(
+export const Account = sqliteTable(
     "account",
     {
-        userId: uuid("userId")
+        userId: text("user_id")
             .notNull()
             .references(() => User.id, { onDelete: "cascade" }),
-        type: varchar("type", { length: 255 })
+        type: text("type", { length: 255 })
             .$type<"email" | "oauth" | "oidc" | "webauthn">()
             .notNull(),
-        provider: varchar("provider", { length: 255 }).notNull(),
-        providerAccountId: varchar("providerAccountId", {
+        provider: text("provider", { length: 255 }).notNull(),
+        providerAccountId: text("provider_account_id", {
             length: 255,
         }).notNull(),
-        refresh_token: varchar("refresh_token", { length: 255 }),
+        refresh_token: text("refresh_token", { length: 255 }),
         access_token: text("access_token"),
         expires_at: integer("expires_at"),
-        token_type: varchar("token_type", { length: 255 }),
-        scope: varchar("scope", { length: 255 }),
+        token_type: text("token_type", { length: 255 }),
+        scope: text("scope", { length: 255 }),
         id_token: text("id_token"),
-        session_state: varchar("session_state", { length: 255 }),
+        session_state: text("session_state", { length: 255 }),
     },
     (account) => ({
         compoundKey: primaryKey({
@@ -78,16 +71,15 @@ export const AccountRelations = relations(Account, ({ one }) => ({
     user: one(User, { fields: [Account.userId], references: [User.id] }),
 }))
 
-export const Session = pgTable("session", {
-    sessionToken: varchar("sessionToken", { length: 255 })
+export const Session = sqliteTable("session", {
+    sessionToken: text("session_token", { length: 255 })
         .notNull()
         .primaryKey(),
-    userId: uuid("userId")
+    userId: text("user_id")
         .notNull()
         .references(() => User.id, { onDelete: "cascade" }),
-    expires: timestamp("expires", {
-        mode: "date",
-        withTimezone: true,
+    expires: integer("expires", {
+        mode: "timestamp_ms",
     }).notNull(),
 })
 

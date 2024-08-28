@@ -4,10 +4,17 @@ if (!process.env.TURSO_DB_URL) {
     throw new Error("Missing TURSO_DB_URL")
 }
 
-const nonPoolingUrl = process.env.TURSO_DB_URL.replace(":6543", ":5432")
+if (!process.env.TURSO_DB_TOKEN) {
+    throw new Error("Missing TURSO_DB_TOKEN")
+}
+
+const url = process.env.TURSO_DB_URL
+const authToken = process.env.TURSO_DB_TOKEN
 
 export default {
     schema: "./src/schema.ts",
-    dialect: "postgresql",
-    dbCredentials: { url: nonPoolingUrl },
+    out: "./migrations",
+    dialect: "sqlite",
+    driver: "turso",
+    dbCredentials: { url, authToken },
 } satisfies Config
