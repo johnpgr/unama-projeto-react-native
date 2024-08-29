@@ -4,7 +4,6 @@ import { defineEventHandler, toWebRequest } from "h3"
 
 export default defineEventHandler(
     async (event) => (
-        console.log(event.node.req),
         Auth(toWebRequest(event), {
             basePath: "/",
             secret: process.env.AUTH_SECRET,
