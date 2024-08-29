@@ -60,13 +60,13 @@ export const Account = sqliteTable(
         providerAccountId: text("provider_account_id", {
             length: 255,
         }).notNull(),
-        refreshToken: text("refresh_token", { length: 255 }),
-        accessToken: text("access_token"),
-        expiresAt: integer("expires_at"),
-        tokenType: text("token_type", { length: 255 }),
+        refresh_token: text("refresh_token", { length: 255 }),
+        access_token: text("access_token"),
+        expires_at: integer("expires_at"),
+        token_type: text("token_type", { length: 255 }),
         scope: text("scope", { length: 255 }),
-        idToken: text("id_token"),
-        sessionState: text("session_state", { length: 255 }),
+        id_token: text("id_token"),
+        session_state: text("session_state", { length: 255 }),
     },
     (account) => ({
         compoundKey: primaryKey({
