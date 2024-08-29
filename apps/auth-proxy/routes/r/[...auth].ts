@@ -1,8 +1,8 @@
 import { Auth } from "@auth/core"
 import GoogleProvider from "@auth/core/providers/google"
-import { eventHandler, toWebRequest } from "h3"
+import { defineEventHandler, toWebRequest } from "h3"
 
-export default eventHandler(async (event) =>
+export default defineEventHandler(async (event) =>
     Auth(toWebRequest(event), {
         basePath: "/r",
         secret: process.env.AUTH_SECRET,
