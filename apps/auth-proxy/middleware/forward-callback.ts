@@ -11,6 +11,8 @@ export default eventHandler(async (event) => {
             body: await readBody(event),
         })
         //@ts-expect-error ok
-        return await $fetch(forwardedReq)
+        const res = await $fetch(forwardedReq)
+        console.log("res:", res)
+        return res
     }
 })
