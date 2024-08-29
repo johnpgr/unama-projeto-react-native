@@ -1,5 +1,5 @@
-import {defineEventHandler} from "h3"
+import {eventHandler} from "h3"
 
-export default defineEventHandler((event) => {
-    console.log(event.node.req)
+export default eventHandler((event) => {
+    console.log(event.path)
 })
