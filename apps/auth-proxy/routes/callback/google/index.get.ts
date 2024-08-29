@@ -1,7 +1,8 @@
-import {defineEventHandler, getRequestHeaders, readBody } from "h3"
+import { defineEventHandler, getRequestHeaders, readBody } from "h3"
 
 export default defineEventHandler(async (event) => {
     console.log("Forwarding request", event.node.req)
+    console.log("Forwarding request method", event.node.req.method)
     const forwardedUrl = "/r/" + event.node.req.url
     const forwardedReq = new Request(forwardedUrl, {
         method: event.node.req.method,
