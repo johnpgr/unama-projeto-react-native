@@ -1,8 +1,13 @@
-import { defineEventHandler, getRequestHeaders } from "h3"
+import { defineEventHandler, getRequestHeaders, readBody } from "h3"
 
 export default defineEventHandler(async (event) => {
+    const url = "/r" + event.node.req.url
+    const headers = getRequestHeaders(event)
+    const body = await readBody(event)
+    console.log({ url, headers, body })
     //@ts-expect-error ok
-    return await $fetch("/r" + event.node.req.url, {
-        headers: getRequestHeaders(event),
+    return await $fetch(url, {
+        headers,
+        body,
     })
 })

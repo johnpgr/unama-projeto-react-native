@@ -3,7 +3,6 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "nitro dev",
         "build": "nitro build",
         "clean": "git clean -xdf .cache .nitro .output .turbo .vercel node_modules",
         "lint": "eslint",
