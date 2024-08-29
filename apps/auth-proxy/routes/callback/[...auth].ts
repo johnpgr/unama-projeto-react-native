@@ -6,7 +6,7 @@ export default defineEventHandler(
     async (event) => (
         console.log(event.node.req),
         Auth(toWebRequest(event), {
-            basePath: "/r",
+            basePath: "/",
             secret: process.env.AUTH_SECRET,
             trustHost: !!process.env.VERCEL,
             redirectProxyUrl: process.env.AUTH_REDIRECT_PROXY_URL,
