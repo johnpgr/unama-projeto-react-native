@@ -1,15 +1,10 @@
-import { defineEventHandler, getRequestHeaders } from "h3"
+import { defineEventHandler, getRequestHeaders, readBody } from "h3"
 
 export default defineEventHandler(async (event) => {
-    console.log("Forwarding request", event.node.req)
-    const forwardedUrl = "/r/" + event.node.req.url
-    const forwardedReq = new Request(forwardedUrl, {
-        //@ts-expect-error ok
-        headers: getRequestHeaders(event),
-    })
-    console.log("forwardedReq", forwardedReq)
     //@ts-expect-error ok
-    const res = await $fetch(forwardedReq)
-    console.log("res:", res)
-    return res
+    return await $fetch("/r" + event.node.req.url, {
+        method: event.node.req.method,
+        headers: getRequestHeaders(event),
+        body: await readBody(event),
+    })
 })
