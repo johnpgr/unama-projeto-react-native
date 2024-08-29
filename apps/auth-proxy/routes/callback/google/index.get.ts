@@ -1,14 +1,11 @@
-import { defineEventHandler, getRequestHeaders, readBody } from "h3"
+import { defineEventHandler, getRequestHeaders } from "h3"
 
 export default defineEventHandler(async (event) => {
     console.log("Forwarding request", event.node.req)
-    console.log("Forwarding request method", event.node.req.method)
     const forwardedUrl = "/r/" + event.node.req.url
     const forwardedReq = new Request(forwardedUrl, {
-        method: event.node.req.method,
         //@ts-expect-error ok
         headers: getRequestHeaders(event),
-        body: await readBody(event),
     })
     console.log("forwardedReq", forwardedReq)
     //@ts-expect-error ok
