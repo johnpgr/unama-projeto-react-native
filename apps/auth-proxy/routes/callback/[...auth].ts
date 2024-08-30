@@ -1,3 +1,4 @@
+import "@projeto/tsconfig/reset"
 import { Auth } from "@auth/core"
 import GoogleProvider from "@auth/core/providers/google"
 import { defineEventHandler, toWebRequest } from "h3"
@@ -5,7 +6,6 @@ import { defineEventHandler, toWebRequest } from "h3"
 export default defineEventHandler(
     async (event) => (
         Auth(toWebRequest(event), {
-            basePath: "/",
             secret: process.env.AUTH_SECRET,
             trustHost: !!process.env.VERCEL,
             redirectProxyUrl: process.env.AUTH_REDIRECT_PROXY_URL,

@@ -1,3 +1,4 @@
+import "@projeto/tsconfig/reset"
 import { fileURLToPath } from "url"
 import createJiti from "jiti"
 

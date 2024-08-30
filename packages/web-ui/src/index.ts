@@ -1,3 +1,4 @@
+import "@projeto/tsconfig/reset"
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
 

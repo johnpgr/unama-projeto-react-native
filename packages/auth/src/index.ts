@@ -1,3 +1,4 @@
+import "@projeto/tsconfig/reset"
 import NextAuth from "next-auth"
 
 import { authConfig } from "./config"
