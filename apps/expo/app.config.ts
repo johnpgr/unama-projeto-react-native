@@ -1,4 +1,3 @@
-import "@projeto/tsconfig/reset"
 import type { ConfigContext, ExpoConfig } from "expo/config"
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
