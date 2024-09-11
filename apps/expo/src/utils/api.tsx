@@ -12,7 +12,7 @@ import { getToken } from "./session-store"
 /**
  * A set of typesafe hooks for consuming your API.
  */
-export const api = createTRPCReact<AppRouter>()
+export const Api = createTRPCReact<AppRouter>()
 export { type RouterInputs, type RouterOutputs } from "@projeto/api"
 
 /**
@@ -22,7 +22,7 @@ export { type RouterInputs, type RouterOutputs } from "@projeto/api"
 export function TRPCProvider(props: { children: React.ReactNode }) {
     const [queryClient] = useState(() => new QueryClient())
     const [trpcClient] = useState(() =>
-        api.createClient({
+        Api.createClient({
             links: [
                 loggerLink({
                     enabled: (opts) =>
@@ -50,10 +50,10 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
     )
 
     return (
-        <api.Provider client={trpcClient} queryClient={queryClient}>
+        <Api.Provider client={trpcClient} queryClient={queryClient}>
             <QueryClientProvider client={queryClient}>
                 {props.children}
             </QueryClientProvider>
-        </api.Provider>
+        </Api.Provider>
     )
 }

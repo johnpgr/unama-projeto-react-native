@@ -6,7 +6,7 @@ import type { AppRouter } from "@projeto/api"
 import { createCaller, createTRPCContext } from "@projeto/api"
 import { auth } from "@projeto/auth"
 
-import { createQueryClient } from "./query-client"
+import { createQueryClient } from "./common"
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
@@ -25,7 +25,7 @@ const createContext = cache(async () => {
 const getQueryClient = cache(createQueryClient)
 const caller = createCaller(createContext)
 
-export const { trpc: api, HydrateClient } = createHydrationHelpers<AppRouter>(
+export const { trpc: Api, HydrateClient } = createHydrationHelpers<AppRouter>(
     caller,
     getQueryClient,
 )

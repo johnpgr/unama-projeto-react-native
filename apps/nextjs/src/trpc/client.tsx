@@ -10,7 +10,7 @@ import superjson from "superjson"
 import type { AppRouter } from "@projeto/api"
 
 import { env } from "~/env"
-import { createQueryClient } from "./query-client"
+import { createQueryClient } from "./common"
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined
 const getQueryClient = () => {
@@ -23,13 +23,13 @@ const getQueryClient = () => {
     }
 }
 
-export const api = createTRPCReact<AppRouter>()
+export const Api = createTRPCReact<AppRouter>()
 
 export function TRPCReactProvider(props: { children: React.ReactNode }) {
     const queryClient = getQueryClient()
 
     const [trpcClient] = useState(() =>
-        api.createClient({
+        Api.createClient({
             links: [
                 loggerLink({
                     enabled: (op) =>
@@ -51,9 +51,9 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <api.Provider client={trpcClient} queryClient={queryClient}>
+            <Api.Provider client={trpcClient} queryClient={queryClient}>
                 {props.children}
-            </api.Provider>
+            </Api.Provider>
         </QueryClientProvider>
     )
 }

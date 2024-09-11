@@ -2,7 +2,7 @@ import * as Linking from "expo-linking"
 import { useRouter } from "expo-router"
 import * as Browser from "expo-web-browser"
 
-import { api } from "./api"
+import { Api } from "./api"
 import { getBaseUrl } from "./base-url"
 import { deleteToken, setToken } from "./session-store"
 
@@ -23,12 +23,12 @@ export const signIn = async () => {
 }
 
 export const useUser = () => {
-    const { data: session } = api.auth.getSession.useQuery()
+    const { data: session } = Api.auth.getSession.useQuery()
     return session?.user ?? null
 }
 
 export const useSignIn = () => {
-    const utils = api.useUtils()
+    const utils = Api.useUtils()
     const router = useRouter()
 
     return async () => {
@@ -39,8 +39,8 @@ export const useSignIn = () => {
 }
 
 export const useSignOut = () => {
-    const utils = api.useUtils()
-    const signOut = api.auth.signOut.useMutation()
+    const utils = Api.useUtils()
+    const signOut = Api.auth.signOut.useMutation()
     const router = useRouter()
 
     return async () => {

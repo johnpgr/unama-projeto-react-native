@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next"
-import { cn } from "@projeto/web-ui"
+
 import { ThemeProvider, ThemeToggle } from "@projeto/web-ui/theme"
 import { Toaster } from "@projeto/web-ui/toast"
 
-import { TRPCReactProvider } from "~/trpc/react"
+import { TRPCReactProvider } from "~/trpc/client"
 
 import "~/app/globals.css"
 
