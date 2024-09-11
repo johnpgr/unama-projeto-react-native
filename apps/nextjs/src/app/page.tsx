@@ -1,8 +1,6 @@
 import { HydrateClient } from "~/trpc/server"
 import { AuthShowcase } from "../components/auth-showcase"
 
-export const runtime = "edge"
-
 export default function HomePage() {
     return (
         <HydrateClient>
