@@ -34,8 +34,6 @@
     "dependencies": {
         "@libsql/client": "^0.10.0",
         "drizzle-orm": "^0.33.0",
-        "drizzle-zod": "^0.5.1",
-        "uuidv7": "^1.0.1",
         "zod": "catalog:"
     },
     "devDependencies": {

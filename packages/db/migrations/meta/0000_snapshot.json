@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "6d6ac8a9-2ccf-4ce0-9df9-ab8af739d169",
+  "id": "6d612a47-927e-4856-9612-03334ad450d0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "account": {
-      "name": "account",
+    "oauth_account": {
+      "name": "oauth_account",
       "columns": {
         "user_id": {
           "name": "user_id",
@@ -87,9 +87,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "account_user_id_user_id_fk": {
-          "name": "account_user_id_user_id_fk",
-          "tableFrom": "account",
+        "oauth_account_user_id_user_id_fk": {
+          "name": "oauth_account_user_id_user_id_fk",
+          "tableFrom": "oauth_account",
           "tableTo": "user",
           "columnsFrom": [
             "user_id"
@@ -102,59 +102,14 @@
         }
       },
       "compositePrimaryKeys": {
-        "account_provider_provider_account_id_pk": {
+        "oauth_account_provider_provider_account_id_pk": {
           "columns": [
             "provider",
             "provider_account_id"
           ],
-          "name": "account_provider_provider_account_id_pk"
+          "name": "oauth_account_provider_provider_account_id_pk"
         }
       },
-      "uniqueConstraints": {}
-    },
-    "post": {
-      "name": "post",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text(256)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "content": {
-          "name": "content",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(unixepoch())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
     "session": {
@@ -206,7 +161,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "text(36)",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
@@ -215,7 +170,7 @@
           "name": "name",
           "type": "text(255)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "email": {
@@ -232,6 +187,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "hashed_password": {
+          "name": "hashed_password",
+          "type": "text(60)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "image": {
           "name": "image",
           "type": "text(255)",
@@ -240,7 +202,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "user_email_unique": {
+          "name": "user_email_unique",
+          "columns": [
+            "email"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}

@@ -1,21 +1,50 @@
-import { Stack } from "expo-router"
-import React, { useState } from "react"
+import React from "react"
 import {
     Image,
     Switch,
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from "react-native"
+import { Stack, useRouter } from "expo-router"
+import { Controller, useForm } from "react-hook-form"
+
+import { Api } from "~/utils/api"
+
+interface RegisterForm {
+    name: string
+    email: string
+    password: string
+}
 
 export default function RegisterScreen() {
-    const [isAgreed, setIsAgreed] = useState(false)
+    const router = useRouter()
+    const [isAgreed, setIsAgreed] = React.useState(false)
+    const form = useForm<RegisterForm>({
+        defaultValues: { email: "", name: "", password: "" },
+    })
+    const signup = Api.auth.signUp.useMutation()
+
+    async function onSubmit(data: RegisterForm) {
+        if (!isAgreed) {
+            return
+        }
+
+        const res = await signup.mutateAsync(data)
+        console.log(res)
+        //TODO: Display errors
+        if (!res.success) {
+            return
+        }
+
+        router.navigate("/login")
+    }
 
     return (
         <>
             <Stack.Screen options={{ title: "Tela de registro" }} />
-            <View className="flex-1 bg-green-900">
+            <View className="flex-1 flex bg-green-900">
                 <View className="h-[30%] bg-green-900" />
 
                 <View className="flex-1 rounded-t-[3rem] bg-white p-8">
@@ -24,23 +53,49 @@ export default function RegisterScreen() {
                     </Text>
 
                     <Text className="m-1 mt-2 text-lg">Full Name:</Text>
-                    <TextInput
-                        className="rounded-xl border border-green-900 px-4 py-2"
-                        placeholder="Enter Full Name"
+                    <Controller
+                        name="name"
+                        control={form.control}
+                        render={({ field }) => (
+                            <TextInput
+                                className="rounded-xl border border-green-900 px-4 py-2"
+                                placeholder="Enter Full Name"
+                                onChangeText={field.onChange}
+                                value={field.value}
+                                onBlur={field.onBlur}
+                            />
+                        )}
                     />
 
                     <Text className="m-1 mt-2 text-lg">Email:</Text>
-                    <TextInput
-                        keyboardType="email-address"
-                        className="rounded-xl border border-green-900 px-4 py-2"
-                        placeholder="Enter Email"
+                    <Controller
+                        name="email"
+                        control={form.control}
+                        render={({ field }) => (
+                            <TextInput
+                                className="rounded-xl border border-green-900 px-4 py-2"
+                                placeholder="Enter Email"
+                                onChangeText={field.onChange}
+                                value={field.value}
+                                onBlur={field.onBlur}
+                            />
+                        )}
                     />
 
                     <Text className="m-1 mt-2 text-lg">Password:</Text>
-                    <TextInput
-                        secureTextEntry
-                        className="rounded-xl border border-green-900 px-4 py-2"
-                        placeholder="Enter Password"
+                    <Controller
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                            <TextInput
+                                secureTextEntry
+                                className="rounded-xl border border-green-900 px-4 py-2"
+                                placeholder="Enter Password"
+                                onChangeText={field.onChange}
+                                value={field.value}
+                                onBlur={field.onBlur}
+                            />
+                        )}
                     />
 
                     <View className="flex flex-row items-center py-4">
@@ -53,7 +108,10 @@ export default function RegisterScreen() {
                         <Text>I agree to the processing of Personal data</Text>
                     </View>
 
-                    <TouchableOpacity className="flex items-center rounded-xl bg-green-900 py-4">
+                    <TouchableOpacity
+                        className="flex items-center rounded-xl bg-green-900 py-4"
+                        onPress={form.handleSubmit(onSubmit)}
+                    >
                         <Text className="text-xl font-bold text-white">
                             Sign up
                         </Text>

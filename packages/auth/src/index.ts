@@ -1,9 +1,11 @@
 import "@projeto/tsconfig/reset"
+
 import NextAuth from "next-auth"
 
 import { authConfig } from "./config"
 
 export type { Session } from "next-auth"
+export type { AdapterAccountType } from "next-auth/adapters"
 
 const { handlers, auth, signIn, signOut } = NextAuth(authConfig)
 

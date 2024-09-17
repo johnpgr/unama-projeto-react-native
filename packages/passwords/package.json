@@ -1,13 +1,10 @@
 {
-    "name": "@projeto/api",
-    "version": "0.1.0",
+    "name": "@projeto/passwords",
     "private": true,
+    "version": "0.1.0",
     "type": "module",
     "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "default": "./src/index.ts"
-        }
+        ".": "./src/index.ts"
     },
     "license": "MIT",
     "scripts": {
@@ -17,14 +14,6 @@
         "format": "prettier --check . --ignore-path ../../.gitignore",
         "lint": "eslint",
         "typecheck": "tsc --noEmit --emitDeclarationOnly false"
-    },
-    "dependencies": {
-        "@projeto/auth": "workspace:*",
-        "@projeto/db": "workspace:*",
-        "@projeto/passwords": "workspace:^",
-        "@trpc/server": "catalog:",
-        "superjson": "2.2.1",
-        "zod": "catalog:"
     },
     "devDependencies": {
         "@projeto/eslint-config": "workspace:*",

@@ -17,7 +17,7 @@
         "@projeto/api": "workspace:*",
         "@projeto/auth": "workspace:*",
         "@projeto/db": "workspace:*",
-        "@projeto/web-ui": "workspace:*",
+        "@projeto/passwords": "workspace:*",
         "@t3-oss/env-nextjs": "^0.11.0",
         "@tanstack/react-query": "catalog:",
         "@trpc/client": "catalog:",
@@ -33,7 +33,6 @@
     "devDependencies": {
         "@projeto/eslint-config": "workspace:*",
         "@projeto/prettier-config": "workspace:*",
-        "@projeto/tailwind-config": "workspace:*",
         "@projeto/tsconfig": "workspace:*",
         "@types/node": "^20.14.15",
         "@types/react": "catalog:react18",

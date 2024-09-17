@@ -1,8 +1,6 @@
-import { Link, Stack } from "expo-router"
 import { View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
-
-import { AuthButton } from "../components/auth-button"
+import { Link, Stack } from "expo-router"
 
 export default function Index() {
     return (
@@ -10,7 +8,12 @@ export default function Index() {
             {/* Changes page title visible on the header */}
             <Stack.Screen options={{ title: "Home" }} />
             <View className="h-full w-full bg-background p-4">
-                <Link href="/registro" className="p-4 rounded bg-green-900 text-white font-bold text-center">Tela de registro</Link>
+                <Link
+                    href="/registro"
+                    className="rounded bg-blue-900 p-4 text-center font-bold text-white"
+                >
+                    Tela de registro
+                </Link>
             </View>
         </SafeAreaView>
     )

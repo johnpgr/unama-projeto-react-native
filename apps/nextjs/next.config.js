@@ -13,7 +13,7 @@ const config = {
         "@projeto/api",
         "@projeto/auth",
         "@projeto/db",
-        "@projeto/web-ui",
+        "@projeto/passwords"
     ],
 
     /** We already do linting and typechecking as separate tasks in CI */
