@@ -12,7 +12,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     splash: {
         image: "./assets/icon.png",
         resizeMode: "contain",
-        backgroundColor: "#1F104A",
+        backgroundColor: "#02391E",
     },
     updates: {
         fallbackToCacheTimeout: 0,
@@ -26,7 +26,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         package: "your.bundle.identifier",
         adaptiveIcon: {
             foregroundImage: "./assets/icon.png",
-            backgroundColor: "#1F104A",
+            backgroundColor: "#02391E",
         },
     },
     // extra: {
@@ -38,5 +38,5 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         tsconfigPaths: true,
         typedRoutes: true,
     },
-    plugins: ["expo-router"],
+    plugins: ["expo-router", ["expo-asset", { assets: "./assets/" }]],
 })

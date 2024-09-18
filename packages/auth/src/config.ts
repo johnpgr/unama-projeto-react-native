@@ -9,12 +9,12 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import * as jwt from "next-auth/jwt"
 import GoogleProvider from "next-auth/providers/google"
 
+import { eq } from "@projeto/db"
 import { db } from "@projeto/db/client"
 import { OAuthAccount, Session, User } from "@projeto/db/schema"
+import { PasswordHasher } from "@projeto/passwords"
 
 import { env } from "../env"
-import { eq } from "@projeto/db"
-import { PasswordHasher } from "@projeto/passwords"
 
 const passwordHasher = PasswordHasher.getInstance()
 
@@ -55,12 +55,12 @@ export const authConfig = {
                 email: {
                     label: "Email",
                     type: "email",
-                    placeholder: "Seu email",
+                    placeholder: "Your email",
                 },
                 password: {
                     label: "Senha",
                     type: "password",
-                    placeholder: "Sua senha",
+                    placeholder: "Your Password",
                 },
             },
             async authorize(credentials, _) {
@@ -72,11 +72,16 @@ export const authConfig = {
                 const user = await db.query.User.findFirst({
                     where: ({ email }) => eq(email, email),
                 })
-                if (!user) {
+
+                if (!user || !user.hashedPassword) {
                     return null
                 }
 
-                const matchPassword = await passwordHasher.compare(password, user.email)
+                const matchPassword = await passwordHasher.compare(
+                    password,
+                    user.hashedPassword,
+                )
+
                 if (!matchPassword) {
                     return null
                 }
@@ -89,42 +94,42 @@ export const authConfig = {
         }),
     ],
     callbacks: {
-        jwt: ({ token, account }) => {
+        jwt: ({ token, account, user }) => {
             if (account?.provider === "credentials") {
                 token.credentials = true
             }
             return token
         },
-        session: (opts) => {
-            if (!("user" in opts))
-                throw new Error("unreachable with session strategy")
+        session: ({ session, user }) => {
+            if (!user) throw new Error("unreachable with session strategy")
 
             return {
-                ...opts.session,
+                ...session,
                 user: {
-                    ...opts.session.user,
-                    id: opts.user.id,
+                    ...session.user,
+                    id: user.id,
                 },
             }
         },
     },
     jwt: {
-        encode: async function (params) {
-            const sessionToken = await jwt.encode({
-                token: params.token,
-                salt: params.salt,
-                secret: env.AUTH_SECRET!,
-            })
-            if (!params.token?.credentials) {
+        encode: async ({ token, salt, secret, maxAge }) => {
+            if(!token) throw new Error("[Unreachable]: No token provided in jwt encode callback")
+
+            const sessionToken = await jwt.encode({ token, salt, secret, maxAge })
+
+            if (!token.credentials) {
                 return sessionToken
             }
-            if (!params.token.sub) {
+
+            if (!token.sub) {
                 throw new Error("No User ID found in token")
             }
+
             const session = await adapter.createSession!({
                 sessionToken,
-                userId: params.token.sub,
-                expires: new Date(params.token?.exp ?? 7 * 24 * 60 * 60 * 1000),
+                userId: token.sub,
+                expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             })
 
             if (!session) {
@@ -140,7 +145,7 @@ export const validateToken = async (
     token: string,
 ): Promise<NextAuthSession | null> => {
     const sessionToken = token.slice("Bearer ".length)
-    const session = await adapter.getSessionAndUser?.(sessionToken)
+    const session = await adapter.getSessionAndUser!(sessionToken)
     return session
         ? {
               user: {
@@ -152,5 +157,5 @@ export const validateToken = async (
 }
 
 export const invalidateSessionToken = async (token: string) => {
-    await adapter.deleteSession?.(token)
+    await adapter.deleteSession!(token)
 }

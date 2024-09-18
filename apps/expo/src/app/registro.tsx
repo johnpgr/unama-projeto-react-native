@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native"
-import { Stack, useRouter } from "expo-router"
+import { Link, Stack, useRouter } from "expo-router"
 import { Controller, useForm } from "react-hook-form"
 
 import { Api } from "~/utils/api"
@@ -32,7 +32,6 @@ export default function RegisterScreen() {
         }
 
         const res = await signup.mutateAsync(data)
-        console.log(res)
         //TODO: Display errors
         if (!res.success) {
             return
@@ -143,11 +142,11 @@ export default function RegisterScreen() {
                         </View>
                     </View>
 
-                    <View className="flex flex-col items-center gap-2 pt-4">
+                    <View className="flex flex-row justify-center items-center gap-2 pt-4">
                         <Text>Already have an account?</Text>
-                        <TouchableOpacity className="flex w-full items-center rounded-xl bg-gray-800 py-2">
-                            <Text className="text-white">Sign in</Text>
-                        </TouchableOpacity>
+                        <Link href="/login" className="text-green-900 font-medium">
+                            Sign in
+                        </Link>
                     </View>
                 </View>
             </View>

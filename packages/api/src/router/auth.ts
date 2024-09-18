@@ -38,6 +38,7 @@ export const authRouter = {
                     email: input.email,
                     password: input.password,
                 })
+                console.log("res in mutation:", res)
                 return { success: true, data: res, error: null } as const
             } catch (error) {
                 return {
