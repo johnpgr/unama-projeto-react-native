@@ -1,6 +1,8 @@
 import React from "react"
 import {
     Image,
+    KeyboardAvoidingView,
+    Platform,
     Switch,
     Text,
     TextInput,
@@ -42,11 +44,13 @@ export default function LoginScreen() {
 
     return (
         <>
-            <Stack.Screen options={{ title: "Tela de registro" }} />
-            <View className="flex flex-1 bg-green-900">
+            <Stack.Screen options={{ headerShown:false }} />
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                className="flex flex-1 bg-green-900">
                 <View className="h-[30%] bg-green-900" />
 
-                <View className="flex-1 rounded-t-[3rem] bg-white p-8">
+                <KeyboardAvoidingView className="flex-1 rounded-t-[3rem] bg-white p-8">
                     <Text className="text-center text-4xl font-bold text-green-900">
                         Welcome back
                     </Text>
@@ -138,8 +142,8 @@ export default function LoginScreen() {
                             Sign in
                         </Link>
                     </View>
-                </View>
-            </View>
+                </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
         </>
     )
 }

@@ -42,8 +42,8 @@ export default function RegisterScreen() {
 
     return (
         <>
-            <Stack.Screen options={{ title: "Tela de registro" }} />
-            <View className="flex-1 flex bg-green-900">
+            <Stack.Screen options={{ headerShown: false }} />
+            <View className="flex flex-1 bg-green-900">
                 <View className="h-[30%] bg-green-900" />
 
                 <View className="flex-1 rounded-t-[3rem] bg-white p-8">
@@ -142,9 +142,12 @@ export default function RegisterScreen() {
                         </View>
                     </View>
 
-                    <View className="flex flex-row justify-center items-center gap-2 pt-4">
+                    <View className="flex flex-row items-center justify-center gap-2 pt-4">
                         <Text>Already have an account?</Text>
-                        <Link href="/login" className="text-green-900 font-medium">
+                        <Link
+                            href="/login"
+                            className="font-medium text-green-900"
+                        >
                             Sign in
                         </Link>
                     </View>

@@ -14,18 +14,14 @@ export default function RootLayout() {
     const { colorScheme } = useColorScheme()
     return (
         <TRPCProvider>
-            {/*
-          The Stack component displays the current page.
-          It also allows you to configure your screens 
-        */}
             <Stack
                 screenOptions={{
                     headerStyle: {
-                        backgroundColor: "#14542E",
+                        backgroundColor: "#003820",
                     },
                     contentStyle: {
                         backgroundColor:
-                            colorScheme == "dark" ? "#09090B" : "#FFFFFF",
+                            colorScheme == "dark" ? "#003820" : "#003820",
                     },
                 }}
             />
