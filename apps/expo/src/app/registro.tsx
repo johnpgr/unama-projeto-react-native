@@ -1,12 +1,16 @@
 import React from "react"
 import {
     Image,
-    Switch,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    SafeAreaView,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from "react-native"
+import Checkbox from "expo-checkbox"
 import { Link, Stack, useRouter } from "expo-router"
 import { Controller, useForm } from "react-hook-form"
 
@@ -41,12 +45,13 @@ export default function RegisterScreen() {
     }
 
     return (
-        <>
+        <SafeAreaView className="flex-1">
             <Stack.Screen options={{ headerShown: false }} />
-            <View className="flex flex-1 bg-green-900">
-                <View className="h-[30%] bg-green-900" />
-
-                <View className="flex-1 rounded-t-[3rem] bg-white p-8">
+            <KeyboardAvoidingView
+                className="flex flex-1"
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+            >
+                <View className="mt-auto max-h-[500px] flex-1 rounded-t-[3rem] bg-white p-8">
                     <Text className="text-center text-4xl font-bold text-green-900">
                         Get started
                     </Text>
@@ -97,24 +102,23 @@ export default function RegisterScreen() {
                         )}
                     />
 
-                    <View className="flex flex-row items-center py-4">
-                        <Switch
+                    <View className="flex flex-row gap-2 items-center py-4">
+                        <Checkbox
                             value={isAgreed}
                             onValueChange={(value) => setIsAgreed(value)}
-                            thumbColor={isAgreed ? "#fff" : "#fff"}
-                            trackColor={{ false: "#767577", true: "#004400" }}
+                            color="#14542E"
                         />
-                        <Text>I agree to the processing of Personal data</Text>
+                        <Text>I agree to the processing of <Text className="text-green-900 font-medium">Personal data</Text></Text>
                     </View>
 
-                    <TouchableOpacity
-                        className="flex items-center rounded-xl bg-green-900 py-4"
+                    <Pressable
+                        className="flex items-center rounded-3xl bg-green-900 py-4"
                         onPress={form.handleSubmit(onSubmit)}
                     >
                         <Text className="text-xl font-bold text-white">
                             Sign up
                         </Text>
-                    </TouchableOpacity>
+                    </Pressable>
 
                     <View className="mt-4 flex flex-col items-center">
                         <Text>Sign up with:</Text>
@@ -152,7 +156,7 @@ export default function RegisterScreen() {
                         </Link>
                     </View>
                 </View>
-            </View>
-        </>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     )
 }

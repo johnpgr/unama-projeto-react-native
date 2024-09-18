@@ -3,6 +3,8 @@ import {
     Image,
     KeyboardAvoidingView,
     Platform,
+    Pressable,
+    SafeAreaView,
     Switch,
     Text,
     TextInput,
@@ -14,7 +16,6 @@ import { Link, Stack, useRouter } from "expo-router"
 import { Controller, useForm } from "react-hook-form"
 
 import { Api } from "~/utils/api"
-import { setToken } from "~/utils/session-store"
 
 interface LoginForm {
     email: string
@@ -43,14 +44,12 @@ export default function LoginScreen() {
     }
 
     return (
-        <>
+        <SafeAreaView className="flex-1">
             <Stack.Screen options={{ headerShown:false }} />
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                className="flex flex-1 bg-green-900">
-                <View className="h-[30%] bg-green-900" />
-
-                <KeyboardAvoidingView className="flex-1 rounded-t-[3rem] bg-white p-8">
+                className="flex flex-1">
+                <View className="flex-1 mt-auto rounded-t-[3rem] max-h-[420px] bg-white p-8">
                     <Text className="text-center text-4xl font-bold text-green-900">
                         Welcome back
                     </Text>
@@ -98,14 +97,14 @@ export default function LoginScreen() {
                         <Text className="font-medium text-green-900">Forgot password?</Text>
                     </View>
 
-                    <TouchableOpacity
-                        className="flex items-center rounded-xl bg-green-900 py-4"
+                    <Pressable
+                        className="flex items-center rounded-3xl bg-green-900 py-4"
                         onPress={form.handleSubmit(onSubmit)}
                     >
                         <Text className="text-xl font-bold text-white">
                             Sign in
                         </Text>
-                    </TouchableOpacity>
+                    </Pressable>
 
                     <View className="mt-4 flex flex-col items-center">
                         <Text>Sign in with:</Text>
@@ -139,11 +138,11 @@ export default function LoginScreen() {
                             href="/registro"
                             className="font-medium text-green-900"
                         >
-                            Sign in
+                            Sign up
                         </Link>
                     </View>
-                </KeyboardAvoidingView>
+                </View>
             </KeyboardAvoidingView>
-        </>
+        </SafeAreaView>
     )
 }
