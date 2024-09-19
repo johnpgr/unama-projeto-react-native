@@ -1,51 +1,63 @@
-import * as Linking from "expo-linking"
 import { useRouter } from "expo-router"
-import * as Browser from "expo-web-browser"
 
-import { Api } from "./api"
-import { getBaseUrl } from "./base-url"
+import { api } from "./api"
 import { deleteToken, setToken } from "./session-store"
 
-export const signIn = async () => {
-    console.log("Hello signIn")
-    const signInUrl = `${getBaseUrl()}/api/auth/signin`
-    const redirectTo = Linking.createURL("/")
-    const result = await Browser.openAuthSessionAsync(
-        `${signInUrl}?expo-redirect=${encodeURIComponent(redirectTo)}`,
-        redirectTo,
-    )
-
-    if (result.type !== "success") return
-    const url = Linking.parse(result.url)
-    const sessionToken = String(url.queryParams?.session_token)
-    if (!sessionToken) return
-
-    setToken(sessionToken)
+export interface SignInParams {
+    email: string
+    password: string
 }
 
-export const useUser = () => {
-    const { data: session } = Api.auth.getSession.useQuery()
+export interface SignUpParams extends SignInParams {
+    fullName: string
+}
+
+export function useSession() {
+    const { data: session } = api.auth.getSession.useQuery()
     return session?.user ?? null
 }
 
-export const useSignIn = () => {
-    const utils = Api.useUtils()
+export function useSignUp() {
+    const utils = api.useUtils()
     const router = useRouter()
+    const signup = api.auth.signUp.useMutation()
 
-    return async () => {
-        await signIn()
+    return async (params: SignUpParams) => {
+        const res = await signup.mutateAsync(params)
+        if (!signup.error) {
+            console.error(signup.error)
+            return
+        }
+        setToken(res.session.id)
         await utils.invalidate()
         router.replace("/")
     }
 }
 
-export const useSignOut = () => {
-    const utils = Api.useUtils()
-    const signOut = Api.auth.signOut.useMutation()
+export function useSignIn() {
+    const utils = api.useUtils()
+    const router = useRouter()
+    const signin = api.auth.signIn.useMutation()
+
+    return async (params: SignInParams) => {
+        const res = await signin.mutateAsync(params)
+        if (signin.error) {
+            console.error(signin.error)
+            return
+        }
+        setToken(res.session.id)
+        await utils.invalidate()
+        router.replace("/")
+    }
+}
+
+export function useSignOut() {
+    const utils = api.useUtils()
+    const signout = api.auth.signOut.useMutation()
     const router = useRouter()
 
     return async () => {
-        const res = await signOut.mutateAsync()
+        const res = await signout.mutateAsync()
         if (!res.success) return
         await deleteToken()
         await utils.invalidate()

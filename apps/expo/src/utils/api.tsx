@@ -4,16 +4,15 @@ import { httpBatchLink, loggerLink } from "@trpc/client"
 import { createTRPCReact } from "@trpc/react-query"
 import superjson from "superjson"
 
-import type { AppRouter } from "@projeto/api"
-
 import { getBaseUrl } from "./base-url"
 import { getToken } from "./session-store"
+import type {AppRouter} from "@projeto/api"
 
 /**
  * A set of typesafe hooks for consuming your API.
  */
-export const Api = createTRPCReact<AppRouter>()
-export { type RouterInputs, type RouterOutputs } from "@projeto/api"
+export const api = createTRPCReact<AppRouter>()
+export type { RouterInputs, RouterOutputs } from "@projeto/api"
 
 /**
  * A wrapper for your app that provides the TRPC context.
@@ -22,7 +21,7 @@ export { type RouterInputs, type RouterOutputs } from "@projeto/api"
 export function TRPCProvider(props: { children: React.ReactNode }) {
     const [queryClient] = useState(() => new QueryClient())
     const [trpcClient] = useState(() =>
-        Api.createClient({
+        api.createClient({
             links: [
                 loggerLink({
                     enabled: (opts) =>
@@ -33,7 +32,7 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
                 }),
                 httpBatchLink({
                     transformer: superjson,
-                    url: `${getBaseUrl()}/api/trpc`,
+                    url: `${getBaseUrl()}/trpc`,
                     headers() {
                         const headers = new Map<string, string>()
                         headers.set("x-trpc-source", "expo-react")
@@ -50,10 +49,10 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
     )
 
     return (
-        <Api.Provider client={trpcClient} queryClient={queryClient}>
+        <api.Provider client={trpcClient} queryClient={queryClient}>
             <QueryClientProvider client={queryClient}>
                 {props.children}
             </QueryClientProvider>
-        </Api.Provider>
+        </api.Provider>
     )
 }

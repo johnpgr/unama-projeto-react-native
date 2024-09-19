@@ -1,2 +1,2 @@
 import "expo-router/entry"
-import "@projeto/tsconfig/reset"
+import "@total-typescript/ts-reset"
