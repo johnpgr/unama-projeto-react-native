@@ -22,9 +22,7 @@ export const authRouter = {
     getSession: publicProcedure.query(({ ctx }) => {
         return ctx.session ?? null
     }),
-    getSecretMessage: protectedProcedure.query(({ ctx }) => {
-        return "you can see this secret message!"
-    }),
+
     signOut: protectedProcedure.mutation(async ({ ctx }) => {
         if (!ctx.token) {
             return { success: false }
@@ -32,6 +30,7 @@ export const authRouter = {
         await lucia.invalidateSession(ctx.token)
         return { success: true }
     }),
+
     signIn: publicProcedure
         .input(
             z.object({
@@ -66,6 +65,7 @@ export const authRouter = {
             const session = await lucia.createSession(existingUser.id, {})
             return { session }
         }),
+
     signUp: publicProcedure
         .input(
             z.object({
@@ -118,4 +118,5 @@ export const authRouter = {
                 })
             }
         }),
+
 } satisfies TRPCRouterRecord
