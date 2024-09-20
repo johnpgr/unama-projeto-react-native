@@ -1,7 +1,7 @@
 {
     "name": "@projeto/api",
     "version": "0.1.0",
-    "main": "index.ts",
+    "main": "src/index.ts",
     "type": "module",
     "exports": {
         ".": {
@@ -10,18 +10,18 @@
     },
     "scripts": {
         "clean": "git clean -xdf .cache .turbo dist node_modules",
-        "dev": "node --env-file=../../.env --watch --experimental-strip-types index.ts",
+        "dev": "node --env-file=../../.env --watch --experimental-strip-types src/index.ts",
         "push": "pnpm with-env drizzle-kit push",
         "dbgen": "pnpm with-env drizzle-kit generate",
         "migrate": "pnpm with-env drizzle-kit migrate",
         "studio": "pnpm with-env drizzle-kit studio",
-        "typecheck": "tsc --noEmit --emitDeclarationOnly false",
         "with-env": "dotenv -e ../../.env --",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "johnpgr",
     "license": "MIT",
     "dependencies": {
+        "@electric-sql/pglite": "^0.2.7",
         "@hono/node-server": "^1.13.0",
         "@hono/trpc-server": "^0.3.2",
         "@lucia-auth/adapter-drizzle": "^1.1.0",

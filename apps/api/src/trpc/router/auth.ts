@@ -16,12 +16,13 @@ const passwordHasher = new Argon2id({
     parallelism: 1,
 })
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export const authRouter = {
     getSession: publicProcedure.query(({ ctx }) => {
         return ctx.session ?? null
     }),
     getSecretMessage: protectedProcedure.query(({ ctx }) => {
-        ctx.session
         return "you can see this secret message!"
     }),
     signOut: protectedProcedure.mutation(async ({ ctx }) => {
@@ -74,7 +75,6 @@ export const authRouter = {
             }),
         )
         .mutation(async ({ ctx, input }) => {
-            console.log("signUp procedure")
             try {
                 const userExists = await ctx.db.query.User.findFirst({
                     where: (user) => eq(user.email, input.email),

@@ -1,4 +1,4 @@
-import "./env.ts"
+import "../env.ts"
 import "@total-typescript/ts-reset"
 
 import { serve } from "@hono/node-server"
@@ -15,6 +15,6 @@ app.use(
     trpcServer({ router: appRouter, createContext: createTRPCContext }),
 )
 
-serve(app, (i) => {
-    console.log(`API Server listening at: http://${i.address}:${i.port}`)
+serve(app, ({ address, port }) => {
+    console.log(`API Server listening at: http://${address}:${port}`)
 })

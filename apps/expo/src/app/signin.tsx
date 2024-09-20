@@ -1,8 +1,6 @@
-import Checkbox from "expo-checkbox"
-import { Link, Stack } from "expo-router"
 import React from "react"
-import { Controller, useForm } from "react-hook-form"
 import {
+    ActivityIndicator,
     Image,
     KeyboardAvoidingView,
     Platform,
@@ -10,8 +8,11 @@ import {
     SafeAreaView,
     Text,
     TextInput,
-    View
+    View,
 } from "react-native"
+import Checkbox from "expo-checkbox"
+import { Link, Stack } from "expo-router"
+import { Controller, useForm } from "react-hook-form"
 
 import { SignInParams, useSignIn } from "~/utils/auth"
 
@@ -20,7 +21,7 @@ export default function SignUpScreen() {
     const form = useForm<SignInParams>({
         defaultValues: { email: "", password: "" },
     })
-    const signIn = useSignIn()
+    const { signIn, error, status } = useSignIn()
 
     async function onSubmit(data: SignInParams) {
         await signIn(data)
@@ -33,7 +34,7 @@ export default function SignUpScreen() {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 className="flex flex-1"
             >
-                <View className="mt-auto max-h-[420px] flex-1 rounded-t-[3rem] bg-white p-8">
+                <View className="mt-auto max-h-[500px] flex-1 rounded-t-[3rem] bg-white p-8">
                     <Text className="text-center text-4xl font-bold text-green-900">
                         Welcome back
                     </Text>
@@ -84,13 +85,27 @@ export default function SignUpScreen() {
                     </View>
 
                     <Pressable
-                        className="flex items-center rounded-3xl bg-green-900 py-4"
+                        className="relative flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 disabled:opacity-80"
                         onPress={form.handleSubmit(onSubmit)}
+                        disabled={status === "pending" || status === "success"}
                     >
+                        {status === "pending" ? (
+                            <ActivityIndicator
+                                className="absolute left-[35%]"
+                                size="small"
+                                color="#FFFFFF"
+                            />
+                        ) : null}
                         <Text className="text-xl font-bold text-white">
                             Sign in
                         </Text>
                     </Pressable>
+
+                    {error ? (
+                        <Text className="mt-4 text-center text-destructive">
+                            {error.message}
+                        </Text>
+                    ) : null}
 
                     <View className="mt-4 flex flex-col items-center">
                         <Text>Sign in with:</Text>

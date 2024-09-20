@@ -18,7 +18,10 @@ type NonNullableObj<T> = {
     [K in keyof T]-?: NonNullable<T[K]>
 }
 
-type CreateContextFn = Parameters<NonNullable<Parameters<typeof trpcServer>[0]["createContext"]>>[0]
+/**
+ * This type is here because `@hono/trpc-server` doesn't export the type for the trpcServer function
+ */
+type CreateContextFn = Parameters<NonNullable<Parameters<typeof trpcServer>[0]["createContext"]>>
 
 /**
  * 1. CONTEXT
@@ -32,7 +35,7 @@ type CreateContextFn = Parameters<NonNullable<Parameters<typeof trpcServer>[0]["
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (opts: CreateContextFn) => {
+export const createTRPCContext = async (opts: CreateContextFn[0], c: CreateContextFn[1]) => {
     const sessionToken = opts.req.headers.get("Authorization")
     const session = await getSession(opts.req.headers as Headers)
 
@@ -137,7 +140,7 @@ export const publicProcedure = t.procedure.use(timingMiddleware)
 export const protectedProcedure = t.procedure
     .use(timingMiddleware)
     .use(({ ctx, next }) => {
-        if (!ctx.session?.user) {
+        if (!ctx.session) {
             throw new TRPCError({ code: "UNAUTHORIZED" })
         }
         return next({

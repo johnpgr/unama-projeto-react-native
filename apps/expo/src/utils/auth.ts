@@ -13,54 +13,52 @@ export interface SignUpParams extends SignInParams {
 }
 
 export function useSession() {
-    const { data: session } = api.auth.getSession.useQuery()
-    return session?.user ?? null
+    const { data, status } = api.auth.getSession.useQuery()
+    return { data: data ?? null, status }
 }
 
 export function useSignUp() {
     const utils = api.useUtils()
     const router = useRouter()
-    const signup = api.auth.signUp.useMutation()
+    const { mutateAsync, error, data, status } = api.auth.signUp.useMutation()
 
-    return async (params: SignUpParams) => {
-        const res = await signup.mutateAsync(params)
-        if (!signup.error) {
-            console.error(signup.error)
-            return
-        }
+    async function signUp(params: SignUpParams) {
+        const res = await mutateAsync(params)
         setToken(res.session.id)
         await utils.invalidate()
         router.replace("/")
     }
+
+    return { signUp, error, data, status }
 }
 
 export function useSignIn() {
     const utils = api.useUtils()
     const router = useRouter()
-    const signin = api.auth.signIn.useMutation()
+    const { mutateAsync, error, data, status } = api.auth.signIn.useMutation()
 
-    return async (params: SignInParams) => {
-        const res = await signin.mutateAsync(params)
-        if (signin.error) {
-            console.error(signin.error)
-            return
-        }
+    async function signIn(params: SignInParams) {
+        const res = await mutateAsync(params)
         setToken(res.session.id)
         await utils.invalidate()
         router.replace("/")
     }
+
+    return { signIn, error, data, status }
 }
 
 export function useSignOut() {
     const utils = api.useUtils()
-    const signout = api.auth.signOut.useMutation()
+    const { mutateAsync, error, data, status } = api.auth.signOut.useMutation()
     const router = useRouter()
 
-    return async () => {
-        const res = await signout.mutateAsync()
+    async function signOut() {
+        const res = await mutateAsync()
         if (!res.success) return
         await deleteToken()
         await utils.invalidate()
         router.replace("/")
     }
+
+    return { signOut, error, data, status }
 }
