@@ -6,13 +6,12 @@
  * tl;dr - this is where all the tRPC server stuff is created and plugged in.
  * The pieces you will need to use are documented accordingly near the end
  */
+import type { trpcServer } from "@hono/trpc-server"
 import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
 import { ZodError } from "zod"
 
-import { db } from "../drizzle/client.ts"
-import { lucia } from "../lucia/index.ts"
-import type {trpcServer} from "@hono/trpc-server"
+import { auth } from "../auth/index.ts"
 
 type NonNullableObj<T> = {
     [K in keyof T]-?: NonNullable<T[K]>
@@ -21,7 +20,9 @@ type NonNullableObj<T> = {
 /**
  * This type is here because `@hono/trpc-server` doesn't export the type for the trpcServer function
  */
-type CreateContextFn = Parameters<NonNullable<Parameters<typeof trpcServer>[0]["createContext"]>>
+type CreateContextFn = Parameters<
+    NonNullable<Parameters<typeof trpcServer>[0]["createContext"]>
+>
 
 /**
  * 1. CONTEXT
@@ -35,17 +36,17 @@ type CreateContextFn = Parameters<NonNullable<Parameters<typeof trpcServer>[0]["
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (opts: CreateContextFn[0], c: CreateContextFn[1]) => {
-    const sessionToken = opts.req.headers.get("Authorization")
-    const session = await getSession(opts.req.headers as Headers)
+export const createTRPCContext = async (
+    opts: CreateContextFn[0],
+    c: CreateContextFn[1],
+) => {
+    const session = (await getSession(opts.req.headers as Headers)) ?? null
 
     const source = opts.req.headers.get("x-trpc-source") ?? "unknown"
     console.log(">>> tRPC Request from", source, "by", session?.user)
 
     return {
         session,
-        db: db,
-        token: sessionToken,
     }
 }
 type TRPCContext = Awaited<ReturnType<typeof createTRPCContext>>
@@ -91,10 +92,14 @@ const getSession = async (headers: Headers) => {
 
     if (sessionToken.startsWith("Bearer ")) sessionToken = sessionToken.slice(7)
 
-    const sessionRes = await lucia.validateSession(sessionToken)
+    const sessionRes = await auth.validateSession(sessionToken)
     if (!sessionRes.session) return
 
-    return sessionRes
+    return {
+        token: sessionToken,
+        session: sessionRes.session,
+        user: sessionRes.user,
+    }
 }
 
 /**

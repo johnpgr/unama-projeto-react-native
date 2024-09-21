@@ -1,9 +1,9 @@
 import type { Config } from "drizzle-kit"
-import { DATABASE_TYPE } from "./src/drizzle/client"
+import { DATABASE_TYPE } from "./src/database/client"
 
 export default {
-    schema: "./src/drizzle/schema.ts",
-    out: "./src/drizzle/migrations",
+    schema: "./src/database/schema.ts",
+    out: "./src/database/migrations",
     dialect: "postgresql",
     ...{
         driver: DATABASE_TYPE === "pg_default"

@@ -51,4 +51,4 @@ dist/
 # turbo
 .turbo
 
-apps/api/src/drizzle/data/
+apps/api/src/database/data/

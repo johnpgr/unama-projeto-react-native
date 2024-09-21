@@ -4,9 +4,9 @@ import { eq } from "drizzle-orm"
 import { Argon2id } from "oslo/password"
 import { z } from "zod"
 
-import { db } from "../../drizzle/client.ts"
-import { User } from "../../drizzle/schema.ts"
-import { lucia } from "../../lucia/index.ts"
+import { db } from "../../database/client.ts"
+import { User } from "../../database/schema.ts"
+import { auth } from "../../auth/index.ts"
 import { protectedProcedure, publicProcedure } from "../index.ts"
 
 const passwordHasher = new Argon2id({
@@ -20,15 +20,20 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const authRouter = {
     getSession: publicProcedure.query(({ ctx }) => {
-        return ctx.session ?? null
+        return ctx.session
     }),
 
     signOut: protectedProcedure.mutation(async ({ ctx }) => {
-        if (!ctx.token) {
-            return { success: false }
+        try {
+            await auth.invalidateSession(ctx.session.token)
+            return "ok"
+        } catch (error) {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                cause: (error as Error).cause,
+                message: (error as Error).message,
+            })
         }
-        await lucia.invalidateSession(ctx.token)
-        return { success: true }
     }),
 
     signIn: publicProcedure
@@ -62,7 +67,7 @@ export const authRouter = {
                 })
             }
 
-            const session = await lucia.createSession(existingUser.id, {})
+            const session = await auth.createSession(existingUser.id, {})
             return { session }
         }),
 
@@ -74,9 +79,9 @@ export const authRouter = {
                 password: z.string().min(8),
             }),
         )
-        .mutation(async ({ ctx, input }) => {
+        .mutation(async ({ input }) => {
             try {
-                const userExists = await ctx.db.query.User.findFirst({
+                const userExists = await db.query.User.findFirst({
                     where: (user) => eq(user.email, input.email),
                 })
 
@@ -87,7 +92,7 @@ export const authRouter = {
                     })
                 }
 
-                const [user] = await ctx.db
+                const [user] = await db
                     .insert(User)
                     .values({
                         email: input.email,
@@ -105,7 +110,7 @@ export const authRouter = {
                     })
                 }
 
-                const session = await lucia.createSession(user.id, {})
+                const session = await auth.createSession(user.id, {})
 
                 //@ts-expect-error ok
                 delete user.hashedPassword
@@ -118,5 +123,4 @@ export const authRouter = {
                 })
             }
         }),
-
 } satisfies TRPCRouterRecord
