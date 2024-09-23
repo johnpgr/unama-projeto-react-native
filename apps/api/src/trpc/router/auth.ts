@@ -1,22 +1,20 @@
 import type { TRPCRouterRecord } from "@trpc/server"
+import { hash, verify } from "@node-rs/argon2"
 import { TRPCError } from "@trpc/server"
 import { eq } from "drizzle-orm"
-import { Argon2id } from "oslo/password"
 import { z } from "zod"
 
+import { auth } from "../../auth/index.ts"
 import { db } from "../../database/client.ts"
 import { User } from "../../database/schema.ts"
-import { auth } from "../../auth/index.ts"
 import { protectedProcedure, publicProcedure } from "../index.ts"
 
-const passwordHasher = new Argon2id({
-    memorySize: 19456,
-    iterations: 2,
-    tagLength: 32,
+const ARGON2_OPTS = {
+    memoryCost: 19456,
+    timeCost: 2,
+    outputLen: 32,
     parallelism: 1,
-})
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 export const authRouter = {
     getSession: publicProcedure.query(({ ctx }) => {
@@ -55,9 +53,10 @@ export const authRouter = {
                 })
             }
 
-            const validPassword = await passwordHasher.verify(
+            const validPassword = await verify(
                 existingUser.hashedPassword,
                 input.password,
+                ARGON2_OPTS,
             )
 
             if (!validPassword) {
@@ -97,9 +96,7 @@ export const authRouter = {
                     .values({
                         email: input.email,
                         fullName: input.fullName,
-                        hashedPassword: await passwordHasher.hash(
-                            input.password,
-                        ),
+                        hashedPassword: await hash(input.password, ARGON2_OPTS),
                     })
                     .returning()
 

@@ -3,23 +3,24 @@ import { eq } from "drizzle-orm"
 import { Hono } from "hono"
 import { getCookie, setCookie } from "hono/cookie"
 
-import type { GoogleOAuthUser } from "./google.ts"
 import { db } from "../../database/client.ts"
 import { OAuthAccount, User } from "../../database/schema.ts"
+import { auth } from "../index.ts"
 import {
     GOOGLE_CODE_VERIFIER,
     GOOGLE_STATE,
     googleAuth,
     isGoogleOAuthUser,
 } from "./google.ts"
-import { auth } from "../index.ts"
 
 const app = new Hono()
 
 app.get("/sigin/google", async (c) => {
     const state = generateState()
     const codeVerifier = generateCodeVerifier()
-    const url = await googleAuth.createAuthorizationURL(state, codeVerifier)
+    const url = await googleAuth.createAuthorizationURL(state, codeVerifier, {
+        scopes: ["profile", "email"],
+    })
 
     setCookie(c, GOOGLE_STATE, state, {
         httpOnly: true,
@@ -42,7 +43,7 @@ app.get("/sigin/google", async (c) => {
 
 app.get("/signin/google/callback", async (c) => {
     const storedState = getCookie(c, GOOGLE_STATE)
-    const codeVerifier = getCookie(c, GOOGLE_STATE)
+    const codeVerifier = getCookie(c, GOOGLE_CODE_VERIFIER)
     const state = c.req.query("state")
     const code = c.req.query("code")
 
@@ -142,7 +143,12 @@ app.get("/signin/google/callback", async (c) => {
             }
             const session = await auth.createSession(user.id, {})
             const sessionCookie = auth.createSessionCookie(session.id)
-            setCookie(c, sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+            setCookie(
+                c,
+                sessionCookie.name,
+                sessionCookie.value,
+                sessionCookie.attributes,
+            )
         })
     } catch (error) {
         c.status(500)
