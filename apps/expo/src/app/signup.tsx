@@ -1,5 +1,6 @@
 import React from "react"
 import {
+    ActivityIndicator,
     Image,
     KeyboardAvoidingView,
     Platform,
@@ -17,7 +18,7 @@ import { SignUpParams, useSignUp } from "~/utils/auth"
 
 export default function SignUpScreen() {
     const [isAgreed, setIsAgreed] = React.useState(false)
-    const signUp = useSignUp()
+    const { signUp, error, status } = useSignUp()
     const form = useForm<SignUpParams>({
         defaultValues: { email: "", fullName: "", password: "" },
     })
@@ -87,23 +88,43 @@ export default function SignUpScreen() {
                         )}
                     />
 
-                    <View className="flex flex-row gap-2 items-center py-4">
+                    {error ? (
+                        <Text className="mt-4 text-center text-red-500">
+                            {error.message}
+                        </Text>
+                    ) : null}
+
+                    <View className="flex flex-row items-center gap-2 py-4">
                         <Checkbox
                             value={isAgreed}
                             onValueChange={(value) => setIsAgreed(value)}
                             color="#14542E"
                         />
-                        <Text>I agree to the processing of <Text className="text-green-900 font-medium">Personal data</Text></Text>
+                        <Text>
+                            I agree to the processing of{" "}
+                            <Text className="font-medium text-green-900">
+                                Personal data
+                            </Text>
+                        </Text>
                     </View>
 
                     <Pressable
-                        className="flex items-center rounded-3xl bg-green-900 py-4"
+                        className="relative flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 disabled:opacity-80"
                         onPress={form.handleSubmit(onSubmit)}
+                        disabled={status === "pending" || status === "success"}
                     >
+                        {status === "pending" ? (
+                            <ActivityIndicator
+                                className="absolute left-[35%]"
+                                size="small"
+                                color="#FFFFFF"
+                            />
+                        ) : null}
                         <Text className="text-xl font-bold text-white">
                             Sign up
                         </Text>
                     </Pressable>
+
 
                     <View className="mt-4 flex flex-col items-center">
                         <Text>Sign up with:</Text>

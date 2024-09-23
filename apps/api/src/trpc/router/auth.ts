@@ -1,6 +1,5 @@
-import type { TRPCRouterRecord } from "@trpc/server"
 import { hash, verify } from "@node-rs/argon2"
-import { TRPCError } from "@trpc/server"
+import { TRPCError, type TRPCRouterRecord } from "@trpc/server"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 
@@ -24,7 +23,7 @@ export const authRouter = {
     signOut: protectedProcedure.mutation(async ({ ctx }) => {
         try {
             await auth.invalidateSession(ctx.session.token)
-            return "ok"
+            return "ok" as const
         } catch (error) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
@@ -103,7 +102,7 @@ export const authRouter = {
                 if (!user) {
                     throw new TRPCError({
                         code: "INTERNAL_SERVER_ERROR",
-                        message: "Failed to create user",
+                        message: "Failed to create user (DB error)",
                     })
                 }
 
@@ -116,7 +115,7 @@ export const authRouter = {
             } catch (error) {
                 throw new TRPCError({
                     code: "INTERNAL_SERVER_ERROR",
-                    message: "Failed to create user",
+                    message: `Failed to create user (${(error as Error).message})`,
                 })
             }
         }),

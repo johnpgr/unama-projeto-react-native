@@ -23,10 +23,12 @@ export function useSignUp() {
     const { mutateAsync, error, data, status } = api.auth.signUp.useMutation()
 
     async function signUp(params: SignUpParams) {
-        const res = await mutateAsync(params)
-        setToken(res.session.id)
-        await utils.invalidate()
-        router.replace("/")
+        try {
+            const res = await mutateAsync(params)
+            setToken(res.session.id)
+            await utils.invalidate()
+            router.replace("/")
+        } catch (error) {}
     }
 
     return { signUp, error, data, status }
@@ -38,10 +40,12 @@ export function useSignIn() {
     const { mutateAsync, error, data, status } = api.auth.signIn.useMutation()
 
     async function signIn(params: SignInParams) {
-        const res = await mutateAsync(params)
-        setToken(res.session.id)
-        await utils.invalidate()
-        router.replace("/")
+        try {
+            const res = await mutateAsync(params)
+            setToken(res.session.id)
+            await utils.invalidate()
+            router.replace("/")
+        } catch (error) {}
     }
 
     return { signIn, error, data, status }
@@ -53,11 +57,12 @@ export function useSignOut() {
     const router = useRouter()
 
     async function signOut() {
-        const res = await mutateAsync()
-        if (!res.success) return
-        await deleteToken()
-        await utils.invalidate()
-        router.replace("/")
+        try {
+            await mutateAsync()
+            await deleteToken()
+            await utils.invalidate()
+            router.replace("/")
+        } catch (error) {}
     }
 
     return { signOut, error, data, status }
