@@ -23,17 +23,17 @@ const App = () => {
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
             if (route.name === 'Home') {
-              return <Image source={require('./assets/casa.png')} style={{ width: size, height: size, tintColor: color }} />;
+              return <Image source={require('../../assets/casa.png')} style={{ width: size, height: size, tintColor: color }} />;
             } else if (route.name === 'Points') {
-              return <Image source={require('./assets/pontos.png')} style={{ width: size, height: size, tintColor: color }} />;
+              return <Image source={require('../../assets/pontos.png')} style={{ width: size, height: size, tintColor: color }} />;
             } else if (route.name === 'Chat') {
-              return <Image source={require('./assets/mensagem.png')} style={{ width: size, height: size, tintColor: color }} />;
+              return <Image source={require('../../assets/mensagem.png')} style={{ width: size, height: size, tintColor: color }} />;
               
             }else if(route.name=='Scan'){
               return <View style={{backgroundColor:'#02391E', padding:15, borderRadius:28, marginBottom:'5rem'}}><Image source={require('./assets/QRCODE_certo.png')} style={{ width: size+4, height: size+4, tintColor: 'white' }} /></View>;
 
             }else if (route.name === 'Menu') {
-              return <Image source={require('./assets/menu.png')} style={{ width: size, height: size, tintColor: color }} />;
+              return <Image source={require('../../assets/menu.png')} style={{ width: size, height: size, tintColor: color }} />;
             }
           },
           tabBarShowLabel: true,
