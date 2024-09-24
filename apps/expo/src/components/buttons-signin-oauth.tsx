@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Image, Pressable, Text, View } from "react-native"
 
 export function SigninOAuthButtons() {
