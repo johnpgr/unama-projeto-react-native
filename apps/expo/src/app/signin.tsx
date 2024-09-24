@@ -34,7 +34,7 @@ export default function SignUpScreen() {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 className="flex flex-1"
             >
-                <View className="mt-auto max-h-[500px] flex-1 rounded-t-[3rem] bg-white p-8">
+                <View className="mt-auto max-h-[470px] flex-1 rounded-t-[3rem] bg-white p-8">
                     <Text className="text-center text-4xl font-bold text-green-900">
                         Welcome back
                     </Text>
@@ -45,7 +45,7 @@ export default function SignUpScreen() {
                         control={form.control}
                         render={({ field }) => (
                             <TextInput
-                                className="rounded-xl border border-green-900 px-4 py-2"
+                                className="rounded-xl border border-border px-4 py-2"
                                 placeholder="Enter Email"
                                 onChangeText={field.onChange}
                                 value={field.value}
@@ -61,7 +61,7 @@ export default function SignUpScreen() {
                         render={({ field }) => (
                             <TextInput
                                 secureTextEntry
-                                className="rounded-xl border border-green-900 px-4 py-2"
+                                className="rounded-xl border border-border px-4 py-2"
                                 placeholder="Enter Password"
                                 onChangeText={field.onChange}
                                 value={field.value}
@@ -109,31 +109,20 @@ export default function SignUpScreen() {
 
                     <View className="mt-4 flex flex-col items-center">
                         <Text>Sign in with:</Text>
-                        <View className="flex flex-row gap-2">
-                            <Image
-                                source={{
-                                    uri: "https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg",
-                                }}
-                            />
-                            <Image
-                                source={{
-                                    uri: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_X_%28formerly_Twitter%29.svg",
-                                }}
-                            />
-                            <Image
-                                source={{
-                                    uri: "https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg",
-                                }}
-                            />
-                            <Image
-                                source={{
-                                    uri: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
-                                }}
-                            />
+                        <View className="py-4 flex flex-row gap-2">
+                            <Pressable>
+                                <Image source={require("../../assets/logo_google.png")} className="w-8 h-8"/>
+                            </Pressable>
+                            <Pressable>
+                                <Image source={require("../../assets/logo_facebook.png")} className="w-8 h-8"/>
+                            </Pressable>
+                            <Pressable>
+                                <Image source={require("../../assets/logo_apple.png")} className="w-8 h-8"/>
+                            </Pressable>
                         </View>
                     </View>
 
-                    <View className="flex flex-row items-center justify-center gap-2 pt-4">
+                    <View className="flex flex-row items-center justify-center gap-2">
                         <Text>Don't have an account?</Text>
                         <Link
                             href="/signup"

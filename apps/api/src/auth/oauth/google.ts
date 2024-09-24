@@ -3,7 +3,7 @@ import { Google } from "arctic"
 export const googleAuth = new Google(
     process.env.AUTH_GOOGLE_ID,
     process.env.AUTH_GOOGLE_SECRET,
-    process.env.API_URL + "/auth/signin/google/callback",
+    process.env.API_URL + "/auth/callback/google",
 )
 
 export const GOOGLE_STATE = "google_oauth_state"

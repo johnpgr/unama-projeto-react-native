@@ -1,7 +1,12 @@
 import { useRouter } from "expo-router"
+import * as Linking from "expo-linking"
+import * as Browser from "expo-web-browser"
 
 import { api } from "./api"
 import { deleteToken, setToken } from "./session-store"
+import { getBaseUrl } from "./base-url"
+
+export type OAuthAccountProvider = "google" | "apple"
 
 export interface SignInParams {
     email: string
@@ -66,4 +71,24 @@ export function useSignOut() {
     }
 
     return { signOut, error, data, status }
+}
+
+
+export async function useSigninOAuth(provider: OAuthAccountProvider) {
+    const signInUrl = `${getBaseUrl()}/auth/signin/${provider}`
+    const redirectUrl = Linking.createURL("/")
+    console.log({redirectUrl})
+    const result = await Browser.openAuthSessionAsync(
+        `${signInUrl}?expo-redirect=${encodeURIComponent(redirectUrl)}`,
+        redirectUrl
+    )
+
+    if(result.type !== "success") return
+
+    const url = Linking.parse(result.url)
+
+    const sessionToken = String(url.queryParams?.session_token)
+    if(!sessionToken) return
+
+    setToken(sessionToken)
 }

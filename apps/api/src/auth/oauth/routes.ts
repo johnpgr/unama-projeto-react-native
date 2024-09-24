@@ -6,6 +6,7 @@ import { getCookie, setCookie } from "hono/cookie"
 import { db } from "../../database/client.ts"
 import { OAuthAccount, User } from "../../database/schema.ts"
 import { auth } from "../index.ts"
+
 import {
     GOOGLE_CODE_VERIFIER,
     GOOGLE_STATE,
@@ -15,39 +16,45 @@ import {
 
 const app = new Hono()
 
-app.get("/sigin/google", async (c) => {
+const EXPO_COOKIE_NAME = "expo-redirect-uri"
+const COOKIE_OPTS = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 10 * 1000, // 1 hour
+} as const
+
+app.get("/signin/google", async (c) => {
     const state = generateState()
     const codeVerifier = generateCodeVerifier()
     const url = await googleAuth.createAuthorizationURL(state, codeVerifier, {
         scopes: ["profile", "email"],
     })
+    const redirectUrl = c.req.query("expo-redirect")
 
-    setCookie(c, GOOGLE_STATE, state, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 60 * 10 * 1000, // 1 hour
-    })
+    if (!redirectUrl) {
+        c.status(400)
+        return c.json({
+            error: "Expo redirect url not found",
+        })
+    }
 
-    setCookie(c, GOOGLE_CODE_VERIFIER, codeVerifier, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 60 * 10 * 1000, // 1 hour
-    })
+    setCookie(c, EXPO_COOKIE_NAME, redirectUrl, COOKIE_OPTS)
+    setCookie(c, GOOGLE_STATE, state, COOKIE_OPTS)
+    setCookie(c, GOOGLE_CODE_VERIFIER, codeVerifier, COOKIE_OPTS)
 
-    c.status(302)
-    c.header("Location", url.toString())
-    return c.body(null)
+    return c.redirect(url.toString())
 })
 
-app.get("/signin/google/callback", async (c) => {
+app.get("/callback/google", async (c) => {
+    const redirectUrl = getCookie(c, EXPO_COOKIE_NAME)
     const storedState = getCookie(c, GOOGLE_STATE)
     const codeVerifier = getCookie(c, GOOGLE_CODE_VERIFIER)
     const state = c.req.query("state")
     const code = c.req.query("code")
 
     if (
+        !redirectUrl ||
         !storedState ||
         !codeVerifier ||
         !state ||
@@ -61,7 +68,7 @@ app.get("/signin/google/callback", async (c) => {
     }
 
     try {
-        const { accessToken, idToken, refreshToken, accessTokenExpiresAt } =
+        const { accessToken, refreshToken, accessTokenExpiresAt } =
             await googleAuth.validateAuthorizationCode(code, codeVerifier)
         const response = await fetch(
             "https://www.googleapis.com/oauth2/v1/userinfo",
@@ -149,6 +156,7 @@ app.get("/signin/google/callback", async (c) => {
                 sessionCookie.value,
                 sessionCookie.attributes,
             )
+            return c.redirect(redirectUrl)
         })
     } catch (error) {
         c.status(500)
