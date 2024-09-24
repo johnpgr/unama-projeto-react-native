@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ActivityIndicator, Image, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { Link, Stack } from "expo-router"
+import { Link } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 
 export function Loading() {
@@ -19,7 +21,7 @@ export function Onboarding() {
             <View className="flex h-full w-full flex-col items-center bg-background p-8 pb-8">
                 <View className="flex flex-col items-center">
                     <Image
-                        source={require("../../../assets/icon.png")}
+                        source={require("../../assets/icon.png")}
                         className="h-32 w-32"
                         resizeMode="contain"
                     />
@@ -30,12 +32,12 @@ export function Onboarding() {
                     </Text>
                     <View className="flex flex-row gap-4">
                         <Image
-                            source={require("../../../assets/image 1.jpg")}
+                            source={require("../../assets/image 1.jpg")}
                             className="h-96 w-48"
                             resizeMode="contain"
                         />
                         <Image
-                            source={require("../../../assets/image 2.jpg")}
+                            source={require("../../assets/image 2.jpg")}
                             className="h-96 w-48"
                             resizeMode="contain"
                         />
@@ -47,7 +49,7 @@ export function Onboarding() {
                 </View>
                 <View className="mt-auto flex w-full flex-row items-center justify-between">
                     <Image
-                        source={require("../../../assets/translate_swap.png")}
+                        source={require("../../assets/translate_swap.png")}
                         className="h-12 w-12"
                         resizeMode="contain"
                     />
