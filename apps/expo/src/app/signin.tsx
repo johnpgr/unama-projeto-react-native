@@ -1,20 +1,22 @@
 import React from "react"
 import {
     ActivityIndicator,
-    Image,
     KeyboardAvoidingView,
     Platform,
     Pressable,
-    SafeAreaView,
     Text,
     TextInput,
     View,
 } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 import Checkbox from "expo-checkbox"
 import { Link, Stack } from "expo-router"
+// import { Zocial } from "@expo/vector-icons"
 import { Controller, useForm } from "react-hook-form"
 
-import { SignInParams, useSignIn } from "~/utils/auth"
+import type { SignInParams } from "~/utils/auth"
+import { SigninOAuthButtons } from "~/components/buttons-signin-oauth"
+import { useSignIn } from "~/utils/auth"
 
 export default function SignUpScreen() {
     const [remember, setRemember] = React.useState(false)
@@ -28,25 +30,30 @@ export default function SignUpScreen() {
     }
 
     return (
-        <SafeAreaView className="flex-1">
-            <Stack.Screen options={{ headerShown: false }} />
+        <SafeAreaView>
+            <Stack.Screen
+                options={{
+                    headerShown: false,
+                    statusBarColor: "#02391E",
+                }}
+            />
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                className="flex flex-1"
+                className="h-full w-full bg-primary"
             >
-                <View className="mt-auto max-h-[470px] flex-1 rounded-t-[3rem] bg-white p-8">
+                <View className="mt-auto max-h-[470px] rounded-t-[3rem] bg-white p-8">
                     <Text className="text-center text-4xl font-bold text-green-900">
-                        Welcome back
+                        Bem vindo
                     </Text>
 
-                    <Text className="m-1 mt-2 text-lg">Email:</Text>
+                    <Text className="m-1 mt-2 text-lg">Email</Text>
                     <Controller
                         name="email"
                         control={form.control}
                         render={({ field }) => (
                             <TextInput
                                 className="rounded-xl border border-border px-4 py-2"
-                                placeholder="Enter Email"
+                                placeholder="Seu email de acesso"
                                 onChangeText={field.onChange}
                                 value={field.value}
                                 onBlur={field.onBlur}
@@ -54,7 +61,7 @@ export default function SignUpScreen() {
                         )}
                     />
 
-                    <Text className="m-1 mt-2 text-lg">Password:</Text>
+                    <Text className="m-1 mt-2 text-lg">Senha</Text>
                     <Controller
                         control={form.control}
                         name="password"
@@ -62,7 +69,7 @@ export default function SignUpScreen() {
                             <TextInput
                                 secureTextEntry
                                 className="rounded-xl border border-border px-4 py-2"
-                                placeholder="Enter Password"
+                                placeholder="Sua senha"
                                 onChangeText={field.onChange}
                                 value={field.value}
                                 onBlur={field.onBlur}
@@ -77,10 +84,10 @@ export default function SignUpScreen() {
                                 onValueChange={(value) => setRemember(value)}
                                 color="#14542E"
                             />
-                            <Text>Remember me?</Text>
+                            <Text>Lembrar de mim?</Text>
                         </View>
                         <Text className="font-medium text-green-900">
-                            Forgot password?
+                            Esqueceu sua senha?
                         </Text>
                     </View>
 
@@ -97,7 +104,7 @@ export default function SignUpScreen() {
                             />
                         ) : null}
                         <Text className="text-xl font-bold text-white">
-                            Sign in
+                            Entrar
                         </Text>
                     </Pressable>
 
@@ -107,28 +114,15 @@ export default function SignUpScreen() {
                         </Text>
                     ) : null}
 
-                    <View className="mt-4 flex flex-col items-center">
-                        <Text>Sign in with:</Text>
-                        <View className="py-4 flex flex-row gap-2">
-                            <Pressable>
-                                <Image source={require("../../assets/logo_google.png")} className="w-8 h-8"/>
-                            </Pressable>
-                            <Pressable>
-                                <Image source={require("../../assets/logo_facebook.png")} className="w-8 h-8"/>
-                            </Pressable>
-                            <Pressable>
-                                <Image source={require("../../assets/logo_apple.png")} className="w-8 h-8"/>
-                            </Pressable>
-                        </View>
-                    </View>
+                    <SigninOAuthButtons />
 
                     <View className="flex flex-row items-center justify-center gap-2">
-                        <Text>Don't have an account?</Text>
+                        <Text>Não possui uma conta?</Text>
                         <Link
                             href="/signup"
                             className="font-medium text-green-900"
                         >
-                            Sign up
+                            Crie uma
                         </Link>
                     </View>
                 </View>
