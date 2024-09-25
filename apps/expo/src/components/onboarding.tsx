@@ -1,19 +1,9 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ActivityIndicator, Image, Text, View } from "react-native"
+import { Image, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Link } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
-
-export function Loading() {
-    return (
-        <SafeAreaView className="flex-1">
-            <View className="flex h-full w-full flex-col items-center bg-background p-8 pb-8">
-                <ActivityIndicator color={"#23910E"} />
-            </View>
-        </SafeAreaView>
-    )
-}
 
 export function Onboarding() {
     return (
