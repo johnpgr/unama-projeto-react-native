@@ -75,6 +75,9 @@ importers:
       '@hono/trpc-server':
         specifier: ^0.3.2
         version: 0.3.2(@trpc/server@11.0.0-rc.487)(hono@4.6.2)
+      '@hono/zod-validator':
+        specifier: ^0.3.0
+        version: 0.3.0(hono@4.6.2)(zod@3.23.8)
       '@lucia-auth/adapter-drizzle':
         specifier: ^1.1.0
         version: 1.1.0(drizzle-orm@0.33.0(@electric-sql/pglite@0.2.7)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.4)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.0)(react@18.3.1))(lucia@3.2.0)
@@ -84,6 +87,9 @@ importers:
       '@trpc/server':
         specifier: 'catalog:'
         version: 11.0.0-rc.487
+      '@tsndr/cloudflare-worker-jwt':
+        specifier: ^2.5.3
+        version: 2.5.3
       arctic:
         specifier: ^1.9.2
         version: 1.9.2
@@ -292,7 +298,7 @@ importers:
         version: 7.35.0(eslint@9.9.1(jiti@1.21.6))
       eslint-plugin-react-hooks:
         specifier: rc
-        version: 5.1.0-rc-04bd67a4-20240924(eslint@9.9.1(jiti@1.21.6))
+        version: 5.1.0-rc-204a551e-20240926(eslint@9.9.1(jiti@1.21.6))
       eslint-plugin-turbo:
         specifier: ^2.0.13
         version: 2.1.0(eslint@9.9.1(jiti@1.21.6))
@@ -1595,6 +1601,12 @@ packages:
       '@trpc/server': ^10.10.0 || >11.0.0-rc
       hono: '>=4.*'
 
+  '@hono/zod-validator@0.3.0':
+    resolution: {integrity: sha512-7XcTk3yYyk6ldrO/VuqsroE7stvDZxHJQcpATRAyha8rUxJNBPV3+6waDrARfgEqxOVlzIadm3/6sE/dPseXgQ==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.19.1
+
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
     engines: {node: '>=12.22'}
@@ -2335,6 +2347,9 @@ packages:
 
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
+
+  '@tsndr/cloudflare-worker-jwt@2.5.3':
+    resolution: {integrity: sha512-zbdvjRG86y/ObiBgTJrzBC39t2FcaeGwB6AV7VO4LvHKJNyZvLYRbKT68eaoJhnJldyHhs7yZ69neRVdUd9knA==}
 
   '@turbo/gen@2.1.0':
     resolution: {integrity: sha512-R7T8qU/J1pDk0MBpmsFLpLIERyh6NNHfdUP747RkSP7jv9gcIpRQ2Wl1fIXpbBmXqckV8QW+4laRvoq49jMM6g==}
@@ -3541,8 +3556,8 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8
 
-  eslint-plugin-react-hooks@5.1.0-rc-04bd67a4-20240924:
-    resolution: {integrity: sha512-7z/4xgNRUds/0jLx1znXbHS1KWIfaLJgaP9maBR3P16ynGppsxmxSgnVAG6NBRYfvn0yfYecU5mGPXjcZnrtPw==}
+  eslint-plugin-react-hooks@5.1.0-rc-204a551e-20240926:
+    resolution: {integrity: sha512-jJPRdt9j5FEMTQfOcRaOaJX2VmycFrteVK3oDkTc8w7jZROR4OqA5JUElK1h5z1Bu+5TTH+hwQq8Rr/bULHXxA==}
     engines: {node: '>=10'}
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
@@ -8332,6 +8347,11 @@ snapshots:
       '@trpc/server': 11.0.0-rc.487
       hono: 4.6.2
 
+  '@hono/zod-validator@0.3.0(hono@4.6.2)(zod@3.23.8)':
+    dependencies:
+      hono: 4.6.2
+      zod: 3.23.8
+
   '@humanwhocodes/module-importer@1.0.1': {}
 
   '@humanwhocodes/retry@0.3.0': {}
@@ -9258,6 +9278,8 @@ snapshots:
   '@tsconfig/node14@1.0.3': {}
 
   '@tsconfig/node16@1.0.4': {}
+
+  '@tsndr/cloudflare-worker-jwt@2.5.3': {}
 
   '@turbo/gen@2.1.0(@types/node@22.5.5)(typescript@5.5.4)':
     dependencies:
@@ -10687,7 +10709,7 @@ snapshots:
       safe-regex-test: 1.0.3
       string.prototype.includes: 2.0.0
 
-  eslint-plugin-react-hooks@5.1.0-rc-04bd67a4-20240924(eslint@9.9.1(jiti@1.21.6)):
+  eslint-plugin-react-hooks@5.1.0-rc-204a551e-20240926(eslint@9.9.1(jiti@1.21.6)):
     dependencies:
       eslint: 9.9.1(jiti@1.21.6)
 

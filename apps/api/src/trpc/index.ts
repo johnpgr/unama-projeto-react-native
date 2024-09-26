@@ -11,7 +11,7 @@ import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
 import { ZodError } from "zod"
 
-import { auth } from "../auth/index.ts"
+import { lucia } from "../auth/index.ts"
 
 type NonNullableObj<T> = {
     [K in keyof T]-?: NonNullable<T[K]>
@@ -92,7 +92,7 @@ const getSession = async (headers: Headers) => {
 
     if (sessionToken.startsWith("Bearer ")) sessionToken = sessionToken.slice(7)
 
-    const sessionRes = await auth.validateSession(sessionToken)
+    const sessionRes = await lucia.validateSession(sessionToken)
     if (!sessionRes.session) return
 
     return {
