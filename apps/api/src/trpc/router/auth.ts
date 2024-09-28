@@ -4,10 +4,10 @@ import { TRPCError } from "@trpc/server"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 
-import { lucia } from "../../auth/index.ts"
+import { lucia } from "../../auth/lucia.ts"
 import { db } from "../../database/client.ts"
 import { User } from "../../database/schema.ts"
-import { protectedProcedure, publicProcedure } from "../index.ts"
+import { protectedProcedure, publicProcedure } from "../trpc.ts"
 
 const ARGON2_OPTS = {
     memoryCost: 19456,
@@ -18,12 +18,12 @@ const ARGON2_OPTS = {
 
 export const authRouter = {
     getSession: publicProcedure.query(({ ctx }) => {
-        return ctx.session
+        return { session: ctx.session, user: ctx.user }
     }),
 
     signOut: protectedProcedure.mutation(async ({ ctx }) => {
         try {
-            await lucia.invalidateSession(ctx.session.token)
+            await lucia.invalidateSession(ctx.session.id)
             return "ok" as const
         } catch (error) {
             throw new TRPCError({

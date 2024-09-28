@@ -1,6 +1,5 @@
 import type { Context } from "hono"
 import type { User } from "lucia"
-import { verifyRequestOrigin } from "lucia"
 
 import type { AppContext } from "../context.ts"
 import type { DatabaseUserAttributes } from "./lucia.ts"
@@ -14,31 +13,18 @@ export const AuthMiddleware = async (
         return next()
     }
 
-    const originHeader = c.req.header("Origin") ?? c.req.header("origin")
-    const hostHeader = c.req.header("Host") ?? c.req.header("X-Forwarded-Host")
-    if (
-        (!originHeader ||
-            !hostHeader ||
-            !verifyRequestOrigin(originHeader, [
-                hostHeader,
-                process.env.API_URL ?? "http://localhost:3000"
-            ])) &&
-        process.env.NODE_ENV === "production" &&
-        c.req.method !== "GET"
-    ) {
-        return new Response(null, {
-            status: 403,
-        })
-    }
-
     const authorizationHeader = c.req.header("Authorization")
     const sessionId = lucia.readBearerToken(authorizationHeader ?? "")
     if (!sessionId) {
-        return new Response("Unauthorized", { status: 401 })
+        c.set("user", null)
+        c.set("session", null)
+        return next()
     }
     const { session, user } = await lucia.validateSession(sessionId)
     if (!session) {
-        return new Response("Unauthorized", { status: 401 })
+        c.set("user", null)
+        c.set("session", null)
+        return next()
     }
     if (session?.fresh) {
         const sessionCookie = lucia.createSessionCookie(session.id)
@@ -46,5 +32,5 @@ export const AuthMiddleware = async (
     }
     c.set("user", user as User & DatabaseUserAttributes)
     c.set("session", session)
-    await next()
+    return next()
 }

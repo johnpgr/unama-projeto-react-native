@@ -4,7 +4,7 @@ import jwt from "@tsndr/cloudflare-worker-jwt"
 import { Apple } from "arctic"
 import { eq } from "drizzle-orm"
 
-import type { DatabaseUserAttributes } from "."
+import type { DatabaseUserAttributes } from "./lucia.ts"
 import { lucia } from "./lucia.ts"
 import { db } from "../database/client.ts"
 import { OAuthAccount, User } from "../database/schema.ts"

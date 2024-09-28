@@ -6,11 +6,14 @@ import type { DatabaseUserAttributes } from "./lucia.ts"
 import { db } from "../database/client.ts"
 import { OAuthAccount, User } from "../database/schema.ts"
 import { CreateSessionError } from "./errors.ts"
-import { lucia } from "./index.ts"
+import { lucia } from "./lucia.ts"
 
 export const githubAuth = new GitHub(
-    process.env.AUTH_GITHUB_CLIENT_ID ?? "NOOP_NO_GITHUB_CLIENT_ID",
+    process.env.AUTH_GITHUB_ID ?? "NOOP_NO_GITHUB_CLIENT_ID",
     process.env.AUTH_GITHUB_SECRET ?? "NOOP_NO_GITHUB_SECRET_ID",
+    {
+        redirectURI: `${process.env.REDIRECT_URL}/auth/github/callback`,
+    },
 )
 
 export async function getGithubAuthorizationUrl(state: string): Promise<URL> {

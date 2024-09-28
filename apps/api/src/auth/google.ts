@@ -6,12 +6,12 @@ import type { DatabaseUserAttributes } from "./lucia.ts"
 import { db } from "../database/client.ts"
 import { OAuthAccount, User } from "../database/schema.ts"
 import { CreateSessionError } from "./errors.ts"
-import { lucia } from "./index.ts"
+import { lucia } from "./lucia.ts"
 
 export const googleAuth = new Google(
     process.env.AUTH_GOOGLE_ID ?? "NOOP_NO_GOOGLE_ID",
     process.env.AUTH_GOOGLE_SECRET ?? "NOOP_NO_GOOGLE_SECRET",
-    `${process.env.API_URL}/auth/google/callback`,
+    `${process.env.REDIRECT_URL}/auth/google/callback`,
 )
 
 export async function getGoogleAuthorizationUrl(

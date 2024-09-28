@@ -72,12 +72,9 @@
         }
     },
     "globalEnv": [
-        "TURSO_DB_URL",
-        "TURSO_DB_TOKEN",
+        "EXPO_PUBLIC_REDIRECT_URL",
         "AUTH_GOOGLE_ID",
         "AUTH_GOOGLE_SECRET",
-        "AUTH_REDIRECT_PROXY_URL",
-        "AUTH_SECRET",
         "PORT"
     ],
     "globalPassThroughEnv": [
