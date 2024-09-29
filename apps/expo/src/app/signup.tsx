@@ -46,7 +46,7 @@ export default function SignUpScreen() {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
                    <Image
-                        source={require('../../assets/logo_ecopoints.png')}
+                        source={require('../../assets/icon.png')}
                         style={{ width: 200, height: 200, alignSelf: 'center'}}
                     />
                 <View className="mt-auto max-h-[540px] flex-1 rounded-t-[3rem] bg-white p-8">
@@ -114,7 +114,7 @@ export default function SignUpScreen() {
                             color="#14542E"
                         />
                         <Text>
-                            Eu concordo com o uso e processamento de{" "}
+                            Eu concordo com o uso e processamento de{"\n"}
                             <Text className="font-medium text-green-900">
                                 dados pessoais
                             </Text>

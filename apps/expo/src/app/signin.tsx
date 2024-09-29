@@ -42,7 +42,7 @@ export default function SignUpScreen() {
                 className="h-full w-full bg-primary"
             >
                     <Image 
-                        source={require('../../assets/logo_ecopoints.png')}
+                        source={require('../../assets/icon.png')}
                         style={{ width: 200, height: 200, alignSelf: 'center'}}
                     />
 
@@ -97,7 +97,7 @@ export default function SignUpScreen() {
                     </View>
 
                     <Pressable
-                        className="mt-4 relative flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 mb-5 disabled:opacity-80"
+                        className="mt-4 relative flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 mb-6 disabled:opacity-80"
                         onPress={form.handleSubmit(onSubmit)}
                         disabled={status === "pending" || status === "success"}
                     >
@@ -121,7 +121,7 @@ export default function SignUpScreen() {
 
                     <SigninOAuthButtons />
 
-                    <View className="flex flex-row items-center justify-center gap-2 mt-5">
+                    <View className="flex flex-row items-center justify-center gap-2 mt-2">
                         <Text>Não possui uma conta?</Text>
                         <Link
                             href="/signup"
