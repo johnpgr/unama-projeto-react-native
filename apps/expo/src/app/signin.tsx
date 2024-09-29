@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from "react"
 import {
     ActivityIndicator,
@@ -42,7 +44,7 @@ export default function SignUpScreen() {
                 className="h-full w-full bg-primary"
             >
                     <Image 
-                        source={require('../../assets/logo_ecopoints.png')}
+                        source={require('../../assets/icon.png')}
                         style={{ width: 200, height: 200, alignSelf: 'center'}}
                     />
 
