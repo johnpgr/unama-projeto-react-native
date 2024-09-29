@@ -8,8 +8,8 @@
         "dev": "expo start --go",
         "dev:android": "expo start --android",
         "dev:ios": "expo start --ios",
-        "android": "expo run:android",
         "ios": "expo run:ios",
+        "android": "expo run:android",
         "format": "prettier --check . --ignore-path ../../.gitignore",
         "lint": "eslint",
         "typecheck": "tsc --noEmit"
@@ -17,6 +17,7 @@
     "dependencies": {
         "@bacons/text-decoder": "^0.0.0",
         "@expo/metro-config": "^0.18.11",
+        "@react-native-google-signin/google-signin": "^13.1.0",
         "@tanstack/react-query": "catalog:",
         "@trpc/client": "catalog:",
         "@trpc/react-query": "catalog:",

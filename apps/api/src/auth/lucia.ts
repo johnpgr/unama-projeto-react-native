@@ -8,12 +8,13 @@ const adapter = new DrizzlePostgreSQLAdapter(db, Session, User)
 
 declare module "lucia" {
     interface Register {
-        Lucia: typeof auth
-        DatabaseUserAttributes: Omit<User, "id">
+        Lucia: typeof lucia
+        DatabaseUserAttributes: DatabaseUserAttributes
     }
 }
+export type DatabaseUserAttributes = typeof User.$inferSelect
 
-export const auth = new Lucia(adapter, {
+export const lucia = new Lucia(adapter, {
     sessionExpiresIn: new TimeSpan(7, "d"),
     sessionCookie: {
         attributes: {
@@ -25,5 +26,4 @@ export const auth = new Lucia(adapter, {
         email: attributes.email,
     }),
 })
-
-export type Auth = typeof auth
+export type LuciaAuth = typeof lucia

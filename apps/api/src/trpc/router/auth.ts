@@ -1,12 +1,13 @@
+import type { TRPCRouterRecord } from "@trpc/server"
 import { hash, verify } from "@node-rs/argon2"
-import { TRPCError, type TRPCRouterRecord } from "@trpc/server"
+import { TRPCError } from "@trpc/server"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 
-import { auth } from "../../auth/index.ts"
+import { lucia } from "../../auth/lucia.ts"
 import { db } from "../../database/client.ts"
 import { User } from "../../database/schema.ts"
-import { protectedProcedure, publicProcedure } from "../index.ts"
+import { protectedProcedure, publicProcedure } from "../trpc.ts"
 
 const ARGON2_OPTS = {
     memoryCost: 19456,
@@ -17,12 +18,12 @@ const ARGON2_OPTS = {
 
 export const authRouter = {
     getSession: publicProcedure.query(({ ctx }) => {
-        return ctx.session
+        return { session: ctx.session, user: ctx.user }
     }),
 
     signOut: protectedProcedure.mutation(async ({ ctx }) => {
         try {
-            await auth.invalidateSession(ctx.session.token)
+            await lucia.invalidateSession(ctx.session.id)
             return "ok" as const
         } catch (error) {
             throw new TRPCError({
@@ -65,7 +66,7 @@ export const authRouter = {
                 })
             }
 
-            const session = await auth.createSession(existingUser.id, {})
+            const session = await lucia.createSession(existingUser.id, {})
             return { session }
         }),
 
@@ -106,7 +107,7 @@ export const authRouter = {
                     })
                 }
 
-                const session = await auth.createSession(user.id, {})
+                const session = await lucia.createSession(user.id, {})
 
                 //@ts-expect-error ok
                 delete user.hashedPassword

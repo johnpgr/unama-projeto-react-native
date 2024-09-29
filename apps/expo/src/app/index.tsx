@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from "react"
-import { Image, Text, View } from "react-native"
+import { Image, Pressable, Text, View } from "react-native"
+import {MaterialIcons} from "@expo/vector-icons"
 
 import { Onboarding } from "~/components/onboarding"
-import { useSession } from "~/utils/auth"
+import { useSession, useSignOut } from "~/utils/auth"
 
 export default function Index() {
-    const { data: session } = useSession()
-    if (!session) return <Onboarding />
+    const { data } = useSession()
+    const signOut = useSignOut()
+    if (!data?.user) return <Onboarding />
 
     return (
         <View className="flex flex-col gap-8 px-4">
@@ -19,8 +21,14 @@ export default function Index() {
                     resizeMode="contain"
                 />
                 <Text className="text-xl font-bold">
-                    Bem vindo, {session.user.fullName}
+                    Bem vindo, {data.user.fullName}
                 </Text>
+                <Pressable 
+                    onPress={()=> signOut()}
+                    className="flex flex-row gap-2 items-center">
+                    <Text className="font-bold">Sair</Text>
+                    <MaterialIcons name="logout" size={20}/>
+                </Pressable>
             </View>
             <View className="flex flex-col gap-4">
                 <Text className="text-lg">Campanhas perto de você</Text>

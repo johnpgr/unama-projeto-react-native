@@ -13,8 +13,8 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { useSession } from "~/utils/auth"
 
 function HomeHeader() {
-    const { data: session } = useSession()
-    if (!session) return null
+    const { data } = useSession()
+    if (!data?.user) return null
 
     return (
         <SafeAreaView>

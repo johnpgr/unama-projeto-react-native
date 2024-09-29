@@ -7,11 +7,13 @@
  * The pieces you will need to use are documented accordingly near the end
  */
 import type { trpcServer } from "@hono/trpc-server"
+import type { Context } from "hono"
 import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
 import { ZodError } from "zod"
 
-import { auth } from "../auth/index.ts"
+import type { AppContext } from "../context.ts"
+import { lucia } from "../auth/lucia.ts"
 
 type NonNullableObj<T> = {
     [K in keyof T]-?: NonNullable<T[K]>
@@ -38,15 +40,17 @@ type CreateContextFn = Parameters<
  */
 export const createTRPCContext = async (
     opts: CreateContextFn[0],
-    c: CreateContextFn[1],
+    c: Context<AppContext>,
 ) => {
-    const session = (await getSession(opts.req.headers as Headers)) ?? null
+    const session = c.get("session")
+    const user = c.get("user")
 
     const source = opts.req.headers.get("x-trpc-source") ?? "unknown"
-    console.log(">>> tRPC Request from", source, "by", session?.user)
+    console.log(">>> tRPC Request from", source, "by", user)
 
     return {
         session,
+        user,
     }
 }
 type TRPCContext = Awaited<ReturnType<typeof createTRPCContext>>
@@ -82,25 +86,25 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
  */
 export const createTRPCRouter = t.router
 
-/**
- *  Session getter for API requests
- *  Expo requests will have a session token in the Authorization header
- */
-const getSession = async (headers: Headers) => {
-    let sessionToken = headers.get("Authorization") ?? null
-    if (!sessionToken) return
-
-    if (sessionToken.startsWith("Bearer ")) sessionToken = sessionToken.slice(7)
-
-    const sessionRes = await auth.validateSession(sessionToken)
-    if (!sessionRes.session) return
-
-    return {
-        token: sessionToken,
-        session: sessionRes.session,
-        user: sessionRes.user,
-    }
-}
+///**
+// *  Session getter for API requests
+// *  Expo requests will have a session token in the Authorization header
+// */
+//const getSession = async (headers: Headers) => {
+//    let sessionToken = headers.get("Authorization") ?? null
+//    if (!sessionToken) return
+//
+//    if (sessionToken.startsWith("Bearer ")) sessionToken = sessionToken.slice(7)
+//
+//    const sessionRes = await lucia.validateSession(sessionToken)
+//    if (!sessionRes.session) return
+//
+//    return {
+//        token: sessionToken,
+//        session: sessionRes.session,
+//        user: sessionRes.user,
+//    }
+//}
 
 /**
  * Middleware for timing procedure execution and adding an articifial delay in development.
