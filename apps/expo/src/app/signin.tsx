@@ -7,11 +7,11 @@ import {
     Text,
     TextInput,
     View,
+    Image,
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import Checkbox from "expo-checkbox"
 import { Link, Stack } from "expo-router"
-// import { Zocial } from "@expo/vector-icons"
 import { Controller, useForm } from "react-hook-form"
 
 import type { SignInParams } from "~/utils/auth"
@@ -41,12 +41,17 @@ export default function SignUpScreen() {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 className="h-full w-full bg-primary"
             >
-                <View className="mt-auto max-h-[470px] rounded-t-[3rem] bg-white p-8">
-                    <Text className="text-center text-4xl font-bold text-green-900">
-                        Bem vindo
+                    <Image 
+                        source={require('../../assets/logo_ecopoints.png')}
+                        style={{ width: 200, height: 200, alignSelf: 'center'}}
+                    />
+
+                <View className="mt-auto max-h-[540px] flex-1 rounded-t-[3rem] bg-white p-8">
+                    <Text className="text-center text-4xl font-bold text-green-900 mt-4">
+                        Bem-vindo de volta
                     </Text>
 
-                    <Text className="m-1 mt-2 text-lg">Email</Text>
+                    <Text className="m-1 mt-10 text-lg">Email</Text>
                     <Controller
                         name="email"
                         control={form.control}
@@ -61,7 +66,7 @@ export default function SignUpScreen() {
                         )}
                     />
 
-                    <Text className="m-1 mt-2 text-lg">Senha</Text>
+                    <Text className="m-1 mt-6 text-lg">Senha</Text>
                     <Controller
                         control={form.control}
                         name="password"
@@ -77,7 +82,7 @@ export default function SignUpScreen() {
                         )}
                     />
 
-                    <View className="flex w-full flex-row items-center justify-between py-4">
+                    <View className="flex w-full flex-row items-center justify-between py-4 mt-5">
                         <View className="flex flex-row gap-2">
                             <Checkbox
                                 value={remember}
@@ -92,7 +97,7 @@ export default function SignUpScreen() {
                     </View>
 
                     <Pressable
-                        className="relative flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 disabled:opacity-80"
+                        className="mt-4 relative flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 mb-5 disabled:opacity-80"
                         onPress={form.handleSubmit(onSubmit)}
                         disabled={status === "pending" || status === "success"}
                     >
@@ -116,7 +121,7 @@ export default function SignUpScreen() {
 
                     <SigninOAuthButtons />
 
-                    <View className="flex flex-row items-center justify-center gap-2">
+                    <View className="flex flex-row items-center justify-center gap-2 mt-5">
                         <Text>Não possui uma conta?</Text>
                         <Link
                             href="/signup"
