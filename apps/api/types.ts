@@ -1,4 +1,5 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
+
 import type { appRouter } from "./src/trpc/router/root.ts"
 
 // export type definition of API

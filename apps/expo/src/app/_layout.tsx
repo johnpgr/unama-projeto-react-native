@@ -1,7 +1,7 @@
 import "@bacons/text-decoder/install"
 
 import { Stack } from "expo-router"
-import { Ionicons, AntDesign } from "@expo/vector-icons"
+import { AntDesign, Ionicons } from "@expo/vector-icons"
 
 import { TRPCProvider } from "~/utils/api"
 
@@ -20,8 +20,8 @@ function HomeHeader() {
         <SafeAreaView>
             <View className="flex flex-row items-center justify-between p-4">
                 <Text className="text-xl font-bold">ECOPoints</Text>
-                <View className="flex flex-row gap-4 items-center">
-                    <AntDesign name="search1" size={24}/>
+                <View className="flex flex-row items-center gap-4">
+                    <AntDesign name="search1" size={24} />
                     <Ionicons name="notifications-outline" size={26} />
                 </View>
             </View>

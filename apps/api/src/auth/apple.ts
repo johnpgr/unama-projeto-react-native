@@ -5,10 +5,10 @@ import { Apple } from "arctic"
 import { eq } from "drizzle-orm"
 
 import type { DatabaseUserAttributes } from "./lucia.ts"
-import { lucia } from "./lucia.ts"
 import { db } from "../database/client.ts"
 import { OAuthAccount, User } from "../database/schema.ts"
 import { CreateSessionError } from "./errors.ts"
+import { lucia } from "./lucia.ts"
 
 export const appleAuth = new Apple(
     {

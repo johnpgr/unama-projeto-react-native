@@ -16,6 +16,7 @@
         "migrate": "pnpm with-env drizzle-kit migrate",
         "studio": "pnpm with-env drizzle-kit studio",
         "with-env": "dotenv -e ../../.env --",
+        "format": "prettier --check . --ignore-path ../../.gitignore",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "johnpgr",

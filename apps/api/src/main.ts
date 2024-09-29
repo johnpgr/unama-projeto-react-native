@@ -9,9 +9,9 @@ import { logger } from "hono/logger"
 
 import type { AppContext } from "./context.ts"
 import { AuthController } from "./auth/controller.ts"
-import { createTRPCContext } from "./trpc/trpc.ts"
-import { appRouter } from "./trpc/router/root.ts"
 import { AuthMiddleware } from "./auth/middleware.ts"
+import { appRouter } from "./trpc/router/root.ts"
+import { createTRPCContext } from "./trpc/trpc.ts"
 
 const app = new Hono<AppContext>()
     .use(logger())

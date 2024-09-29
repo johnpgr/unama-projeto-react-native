@@ -47,12 +47,11 @@ export default function SignUpScreen() {
                 className="h-full w-full bg-primary"
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
-                   <Image
-                        source={require('../../assets/icon.png')}
-                        style={{ width: 200, height: 200, alignSelf: 'center'}}
-                    />
+                <Image
+                    source={require("../../assets/icon.png")}
+                    style={{ width: 200, height: 200, alignSelf: "center" }}
+                />
                 <View className="mt-auto max-h-[540px] flex-1 rounded-t-[3rem] bg-white p-8">
-
                     <Text className="text-center text-4xl font-bold text-green-900">
                         Vamos começar
                     </Text>
@@ -109,7 +108,7 @@ export default function SignUpScreen() {
                         </Text>
                     ) : null}
 
-                    <View className="flex flex-row items-center gap-2 py-4 mt-2">
+                    <View className="mt-2 flex flex-row items-center gap-2 py-4">
                         <Checkbox
                             value={isAgreed}
                             onValueChange={(value) => setIsAgreed(value)}

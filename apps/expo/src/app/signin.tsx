@@ -3,13 +3,13 @@
 import React from "react"
 import {
     ActivityIndicator,
+    Image,
     KeyboardAvoidingView,
     Platform,
     Pressable,
     Text,
     TextInput,
     View,
-    Image,
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import Checkbox from "expo-checkbox"
@@ -43,13 +43,13 @@ export default function SignUpScreen() {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 className="h-full w-full bg-primary"
             >
-                    <Image 
-                        source={require('../../assets/icon.png')}
-                        style={{ width: 200, height: 200, alignSelf: 'center'}}
-                    />
+                <Image
+                    source={require("../../assets/icon.png")}
+                    style={{ width: 200, height: 200, alignSelf: "center" }}
+                />
 
                 <View className="mt-auto max-h-[540px] flex-1 rounded-t-[3rem] bg-white p-8">
-                    <Text className="text-center text-4xl font-bold text-green-900 mt-4">
+                    <Text className="mt-4 text-center text-4xl font-bold text-green-900">
                         Bem-vindo de volta
                     </Text>
 
@@ -84,7 +84,7 @@ export default function SignUpScreen() {
                         )}
                     />
 
-                    <View className="flex w-full flex-row items-center justify-between py-4 mt-5">
+                    <View className="mt-5 flex w-full flex-row items-center justify-between py-4">
                         <View className="flex flex-row gap-2">
                             <Checkbox
                                 value={remember}
@@ -99,7 +99,7 @@ export default function SignUpScreen() {
                     </View>
 
                     <Pressable
-                        className="mt-4 relative flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 mb-5 disabled:opacity-80"
+                        className="relative mb-5 mt-4 flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 disabled:opacity-80"
                         onPress={form.handleSubmit(onSubmit)}
                         disabled={status === "pending" || status === "success"}
                     >
@@ -123,7 +123,7 @@ export default function SignUpScreen() {
 
                     <SigninOAuthButtons />
 
-                    <View className="flex flex-row items-center justify-center gap-2 mt-5">
+                    <View className="mt-5 flex flex-row items-center justify-center gap-2">
                         <Text>Não possui uma conta?</Text>
                         <Link
                             href="/signup"

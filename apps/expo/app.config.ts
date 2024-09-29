@@ -38,5 +38,5 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         tsconfigPaths: true,
         typedRoutes: true,
     },
-    plugins: ["expo-router", "@react-native-google-signin/google-signin",],
+    plugins: ["expo-router", "@react-native-google-signin/google-signin"],
 })

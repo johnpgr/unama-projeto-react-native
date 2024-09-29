@@ -9,7 +9,7 @@ export function GoogleSignInButton() {
     const signIn = useSignInOAuth()
 
     return (
-        <Pressable onPress={()=> signIn("google")}>
+        <Pressable onPress={() => signIn("google")}>
             <Image
                 source={require("../../assets/logo_google.png")}
                 className="h-8 w-8"

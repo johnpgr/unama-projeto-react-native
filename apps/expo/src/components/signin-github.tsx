@@ -7,9 +7,8 @@ import { useSignInOAuth } from "~/utils/auth"
 export function GithubSignInButton() {
     const signIn = useSignInOAuth()
 
-
     return (
-        <Pressable onPress={()=> signIn("github")}>
+        <Pressable onPress={() => signIn("github")}>
             <Image
                 source={require("../../assets/logo_github.png")}
                 className="h-8 w-8"
