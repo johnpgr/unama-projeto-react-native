@@ -36,9 +36,6 @@ export const OAuthAccount = pgTable(
             .references(() => User.id),
         provider: text("provider").$type<OAuthAccountProvider>().notNull(),
         providerUserId: text("provider_user_id").notNull(),
-        userType: text("user_type").notNull().default(userType.enumValues[0]),
-        totalPoints: integer("total_points").default(1000),
-        canRedeemRewards: boolean("can_redeem_rewards").default(true),
     },
     (table) => ({
         pk: primaryKey({ columns: [table.provider, table.providerUserId] }),
@@ -75,7 +72,7 @@ export const recyclingTransactions = pgTable("recycling_transactions", {
         .primaryKey()
         .references(() => User.id)
         .notNull(),
-    weight: integer("weight").notNull(), // Peso dos resíduos reciclados
-    points: integer("points").notNull(), // Pontos ganhos
-    transactionDate: date("transaction_date").defaultNow(), // Data da transação
+    weight: integer("weight").notNull(),
+    points: integer("points").notNull(),
+    transactionDate: date("transaction_date").defaultNow(),
 })
