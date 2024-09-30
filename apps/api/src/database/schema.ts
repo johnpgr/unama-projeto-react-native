@@ -1,18 +1,18 @@
 import { inArray, relations, sql } from "drizzle-orm"
 import {
     boolean,
+    date,
+    integer,
+    pgEnum,
     pgTable,
     primaryKey,
+    serial,
     text,
     timestamp,
     uuid,
-    serial,
-    integer,
-    date,
-    pgEnum
-
 } from "drizzle-orm/pg-core"
-export const userType = pgEnum('user_type', ['normal', 'cooperative']);
+
+export const userType = pgEnum("user_type", ["normal", "cooperative"])
 export const User = pgTable("user", {
     id: uuid("id").primaryKey().defaultRandom(),
     fullName: text("full_name").notNull(),
@@ -20,7 +20,7 @@ export const User = pgTable("user", {
     hashedPassword: text("hashed_password"),
     emailVerified: boolean("email_verified").notNull().default(false),
     imageUrl: text("image_url"),
-    userType: text("user_type", ).notNull().default(userType.enumValues[0]), 
+    userType: userType("user_type").default(userType.enumValues[0]),
     totalPoints: integer("total_points").default(1000),
     canRedeemRewards: boolean("can_redeem_rewards").default(true),
 })
@@ -36,7 +36,7 @@ export const OAuthAccount = pgTable(
             .references(() => User.id),
         provider: text("provider").$type<OAuthAccountProvider>().notNull(),
         providerUserId: text("provider_user_id").notNull(),
-        userType: text("user_type", ).notNull().default(userType.enumValues[0]), 
+        userType: text("user_type").notNull().default(userType.enumValues[0]),
         totalPoints: integer("total_points").default(1000),
         canRedeemRewards: boolean("can_redeem_rewards").default(true),
     },
@@ -71,10 +71,11 @@ export const SessionRelations = relations(Session, ({ one }) => ({
 
 export const recyclingTransactions = pgTable("recycling_transactions", {
     id: serial("id").primaryKey(),
-    userId:  uuid("id").primaryKey()
-      .references(() => User.id)
-      .notNull(),
+    userId: uuid("id")
+        .primaryKey()
+        .references(() => User.id)
+        .notNull(),
     weight: integer("weight").notNull(), // Peso dos resíduos reciclados
     points: integer("points").notNull(), // Pontos ganhos
     transactionDate: date("transaction_date").defaultNow(), // Data da transação
-  });
+})
