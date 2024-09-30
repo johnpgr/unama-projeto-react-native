@@ -1,13 +1,18 @@
 import { inArray, relations, sql } from "drizzle-orm"
 import {
     boolean,
+    date,
+    integer,
+    pgEnum,
     pgTable,
     primaryKey,
+    serial,
     text,
     timestamp,
     uuid,
 } from "drizzle-orm/pg-core"
 
+export const userType = pgEnum("user_type", ["normal", "cooperative"])
 export const User = pgTable("user", {
     id: uuid("id").primaryKey().defaultRandom(),
     fullName: text("full_name").notNull(),
@@ -15,6 +20,9 @@ export const User = pgTable("user", {
     hashedPassword: text("hashed_password"),
     emailVerified: boolean("email_verified").notNull().default(false),
     imageUrl: text("image_url"),
+    userType: userType("user_type").default(userType.enumValues[0]),
+    totalPoints: integer("total_points").default(1000),
+    canRedeemRewards: boolean("can_redeem_rewards").default(true),
 })
 export type User = typeof User.$inferSelect
 
@@ -57,3 +65,14 @@ export type Session = typeof Session.$inferSelect
 export const SessionRelations = relations(Session, ({ one }) => ({
     user: one(User, { references: [User.id], fields: [Session.userId] }),
 }))
+
+export const recyclingTransactions = pgTable("recycling_transactions", {
+    id: serial("id").primaryKey(),
+    userId: uuid("id")
+        .primaryKey()
+        .references(() => User.id)
+        .notNull(),
+    weight: integer("weight").notNull(),
+    points: integer("points").notNull(),
+    transactionDate: date("transaction_date").defaultNow(),
+})
