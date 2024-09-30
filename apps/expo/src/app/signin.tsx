@@ -122,7 +122,7 @@ export default function SignUpScreen() {
                     ) : null}
 
                     <SigninOAuthButtons />
-
+                    <Link href={"./teste"}>TESTE AQUI PONTO</Link>
                     <View className="mt-5 flex flex-row items-center justify-center gap-2">
                         <Text>Não possui uma conta?</Text>
                         <Link

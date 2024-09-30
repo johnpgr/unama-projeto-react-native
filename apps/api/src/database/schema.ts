@@ -6,8 +6,13 @@ import {
     text,
     timestamp,
     uuid,
-} from "drizzle-orm/pg-core"
+    serial,
+    integer,
+    date,
+    pgEnum
 
+} from "drizzle-orm/pg-core"
+export const userType = pgEnum('user_type', ['normal', 'cooperative']);
 export const User = pgTable("user", {
     id: uuid("id").primaryKey().defaultRandom(),
     fullName: text("full_name").notNull(),
@@ -15,6 +20,9 @@ export const User = pgTable("user", {
     hashedPassword: text("hashed_password"),
     emailVerified: boolean("email_verified").notNull().default(false),
     imageUrl: text("image_url"),
+    userType: text("user_type", ).notNull().default(userType.enumValues[0]), 
+    totalPoints: integer("total_points").default(1000),
+    canRedeemRewards: boolean("can_redeem_rewards").default(true),
 })
 export type User = typeof User.$inferSelect
 
@@ -28,6 +36,9 @@ export const OAuthAccount = pgTable(
             .references(() => User.id),
         provider: text("provider").$type<OAuthAccountProvider>().notNull(),
         providerUserId: text("provider_user_id").notNull(),
+        userType: text("user_type", ).notNull().default(userType.enumValues[0]), 
+        totalPoints: integer("total_points").default(1000),
+        canRedeemRewards: boolean("can_redeem_rewards").default(true),
     },
     (table) => ({
         pk: primaryKey({ columns: [table.provider, table.providerUserId] }),
@@ -57,3 +68,13 @@ export type Session = typeof Session.$inferSelect
 export const SessionRelations = relations(Session, ({ one }) => ({
     user: one(User, { references: [User.id], fields: [Session.userId] }),
 }))
+
+export const recyclingTransactions = pgTable("recycling_transactions", {
+    id: serial("id").primaryKey(),
+    userId:  uuid("id").primaryKey()
+      .references(() => User.id)
+      .notNull(),
+    weight: integer("weight").notNull(), // Peso dos resíduos reciclados
+    points: integer("points").notNull(), // Pontos ganhos
+    transactionDate: date("transaction_date").defaultNow(), // Data da transação
+  });
