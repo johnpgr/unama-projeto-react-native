@@ -12,7 +12,7 @@ import {
     uuid,
 } from "drizzle-orm/pg-core"
 
-export const userType = pgEnum("user_type", ["normal", "cooperative"])
+export const UserTypeEnum = pgEnum("user_type", ["normal", "cooperative"])
 export const User = pgTable("user", {
     id: uuid("id").primaryKey().defaultRandom(),
     fullName: text("full_name").notNull(),
@@ -20,7 +20,7 @@ export const User = pgTable("user", {
     hashedPassword: text("hashed_password"),
     emailVerified: boolean("email_verified").notNull().default(false),
     imageUrl: text("image_url"),
-    userType: userType("user_type").default(userType.enumValues[0]),
+    userType: UserTypeEnum("user_type").default(UserTypeEnum.enumValues[0]),
     totalPoints: integer("total_points").default(1000),
     canRedeemRewards: boolean("can_redeem_rewards").default(true),
 })

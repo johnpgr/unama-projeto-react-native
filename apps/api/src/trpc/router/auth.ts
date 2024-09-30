@@ -4,6 +4,8 @@ import { TRPCError } from "@trpc/server"
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 
+import { signInSchema, signUpSchema } from "@projeto/validation"
+
 import { lucia } from "../../auth/lucia.ts"
 import { db } from "../../database/client.ts"
 import { User } from "../../database/schema.ts"
@@ -34,90 +36,68 @@ export const authRouter = {
         }
     }),
 
-    signIn: publicProcedure
-        .input(
-            z.object({
-                email: z.string().email(),
-                password: z.string().min(1),
-            }),
-        )
-        .mutation(async ({ input }) => {
-            const existingUser = await db.query.User.findFirst({
-                where: (user) => eq(user.email, input.email),
+    signIn: publicProcedure.input(signInSchema).mutation(async ({ input }) => {
+        const existingUser = await db.query.User.findFirst({
+            where: (user) => eq(user.email, input.email),
+        })
+
+        if (!existingUser?.hashedPassword) {
+            throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Email ou senha inválido.",
             })
+        }
 
-            if (!existingUser || !existingUser.hashedPassword) {
-                throw new TRPCError({
-                    code: "BAD_REQUEST",
-                    message: "Invalid email or password",
-                })
-            }
-
-            const validPassword = await verify(
-                existingUser.hashedPassword,
-                input.password,
-                ARGON2_OPTS,
-            )
-
-            if (!validPassword) {
-                throw new TRPCError({
-                    code: "BAD_REQUEST",
-                    message: "Invalid email or password",
-                })
-            }
-
-            const session = await lucia.createSession(existingUser.id, {})
-            return { session }
-        }),
-
-    signUp: publicProcedure
-        .input(
-            z.object({
-                email: z.string().email(),
-                fullName: z.string().min(3),
-                password: z.string().min(8),
-            }),
+        const validPassword = await verify(
+            existingUser.hashedPassword,
+            input.password,
+            ARGON2_OPTS,
         )
-        .mutation(async ({ input }) => {
-            try {
-                const userExists = await db.query.User.findFirst({
-                    where: (user) => eq(user.email, input.email),
-                })
 
-                if (userExists) {
-                    throw new TRPCError({
-                        code: "CONFLICT",
-                        message: "User with this email already exists",
-                    })
-                }
+        if (!validPassword) {
+            throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Email ou senha inválido.",
+            })
+        }
 
-                const [user] = await db
-                    .insert(User)
-                    .values({
-                        email: input.email,
-                        fullName: input.fullName,
-                        hashedPassword: await hash(input.password, ARGON2_OPTS),
-                    })
-                    .returning()
+        const session = await lucia.createSession(existingUser.id, {})
+        return { session }
+    }),
 
-                if (!user) {
-                    throw new TRPCError({
-                        code: "INTERNAL_SERVER_ERROR",
-                        message: "Failed to create user (DB error)",
-                    })
-                }
+    signUp: publicProcedure.input(signUpSchema).mutation(async ({ input }) => {
+        const userExists = await db.query.User.findFirst({
+            where: (user) => eq(user.email, input.email),
+        })
 
-                const session = await lucia.createSession(user.id, {})
+        if (userExists) {
+            throw new TRPCError({
+                code: "CONFLICT",
+                message: "Usuário com este email já existe.",
+            })
+        }
 
-                //@ts-expect-error ok
-                delete user.hashedPassword
+        const [user] = await db
+            .insert(User)
+            .values({
+                email: input.email,
+                fullName: input.fullName,
+                hashedPassword: await hash(input.password, ARGON2_OPTS),
+            })
+            .returning()
 
-                return { user, session }
-            } catch (error) {
-                throw new TRPCError({
-                    code: "INTERNAL_SERVER_ERROR",
-                    message: `Failed to create user (${(error as Error).message})`,
-                })
-            }
-        }),
+        if (!user) {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Falha ao criar conta. (Erro de banco de dados)",
+            })
+        }
+
+        const session = await lucia.createSession(user.id, {})
+
+        //@ts-expect-error ok
+        delete user.hashedPassword
+
+        return { user, session }
+    }),
 } satisfies TRPCRouterRecord

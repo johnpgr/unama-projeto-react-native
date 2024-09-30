@@ -1,20 +1,17 @@
 import * as Linking from "expo-linking"
 import { useRouter } from "expo-router"
 import * as Browser from "expo-web-browser"
+import type {signInSchema, signUpSchema} from "@projeto/validation"
 
 import { api } from "./api"
 import { deleteToken, getToken, setToken } from "./session-store"
+import type { z } from "zod"
 
 export type OAuthAccountProvider = "google" | "apple" | "github"
 
-export interface SignInParams {
-    email: string
-    password: string
-}
+export type SignInParams = z.infer<typeof signInSchema>
 
-export interface SignUpParams extends SignInParams {
-    fullName: string
-}
+export type SignUpParams = z.infer<typeof signUpSchema>
 
 export function useSession() {
     const { data, status } = api.auth.getSession.useQuery()

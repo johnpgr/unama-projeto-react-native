@@ -28,6 +28,7 @@
         "@hono/zod-validator": "^0.3.0",
         "@lucia-auth/adapter-drizzle": "^1.1.0",
         "@node-rs/argon2": "^1.8.3",
+        "@projeto/validation": "workspace:^",
         "@trpc/server": "catalog:",
         "@tsndr/cloudflare-worker-jwt": "^2.5.3",
         "arctic": "^1.9.2",

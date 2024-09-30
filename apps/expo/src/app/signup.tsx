@@ -14,18 +14,25 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 import Checkbox from "expo-checkbox"
 import { Link, Stack } from "expo-router"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
+
+import { signUpSchema } from "@projeto/validation"
 
 import type { SignUpParams } from "~/utils/auth"
 import { SigninOAuthButtons } from "~/components/buttons-signin-oauth"
 import { useSignUp } from "~/utils/auth"
+import { useIsKeyboardOpen } from "~/utils/keyboard"
 
 export default function SignUpScreen() {
     const [isAgreed, setIsAgreed] = React.useState(false)
-    const { signUp, error, status } = useSignUp()
+    const { signUp, error: signUpError, status } = useSignUp()
     const form = useForm<SignUpParams>({
-        defaultValues: { email: "", fullName: "", password: "" },
+        resolver: zodResolver(signUpSchema),
+        mode: "onSubmit",
+        criteriaMode: "all",
     })
+    const isKeyboardOpen = useIsKeyboardOpen()
 
     async function onSubmit(data: SignUpParams) {
         if (!isAgreed) {
@@ -47,42 +54,58 @@ export default function SignUpScreen() {
                 className="h-full w-full bg-primary"
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
-                <Image
-                    source={require("../../assets/icon.png")}
-                    style={{ width: 200, height: 200, alignSelf: "center" }}
-                />
-                <View className="mt-auto max-h-[540px] flex-1 rounded-t-[3rem] bg-white p-8">
-                    <Text className="text-center text-4xl font-bold text-green-900">
+                {isKeyboardOpen ? null : (
+                    <Image
+                        source={require("../../assets/icon.png")}
+                        style={{ width: 200, height: 200, alignSelf: "center" }}
+                    />
+                )}
+                <View className="mt-auto max-h-[630px] rounded-t-[3rem] bg-white p-8">
+                    <Text className="mt-4 text-center text-4xl font-bold text-green-900">
                         Vamos começar
                     </Text>
 
-                    <Text className="m-1 mt-4 text-lg">Nome</Text>
                     <Controller
                         name="fullName"
                         control={form.control}
                         render={({ field }) => (
-                            <TextInput
-                                className="rounded-xl border border-border px-4 py-2"
-                                placeholder="Seu nome completo"
-                                onChangeText={field.onChange}
-                                value={field.value}
-                                onBlur={field.onBlur}
-                            />
+                            <View className="mt-4">
+                                <Text className="text-lg">Nome</Text>
+                                <TextInput
+                                    className="rounded-xl border border-border px-4 py-2"
+                                    placeholder="Seu nome completo"
+                                    onChangeText={field.onChange}
+                                    value={field.value}
+                                    onBlur={field.onBlur}
+                                />
+                                {form.formState.errors.fullName ? (
+                                    <Text className="text-destructive">
+                                        {form.formState.errors.fullName.message}
+                                    </Text>
+                                ) : null}
+                            </View>
                         )}
                     />
 
-                    <Text className="m-1 mt-5 text-lg">Email</Text>
                     <Controller
                         name="email"
                         control={form.control}
                         render={({ field }) => (
-                            <TextInput
-                                className="rounded-xl border border-border px-4 py-2"
-                                placeholder="Seu melhor email"
-                                onChangeText={field.onChange}
-                                value={field.value}
-                                onBlur={field.onBlur}
-                            />
+                            <View className="mt-4">
+                                <Text className="text-lg">Email</Text>
+                                <TextInput
+                                    className="rounded-xl border border-border px-4 py-2"
+                                    placeholder="Seu melhor email"
+                                    onChangeText={field.onChange}
+                                    value={field.value}
+                                    onBlur={field.onBlur}
+                                />
+                                {form.formState.errors.email ? (
+                                    <Text className="text-destructive">
+                                        {form.formState.errors.email.message}
+                                    </Text>
+                                ) : null}
+                            </View>
                         )}
                     />
 
@@ -91,20 +114,27 @@ export default function SignUpScreen() {
                         control={form.control}
                         name="password"
                         render={({ field }) => (
-                            <TextInput
-                                secureTextEntry
-                                className="rounded-xl border border-border px-4 py-2"
-                                placeholder="Mínimo 8 caracteres"
-                                onChangeText={field.onChange}
-                                value={field.value}
-                                onBlur={field.onBlur}
-                            />
+                            <View>
+                                <TextInput
+                                    secureTextEntry
+                                    className="rounded-xl border border-border px-4 py-2"
+                                    placeholder="Mínimo 8 caracteres"
+                                    onChangeText={field.onChange}
+                                    value={field.value}
+                                    onBlur={field.onBlur}
+                                />
+                                {form.formState.errors.password ? (
+                                    <Text className="text-destructive">
+                                        {form.formState.errors.password.message}
+                                    </Text>
+                                ) : null}
+                            </View>
                         )}
                     />
 
-                    {error ? (
+                    {signUpError ? (
                         <Text className="mt-4 text-center text-red-500">
-                            {error.message}
+                            {signUpError.message}
                         </Text>
                     ) : null}
 

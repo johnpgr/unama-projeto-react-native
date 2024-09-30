@@ -71,7 +71,7 @@ export const transactionRouter = {
         })
 
         return {
-            points: user?.totalPoints || 0,
+            points: user?.totalPoints ?? 0,
             canRedeemRewards: user?.canRedeemRewards,
         }
     }),
