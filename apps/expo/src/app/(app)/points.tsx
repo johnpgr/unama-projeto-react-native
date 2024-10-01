@@ -11,12 +11,12 @@ import { Controller, useForm } from "react-hook-form"
 import type { sendPointParams } from "~/utils/transaction"
 import { useSendPointsP2P } from "~/utils/transaction" // O caminho correto do seu hook
 
-const SendPointsComponent = () => {
+export default function SendPointsScreen() {
     const [isAgreed, setIsAgreed] = React.useState(false)
     const form = useForm<sendPointParams>({
         defaultValues: { receiverId: "0", amountPoints: 0 },
     })
-    const { sendPoints, error, status } = useSendPointsP2P()
+    const { sendPoints, error, isPending } = useSendPointsP2P()
 
     async function onSubmit(data: sendPointParams) {
         if (!isAgreed) {
@@ -81,9 +81,9 @@ const SendPointsComponent = () => {
             <Pressable
                 className="relative flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 disabled:opacity-80"
                 onPress={form.handleSubmit(onSubmit)}
-                disabled={status === "pending" || !isAgreed}
+                disabled={isPending || !isAgreed}
             >
-                {status === "pending" ? (
+                {isPending ? (
                     <ActivityIndicator
                         className="absolute left-[35%]"
                         size="small"
@@ -96,5 +96,3 @@ const SendPointsComponent = () => {
         </View>
     )
 }
-
-export default SendPointsComponent

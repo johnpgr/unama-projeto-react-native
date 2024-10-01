@@ -26,7 +26,7 @@ import { useIsKeyboardOpen } from "~/utils/keyboard"
 
 export default function SignUpScreen() {
     const [remember, setRemember] = React.useState(false)
-    const { signIn, error: signInError, status } = useSignIn()
+    const { signIn, error: signInError, isPending } = useSignIn()
     const form = useForm<SignInParams>({
         resolver: zodResolver(signInSchema),
         mode: "onSubmit",
@@ -124,9 +124,9 @@ export default function SignUpScreen() {
                     <Pressable
                         className="relative mt-4 flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 disabled:opacity-80"
                         onPress={form.handleSubmit(onSubmit)}
-                        disabled={status === "pending" || status === "success"}
+                        disabled={isPending}
                     >
-                        {status === "pending" ? (
+                        {isPending ? (
                             <ActivityIndicator
                                 className="absolute left-[35%]"
                                 size="small"

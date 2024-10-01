@@ -14,7 +14,7 @@ export interface sendPointParams {
 //}
 
 export function useSendPointsP2P() {
-    const { mutateAsync, error, data, status } =
+    const { mutateAsync, error, data, isPending } =
         api.transaction.sendPointsP2P.useMutation()
     async function sendPoints(params: sendPointParams) {
         try {
@@ -27,5 +27,5 @@ export function useSendPointsP2P() {
             throw error
         }
     }
-    return { sendPoints, error, data, status }
+    return { sendPoints, error, data, isPending }
 }

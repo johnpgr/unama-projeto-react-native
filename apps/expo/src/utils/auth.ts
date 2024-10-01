@@ -1,11 +1,12 @@
+import type { z } from "zod"
 import * as Linking from "expo-linking"
 import { useRouter } from "expo-router"
 import * as Browser from "expo-web-browser"
-import type {signInSchema, signUpSchema} from "@projeto/validation"
+
+import type { signInSchema, signUpSchema } from "@projeto/validation"
 
 import { api } from "./api"
 import { deleteToken, getToken, setToken } from "./session-store"
-import type { z } from "zod"
 
 export type OAuthAccountProvider = "google" | "apple" | "github"
 
@@ -14,9 +15,8 @@ export type SignInParams = z.infer<typeof signInSchema>
 export type SignUpParams = z.infer<typeof signUpSchema>
 
 export function useSession() {
-    const { data, status } = api.auth.getSession.useQuery()
-    console.log(data)
-    return { data: data ?? {user: null, session: null}, status }
+    const { data, isLoading } = api.auth.getSession.useQuery()
+    return { data: data ?? { user: null, session: null }, isLoading }
 }
 
 export function useSignUp() {
@@ -40,7 +40,7 @@ export function useSignUp() {
         signUp,
         error: signUpMut.error,
         data: signUpMut.data,
-        status: signUpMut.status,
+        isPending: signUpMut.isPending,
     }
 }
 
@@ -65,7 +65,7 @@ export function useSignIn() {
         signIn,
         error: signInMut.error,
         data: signInMut.data,
-        status: signInMut.status,
+        isPending: signInMut.isPending,
     }
 }
 
@@ -105,14 +105,21 @@ async function signInOAuth(
         redirect,
     )
     if (result.type !== "success") {
-        return
+        console.error(
+            "Oauth signin failed (Browser auth session returned result was not successfull)",
+        )
+        return { success: false, token: null } as const
     }
     const url = Linking.parse(result.url)
     const sessionToken = url.queryParams?.token?.toString()
     if (!sessionToken) {
-        return
+        console.error(
+            "Oauth signin failed (Session token not found in callback url)",
+        )
+        return { success: false, token: null } as const
     }
-    setToken(sessionToken)
+
+    return { success: true, token: sessionToken } as const
 }
 
 export function useSignInOAuth() {
@@ -120,7 +127,9 @@ export function useSignInOAuth() {
     const router = useRouter()
 
     return async (...params: Parameters<typeof signInOAuth>) => {
-        await signInOAuth(...params)
+        const { success, token } = await signInOAuth(...params)
+        if (!success) return
+        setToken(token)
         await utils.invalidate()
         router.replace("/")
     }

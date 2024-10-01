@@ -1,29 +1,32 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react"
 import { Image, Pressable, Text, View } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
 
-import { Onboarding } from "~/components/onboarding"
 import { useSession, useSignOut } from "~/utils/auth"
 
 export default function Index() {
     const { data } = useSession()
     const signOut = useSignOut()
-    if (!data.user) return <Onboarding />
-
-    const avatarUrl = data.user.imageUrl
+    const user = data.user! // user aqui não pode ser nulo, devido ao layout
+    const avatarUrl = user.imageUrl
 
     return (
         <View className="flex flex-col gap-8 px-4">
             <View className="flex flex-row items-center gap-8">
                 <Image
-                    source={avatarUrl ? {uri: avatarUrl} : require("../../assets/avatar_default.png")}
+                    source={
+                        avatarUrl
+                            ? { uri: avatarUrl }
+                            : require("../../../assets/avatar_default.png")
+                    }
                     className="h-12 w-12 rounded-full"
                     resizeMode="contain"
                 />
                 <Text className="text-xl font-bold">
-                    Bem vindo, {data.user.fullName}
+                    Bem vindo, {user.fullName}
                 </Text>
                 <Pressable
                     onPress={() => signOut()}
@@ -35,8 +38,17 @@ export default function Index() {
             </View>
             <View className="flex flex-col gap-4">
                 <Text className="text-lg">Campanhas perto de você</Text>
-                <View className="p-4">
-                    <Image source={require("../../assets/Frame 3.png")} />
+                <View className="flex flex-row p-4">
+                    <Image
+                        source={require("../../../assets/card_1.png")}
+                        className="h-80 w-80"
+                        resizeMode="contain"
+                    />
+                    <Image
+                        source={require("../../../assets/card_2.png")}
+                        className="-ml-20 h-80 w-80"
+                        resizeMode="contain"
+                    />
                 </View>
                 <Text className="text-medium text-lg text-primary">
                     Sobre a COP30:
