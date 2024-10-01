@@ -58,6 +58,13 @@ export default function Index() {
                     Climáticas, que será realizada em Belém do Pará, em novembro
                     de 2025.
                 </Text>
+                <View className="h-[1px] w-full bg-border"></View>
+                <View className="flex flex-row gap-2 p-2">
+                    <Text className="max-w-64 text-lg">
+                        A COP, que significa "Conferência das Partes", reúne representantes de 198 países, ativistas, defensores do meio ambiente, empresas e a sociedade civil para discutir e acelerar ações em prol de um planeta mais sustentável
+                    </Text>
+                    <View className="bg-zinc-200 rounded-2xl w-40 h-48"></View>
+                </View>
             </View>
         </View>
     )

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { LinkProps } from "expo-router"
 import React from "react"
-import { Image, Text, View } from "react-native"
+import { Image, Pressable, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Link, Redirect, Slot, usePathname } from "expo-router"
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons"
@@ -40,8 +40,8 @@ function NavigationItem(props: {
     const isActive = currentPath === props.path
 
     return (
-        <Link href={props.path} disabled={isActive}>
-            <View className="flex flex-col">
+        <Link asChild href={props.path} disabled={isActive}>
+            <Pressable className="flex flex-col w-16 items-center">
                 <Entypo
                     name={props.iconName}
                     size={32}
@@ -60,7 +60,7 @@ function NavigationItem(props: {
                 >
                     {props.label}
                 </Text>
-            </View>
+            </Pressable>
         </Link>
     )
 }
@@ -74,7 +74,7 @@ function ScanButton() {
         <Link
             href={path}
             disabled={isActive}
-            className="absolute right-[46%] -top-5 translate-x-1/2"
+            className="absolute right-[45%] -top-5 translate-x-1/2"
         >
             <View className="flex flex-col">
                 <View className="h-16 w-16 flex items-center justify-center rounded-full bg-primary">
@@ -103,7 +103,7 @@ function AppNavigationBar() {
         <View className="relative mt-auto flex flex-row justify-around rounded-t-[2rem] border-x border-t border-primary bg-zinc-200 p-4">
             <NavigationItem label="Início" path="/" iconName="home" />
             <NavigationItem label="Pontos" path="/points" iconName="wallet" />
-            <View className="w-10"></View>
+            <View className="w-16"></View>
             <ScanButton />
             <NavigationItem label="Chat" path="/chat" iconName="chat" />
             <NavigationItem label="Menu" path="/menu" iconName="menu" />
