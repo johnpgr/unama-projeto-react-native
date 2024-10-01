@@ -15,7 +15,8 @@ export type SignUpParams = z.infer<typeof signUpSchema>
 
 export function useSession() {
     const { data, status } = api.auth.getSession.useQuery()
-    return { data: data ?? null, status }
+    console.log(data)
+    return { data: data ?? {user: null, session: null}, status }
 }
 
 export function useSignUp() {

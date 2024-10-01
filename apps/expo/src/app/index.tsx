@@ -10,14 +10,16 @@ import { useSession, useSignOut } from "~/utils/auth"
 export default function Index() {
     const { data } = useSession()
     const signOut = useSignOut()
-    if (!data?.user) return <Onboarding />
+    if (!data.user) return <Onboarding />
+
+    const avatarUrl = data.user.imageUrl
 
     return (
         <View className="flex flex-col gap-8 px-4">
             <View className="flex flex-row items-center gap-8">
                 <Image
-                    source={require("../../assets/avatar_default.png")}
-                    className="h-12 w-12"
+                    source={avatarUrl ? {uri: avatarUrl} : require("../../assets/avatar_default.png")}
+                    className="h-12 w-12 rounded-full"
                     resizeMode="contain"
                 />
                 <Text className="text-xl font-bold">
