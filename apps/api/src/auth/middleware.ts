@@ -26,7 +26,7 @@ export const AuthMiddleware = async (
         c.set("session", null)
         return next()
     }
-    if (session?.fresh) {
+    if (session.fresh) {
         const sessionCookie = lucia.createSessionCookie(session.id)
         c.header("Set-Cookie", sessionCookie.serialize())
     }

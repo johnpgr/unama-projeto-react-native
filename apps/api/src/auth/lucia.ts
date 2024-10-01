@@ -24,6 +24,10 @@ export const lucia = new Lucia(adapter, {
     getUserAttributes: (attributes) => ({
         fullName: attributes.fullName,
         email: attributes.email,
+        imageUrl: attributes.imageUrl,
+        userType: attributes.userType,
+        totalPoints: attributes.totalPoints,
+        canRedeemRewards: attributes.canRedeemRewards,
     }),
 })
 export type LuciaAuth = typeof lucia

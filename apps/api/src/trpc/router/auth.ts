@@ -2,7 +2,6 @@ import type { TRPCRouterRecord } from "@trpc/server"
 import { hash, verify } from "@node-rs/argon2"
 import { TRPCError } from "@trpc/server"
 import { eq } from "drizzle-orm"
-import { z } from "zod"
 
 import { signInSchema, signUpSchema } from "@projeto/validation"
 

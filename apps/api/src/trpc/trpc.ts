@@ -13,7 +13,6 @@ import superjson from "superjson"
 import { ZodError } from "zod"
 
 import type { AppContext } from "../context.ts"
-import { lucia } from "../auth/lucia.ts"
 
 type NonNullableObj<T> = {
     [K in keyof T]-?: NonNullable<T[K]>
@@ -38,7 +37,7 @@ type CreateContextFn = Parameters<
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (
+export const createTRPCContext = (
     opts: CreateContextFn[0],
     c: Context<AppContext>,
 ) => {
