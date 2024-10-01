@@ -14,7 +14,7 @@ export default function OnboardingScreen() {
 
     return (
         <SafeAreaView className="flex-1">
-            <View className="flex h-full w-full flex-col items-center bg-background p-8 pb-8">
+            <View className="flex h-full w-full flex-col items-center bg-background p-8 pb-8 bg-white">
                 <View className="flex flex-col items-center">
                     <Image
                         source={require("../../assets/icon.png")}

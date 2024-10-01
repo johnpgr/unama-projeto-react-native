@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react"
 import { Image, Pressable, Text, View } from "react-native"
+import { Link } from "expo-router"
 import { MaterialIcons } from "@expo/vector-icons"
 
 import { useSession, useSignOut } from "~/utils/auth"
@@ -39,11 +40,15 @@ export default function Index() {
             <View className="flex flex-col gap-4">
                 <Text className="text-lg">Campanhas perto de você</Text>
                 <View className="flex flex-row p-4">
-                    <Image
-                        source={require("../../../assets/card_1.png")}
-                        className="h-80 w-80"
-                        resizeMode="contain"
-                    />
+                    <Link href={"/campaigns/1"} asChild>
+                        <Pressable>
+                            <Image
+                                source={require("../../../assets/card_1.png")}
+                                className="h-80 w-80"
+                                resizeMode="contain"
+                            />
+                        </Pressable>
+                    </Link>
                     <Image
                         source={require("../../../assets/card_2.png")}
                         className="-ml-20 h-80 w-80"
@@ -61,9 +66,13 @@ export default function Index() {
                 <View className="h-[1px] w-full bg-border"></View>
                 <View className="flex flex-row gap-2 p-2">
                     <Text className="max-w-64 text-lg">
-                        A COP, que significa "Conferência das Partes", reúne representantes de 198 países, ativistas, defensores do meio ambiente, empresas e a sociedade civil para discutir e acelerar ações em prol de um planeta mais sustentável
+                        A COP, que significa "Conferência das Partes", reúne
+                        representantes de 198 países, ativistas, defensores do
+                        meio ambiente, empresas e a sociedade civil para
+                        discutir e acelerar ações em prol de um planeta mais
+                        sustentável
                     </Text>
-                    <View className="bg-zinc-200 rounded-2xl w-40 h-48"></View>
+                    <View className="h-48 w-40 rounded-2xl bg-zinc-200"></View>
                 </View>
             </View>
         </View>
