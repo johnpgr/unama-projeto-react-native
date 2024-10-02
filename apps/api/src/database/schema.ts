@@ -66,7 +66,7 @@ export const SessionRelations = relations(Session, ({ one }) => ({
     user: one(User, { references: [User.id], fields: [Session.userId] }),
 }))
 
-export const recyclingTransactions = pgTable("recycling_transactions", {
+export const RecyclingTransactions = pgTable("recycling_transactions", {
     id: serial("id").primaryKey(),
     userId: uuid("id")
         .primaryKey()
@@ -77,16 +77,16 @@ export const recyclingTransactions = pgTable("recycling_transactions", {
     transactionDate: date("transaction_date").defaultNow(),
 })
 
-export const transactionType = pgEnum("transaction_type", [
+export const TransactionTypeEnum = pgEnum("transaction_type", [
     "envio",
     "recebimento",
 ])
 
-export const P2Ptransactions = pgTable("p2p_transactions", {
+export const P2PTransactions = pgTable("p2p_transactions", {
     id: serial("id").primaryKey(),
     userId: uuid("user_id") // Alterando de "id" para "user_id" para evitar conflito
         .references(() => User.id)
         .notNull(),
-    transactionType: transactionType("transaction_type").notNull(),
+    transactionType: TransactionTypeEnum("transaction_type").notNull(),
     points: integer("points").notNull(),
 })

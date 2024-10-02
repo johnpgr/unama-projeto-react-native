@@ -10,7 +10,7 @@ import { Link } from "expo-router"
 
 export default function ChatScreen() {
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#F3F4F6" }}>
+        <View className="flex-1">
             <ScrollView contentContainerStyle={{ padding: 16 }}>
                 <View
                     style={{
@@ -113,7 +113,11 @@ export default function ChatScreen() {
                                 justifyContent: "space-between",
                                 padding: 16,
                                 borderBottomWidth: 1,
+                                borderLeftWidth: 1,
+                                borderRightWidth: 1,
                                 borderBottomColor: "#E5E7EB",
+                                borderLeftColor: "#E5E7EB",
+                                borderRightColor: "#E5E7EB",
                             }}
                         >
                             <View>
@@ -131,6 +135,6 @@ export default function ChatScreen() {
                     ))}
                 </View>
             </ScrollView>
-        </SafeAreaView>
+        </View>
     )
 }
