@@ -12,6 +12,7 @@ export default function MyCodeScreen() {
     function onPressShareHandler() {}
 
     const user = data.user!
+    console.log(user)
 
     return (
         <View className="flex flex-1 flex-col gap-10 px-4">
@@ -31,12 +32,13 @@ export default function MyCodeScreen() {
                 <View className="bg-white p-8 rounded-lg">
                     <QRCode
                         size={200}
-                        value={user.id}
+                        value={user.userCode}
                     />
                 </View>
             </View>
             <Text className="text-lg text-center">
-                Meu código é: {"\n"}{user.id}
+                Meu código é: {"\n"}
+                <Text className="tracking-widest font-bold">{user.userCode}</Text>
             </Text>
         </View>
     )

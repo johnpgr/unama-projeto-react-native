@@ -4,8 +4,8 @@ import { z } from "zod"
 
 import { db } from "../../database/client.ts"
 import {
-    P2Ptransactions,
-    recyclingTransactions,
+    P2PTransaction,
+    RecyclingTransaction,
     User,
 } from "../../database/schema.ts"
 import { protectedProcedure, publicProcedure } from "../trpc.ts"
@@ -27,7 +27,7 @@ export const transactionRouter = {
                 throw new Error("Apenas usuários normais podem enviar pontos.")
             }
             const pointsEarned = input.weight * 10
-            await db.insert(recyclingTransactions).values({
+            await db.insert(RecyclingTransaction).values({
                 userId: input.userId,
                 weight: input.weight,
                 points: pointsEarned,
@@ -144,15 +144,10 @@ export const transactionRouter = {
                     .where(inArray(User.id, [userID, input.receiverId]))
             }
 
-            await db.insert(P2Ptransactions).values({
-                userId: userID,
-                transactionType: "envio",
+            await db.insert(P2PTransaction).values({
+                from: userID,
+                to: input.receiverId,
                 points: -input.amountPoints,
-            })
-            await db.insert(P2Ptransactions).values({
-                userId: input.receiverId,
-                transactionType: "recebimento",
-                points: input.amountPoints,
             })
 
             return {

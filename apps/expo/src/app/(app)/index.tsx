@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react"
 import { Image, Pressable, Text, View } from "react-native"
-import { Link, Stack } from "expo-router"
+import { Link } from "expo-router"
 import { MaterialIcons } from "@expo/vector-icons"
 
 import { useSession, useSignOut } from "~/utils/auth"
@@ -36,7 +36,7 @@ export default function Index() {
                     <MaterialIcons name="logout" size={20} />
                 </Pressable>
             </View>
-            <View className="flex flex-col gap-4">
+            <View className="flex flex-col gap-2">
                 <Text className="text-lg">Campanhas perto de você</Text>
                 <View className="flex flex-row p-4">
                     <Link href={"/campaigns/1"} asChild>
