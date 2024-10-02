@@ -9,16 +9,27 @@ import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons"
 
 import { useSession } from "~/utils/auth"
 
+const ScreenTitles = {
+    "/": "ECOPoints",
+    "/points": "Pontos",
+    "/chat": "Chat",
+    "/my-code": "QR Code",
+    "/profile": "Perfil",
+    "/menu": "Menu",
+    "/config": "Configuração",
+    "/notifications": "Notificações",
+} as Record<string, string>
+
 function AppHeader() {
     const path = usePathname()
     const { data } = useSession()
     if (!data.user) return null
-    if(path === "/scan") return null
+    if (path === "/scan") return null
 
     return (
         <SafeAreaView>
             <View className="flex flex-row items-center justify-between p-6">
-                <Text className="text-xl font-bold">ECOPoints</Text>
+                <Text className="text-2xl font-bold">{ScreenTitles[path]}</Text>
                 <View className="flex flex-row items-center gap-4">
                     <AntDesign name="search1" size={24} />
                     <Ionicons name="notifications-outline" size={26} />
@@ -43,7 +54,7 @@ function NavigationItem(props: {
 
     return (
         <Link asChild href={props.path} disabled={isActive}>
-            <Pressable className="flex flex-col w-16 items-center">
+            <Pressable className="flex w-16 flex-col items-center">
                 <Entypo
                     name={props.iconName}
                     size={32}
@@ -76,13 +87,13 @@ function ScanButton() {
         <Link
             href={path}
             disabled={isActive}
-            className="absolute right-[45%] -top-5 translate-x-1/2"
+            className="absolute -top-5 right-[45%] translate-x-1/2"
         >
             <View className="flex flex-col">
-                <View className="h-16 w-16 flex items-center justify-center rounded-full bg-primary">
+                <View className="flex h-16 w-16 items-center justify-center rounded-full bg-primary">
                     <Image
                         source={require("../../../assets/qr_code.png")}
-                        className="w-10 h-10"
+                        className="h-10 w-10"
                         resizeMode="contain"
                     />
                 </View>
@@ -102,7 +113,7 @@ function ScanButton() {
 
 function AppNavigationBar() {
     const path = usePathname()
-    if(path === "/scan") return null
+    if (path === "/scan") return null
 
     return (
         <View className="relative mt-auto flex flex-row justify-around rounded-t-[2rem] border-x border-t border-primary bg-zinc-200 p-4">

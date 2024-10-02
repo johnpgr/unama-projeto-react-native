@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react"
 import { Image, Pressable, Text, View } from "react-native"
-import { Link } from "expo-router"
+import { Link, Stack } from "expo-router"
 import { MaterialIcons } from "@expo/vector-icons"
 
 import { useSession, useSignOut } from "~/utils/auth"
@@ -16,7 +16,7 @@ export default function Index() {
 
     return (
         <View className="flex flex-col gap-8 px-4">
-            <View className="flex flex-row items-center gap-8">
+            <View className="flex flex-row items-center gap-4">
                 <Image
                     source={
                         avatarUrl
@@ -33,7 +33,6 @@ export default function Index() {
                     onPress={() => signOut()}
                     className="flex flex-row items-center gap-2"
                 >
-                    <Text className="font-bold">Sair</Text>
                     <MaterialIcons name="logout" size={20} />
                 </Pressable>
             </View>

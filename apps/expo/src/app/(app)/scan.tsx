@@ -1,7 +1,7 @@
 import React from "react"
-import { Animated, Dimensions, Pressable, StyleSheet, View } from "react-native"
-import { CameraView, useCameraPermissions } from "expo-camera"
-import { useRouter } from "expo-router"
+import { Animated, Dimensions, Pressable, StyleSheet, Text, View } from "react-native"
+import { BarcodeScanningResult, CameraView, useCameraPermissions } from "expo-camera"
+import { Link, useRouter } from "expo-router"
 import { MaterialIcons } from "@expo/vector-icons"
 
 const { width, height } = Dimensions.get("window")
@@ -104,7 +104,9 @@ export default function ScanScreen() {
     const [permission, requestPermission] = useCameraPermissions()
     const [torchEnabled, setTorchEnabled] = React.useState(false)
 
-    async function onBarCodeScannedHandler() {}
+    function onBarCodeScannedHandler(res: BarcodeScanningResult) {
+        console.log("Scanned:", res.data)
+    }
 
     React.useEffect(() => {
         void requestPermission()
@@ -124,6 +126,15 @@ export default function ScanScreen() {
                 }}
             />
             <QRCodeOverlay />
+            <Link asChild href={"/my-code"}>
+                <Pressable
+                    className="absolute bottom-8 right-1/2 translate-x-1/2 rounded-full bg-black/30 p-6 px-10"
+                >
+                    <Text className="text-white font-bold">
+                        Mostrar código
+                    </Text>
+                </Pressable>
+            </Link>
             <Pressable
                 onPress={() => router.back()}
                 className="absolute bottom-8 right-8 rounded-full bg-black/30 p-4"
