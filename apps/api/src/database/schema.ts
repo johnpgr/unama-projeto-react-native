@@ -1,4 +1,4 @@
-import { inArray, relations, sql } from "drizzle-orm"
+import { relations } from "drizzle-orm"
 import {
     boolean,
     date,
@@ -75,4 +75,18 @@ export const recyclingTransactions = pgTable("recycling_transactions", {
     weight: integer("weight").notNull(),
     points: integer("points").notNull(),
     transactionDate: date("transaction_date").defaultNow(),
+})
+
+export const transactionType = pgEnum("transaction_type", [
+    "envio",
+    "recebimento",
+])
+
+export const P2Ptransactions = pgTable("p2p_transactions", {
+    id: serial("id").primaryKey(),
+    userId: uuid("user_id") // Alterando de "id" para "user_id" para evitar conflito
+        .references(() => User.id)
+        .notNull(),
+    transactionType: transactionType("transaction_type").notNull(),
+    points: integer("points").notNull(),
 })

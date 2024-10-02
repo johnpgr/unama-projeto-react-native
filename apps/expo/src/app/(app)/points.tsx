@@ -1,98 +1,54 @@
-import React from "react"
-import {
-    ActivityIndicator,
-    Pressable,
-    Text,
-    TextInput,
-    View,
-} from "react-native"
-import { Controller, useForm } from "react-hook-form"
-
-import type { sendPointParams } from "~/utils/transaction"
-import { useSendPointsP2P } from "~/utils/transaction" // O caminho correto do seu hook
-
-export default function SendPointsScreen() {
-    const [isAgreed, setIsAgreed] = React.useState(false)
-    const form = useForm<sendPointParams>({
-        defaultValues: { receiverId: "0", amountPoints: 0 },
-    })
-    const { sendPoints, error, isPending } = useSendPointsP2P()
-
-    async function onSubmit(data: sendPointParams) {
-        if (!isAgreed) {
-            return
-        }
-        const amountPoints = Number(data.amountPoints)
-        if (isNaN(amountPoints) || amountPoints <= 0) {
-            console.error("A quantidade de pontos deve ser um número positivo.")
-            return
-        }
-        await sendPoints(data)
-    }
-
+import { Link } from 'expo-router';
+import React from 'react';
+import { View, Text, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+export default function ChatScreen() {
     return (
-        <View>
-            <Controller
-                control={form.control}
-                name="receiverId"
-                render={({ field }) => (
-                    <TextInput
-                        className="rounded-xl border border-border px-4 py-2"
-                        placeholder="Digite o ID do receptor"
-                        onChangeText={field.onChange}
-                        value={field.value}
-                        onBlur={field.onBlur}
-                    />
-                )}
-            />
-
-            {/* Input para a quantidade de pontos */}
-            <Controller
-                control={form.control}
-                name="amountPoints"
-                render={({ field }) => (
-                    <TextInput
-                        className="rounded-xl border border-border px-4 py-2"
-                        placeholder="Insira a quantidade de pontos"
-                        keyboardType="numeric"
-                        onChangeText={(value) => {
-                            const sanitizedValue = value.replace(/[^0-9]/g, "")
-                            field.onChange(
-                                sanitizedValue
-                                    ? parseInt(sanitizedValue, 10)
-                                    : "",
-                            )
-                        }}
-                        value={field.value.toString() || ""}
-                        onBlur={field.onBlur}
-                    />
-                )}
-            />
-
-            {/* Exibe erro se houver */}
-            {error && <Text>Erro: {error.message}</Text>}
-
-            {/* Checkbox de aceitação */}
-            <Pressable onPress={() => setIsAgreed(!isAgreed)}>
-                <Text>{isAgreed ? "☑" : "☐"} Concordo com os termos</Text>
-            </Pressable>
-
-            {/* Botão de envio */}
-            <Pressable
-                className="relative flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 disabled:opacity-80"
-                onPress={form.handleSubmit(onSubmit)}
-                disabled={isPending || !isAgreed}
-            >
-                {isPending ? (
-                    <ActivityIndicator
-                        className="absolute left-[35%]"
-                        size="small"
-                        color="#FFFFFF"
-                    />
-                ) : (
-                    <Text className="text-xl font-bold text-white">Enviar</Text>
-                )}
-            </Pressable>
-        </View>
-    )
-}
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F3F4F6' }}>
+          
+    
+          <ScrollView contentContainerStyle={{ padding: 16 }}>
+            <View style={{ backgroundColor: '#047857', borderRadius: 12, padding: 16, alignItems: 'center' }}>
+              <Text style={{ color: '#fff', fontSize: 18 }}>Pontuação atual</Text>
+              <Text style={{ color: '#fff', fontSize: 48, fontWeight: 'bold' }}>1.000</Text>
+            </View>
+    
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 16 }}>
+              <TouchableOpacity style={{ backgroundColor: '#E5E7EB', padding: 12, borderRadius: 8 }}>
+              <Link href={"/myCode"}>Receber</Link>
+              </TouchableOpacity>
+              <TouchableOpacity style={{ backgroundColor: '#E5E7EB', padding: 12, borderRadius: 8 }}>
+                <Link href={"/sendPoints"}>Enviar</Link>
+              </TouchableOpacity>
+              <TouchableOpacity style={{ backgroundColor: '#E5E7EB', padding: 12, borderRadius: 8 }}>
+                <Text>Resgatar</Text>
+              </TouchableOpacity>
+            </View>
+    
+            <View style={{ backgroundColor: '#065F46', padding: 16, borderTopLeftRadius: 12, borderTopRightRadius: 12 }}>
+              <Text style={{ color: '#fff', fontSize: 20 }}>Histórico</Text>
+            </View>
+    
+            <View style={{ backgroundColor: '#fff', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5 }}>
+              {[
+                { pontos: '+25 pontos', data: '23 de setembro de 2024' },
+                { pontos: 'Resgatado', data: '23 de setembro de 2024' },
+                { pontos: '+10 pontos', data: '23 de setembro de 2024' },
+                { pontos: '+30 pontos', data: '23 de setembro de 2024' },
+              ].map((item, index) => (
+                <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: '#E5E7EB' }}>
+                  <View>
+                    <Text style={{ fontSize: 16 }}>{item.pontos}</Text>
+                    <Text style={{ color: '#6B7280' }}>Data: {item.data}</Text>
+                  </View>
+                  <TouchableOpacity>
+                    <Text style={{ color: '#047857' }}>→</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+    
+          
+        </SafeAreaView>
+      );
+    };
