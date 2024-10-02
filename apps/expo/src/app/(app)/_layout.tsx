@@ -10,8 +10,10 @@ import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons"
 import { useSession } from "~/utils/auth"
 
 function AppHeader() {
+    const path = usePathname()
     const { data } = useSession()
     if (!data.user) return null
+    if(path === "/scan") return null
 
     return (
         <SafeAreaView>
@@ -99,6 +101,9 @@ function ScanButton() {
 }
 
 function AppNavigationBar() {
+    const path = usePathname()
+    if(path === "/scan") return null
+
     return (
         <View className="relative mt-auto flex flex-row justify-around rounded-t-[2rem] border-x border-t border-primary bg-zinc-200 p-4">
             <NavigationItem label="Início" path="/" iconName="home" />
