@@ -14,20 +14,20 @@ import { appRouter } from "./trpc/router/root.ts"
 import { createTRPCContext } from "./trpc/trpc.ts"
 
 const app = new Hono<AppContext>()
-    .use(logger())
-    .use((c, next) => {
-        const handler = cors({
-            origin: process.env.API_URL ?? "http://localhost:3000",
-        })
-        return handler(c, next)
+  .use(logger())
+  .use((c, next) => {
+    const handler = cors({
+      origin: process.env.API_URL ?? "http://localhost:3000",
     })
-    .use(AuthMiddleware)
-    .use(
-        "/trpc/*",
-        trpcServer({ router: appRouter, createContext: createTRPCContext }),
-    )
-    .route("/auth", AuthController)
+    return handler(c, next)
+  })
+  .use(AuthMiddleware)
+  .use(
+    "/trpc/*",
+    trpcServer({ router: appRouter, createContext: createTRPCContext }),
+  )
+  .route("/auth", AuthController)
 
 serve(app, ({ address, port }) => {
-    console.log(`API Server listening at: http://${address}:${port}`)
+  console.log(`API Server listening at: http://${address}:${port}`)
 })

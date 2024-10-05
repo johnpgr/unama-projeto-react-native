@@ -1,9 +1,9 @@
 {
-    "extends": ["@projeto/tsconfig/base.json"],
-    "include": ["."],
-    "exclude": ["node_modules"],
-    "compilerOptions": {
-        "allowImportingTsExtensions": true,
-        "verbatimModuleSyntax": true
-    }
+  "extends": ["@projeto/tsconfig/base.json"],
+  "include": ["."],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true
+  }
 }

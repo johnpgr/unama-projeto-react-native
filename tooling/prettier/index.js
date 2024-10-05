@@ -6,47 +6,47 @@ import { fileURLToPath } from "url"
 
 /** @type { PrettierConfig | SortImportsConfig | TailwindConfig } */
 const config = {
-    tabWidth: 4,
-    semi: false,
-    plugins: [
-        "@ianvs/prettier-plugin-sort-imports",
-        "prettier-plugin-tailwindcss",
-    ],
-    tailwindConfig: fileURLToPath(
-        new URL("../../tooling/tailwind/web.ts", import.meta.url),
-    ),
-    tailwindFunctions: ["cn", "cva"],
-    importOrder: [
-        "<TYPES>",
-        "^(react/(.*)$)|^(react$)|^(react-native(.*)$)",
-        "^(next/(.*)$)|^(next$)",
-        "^(expo(.*)$)|^(expo$)",
-        "<THIRD_PARTY_MODULES>",
-        "",
-        "<TYPES>^@projeto",
-        "^@projeto/(.*)$",
-        "",
-        "<TYPES>^[.|..|~]",
-        "^~/",
-        "^[../]",
-        "^[./]",
-    ],
-    importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
-    importOrderTypeScriptVersion: "4.4.0",
-    overrides: [
-        {
-            files: "*.json.hbs",
-            options: {
-                parser: "json",
-            },
-        },
-        {
-            files: "*.js.hbs",
-            options: {
-                parser: "babel",
-            },
-        },
-    ],
+  tabWidth: 2,
+  semi: false,
+  plugins: [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss",
+  ],
+  tailwindConfig: fileURLToPath(
+    new URL("../../tooling/tailwind/web.ts", import.meta.url),
+  ),
+  tailwindFunctions: ["cn", "cva"],
+  importOrder: [
+    "<TYPES>",
+    "^(react/(.*)$)|^(react$)|^(react-native(.*)$)",
+    "^(next/(.*)$)|^(next$)",
+    "^(expo(.*)$)|^(expo$)",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "<TYPES>^@projeto",
+    "^@projeto/(.*)$",
+    "",
+    "<TYPES>^[.|..|~]",
+    "^~/",
+    "^[../]",
+    "^[./]",
+  ],
+  importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
+  importOrderTypeScriptVersion: "4.4.0",
+  overrides: [
+    {
+      files: "*.json.hbs",
+      options: {
+        parser: "json",
+      },
+    },
+    {
+      files: "*.js.hbs",
+      options: {
+        parser: "babel",
+      },
+    },
+  ],
 }
 
 export default config

@@ -15,14 +15,14 @@ import { ZodError } from "zod"
 import type { AppContext } from "../context.ts"
 
 type NonNullableObj<T> = {
-    [K in keyof T]-?: NonNullable<T[K]>
+  [K in keyof T]-?: NonNullable<T[K]>
 }
 
 /**
  * This type is here because `@hono/trpc-server` doesn't export the type for the trpcServer function
  */
 type CreateContextFn = Parameters<
-    NonNullable<Parameters<typeof trpcServer>[0]["createContext"]>
+  NonNullable<Parameters<typeof trpcServer>[0]["createContext"]>
 >
 
 /**
@@ -38,19 +38,19 @@ type CreateContextFn = Parameters<
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = (
-    opts: CreateContextFn[0],
-    c: Context<AppContext>,
+  opts: CreateContextFn[0],
+  c: Context<AppContext>,
 ) => {
-    const session = c.get("session")
-    const user = c.get("user")
+  const session = c.get("session")
+  const user = c.get("user")
 
-    const source = opts.req.headers.get("x-trpc-source") ?? "unknown"
-    console.log(">>> tRPC Request from", source, "by", user)
+  const source = opts.req.headers.get("x-trpc-source") ?? "unknown"
+  console.log(">>> tRPC Request from", source, "by", user)
 
-    return {
-        session,
-        user,
-    }
+  return {
+    session,
+    user,
+  }
 }
 type TRPCContext = Awaited<ReturnType<typeof createTRPCContext>>
 
@@ -61,15 +61,14 @@ type TRPCContext = Awaited<ReturnType<typeof createTRPCContext>>
  * transformer
  */
 const t = initTRPC.context<typeof createTRPCContext>().create({
-    transformer: superjson,
-    errorFormatter: ({ shape, error }) => ({
-        ...shape,
-        data: {
-            ...shape.data,
-            zodError:
-                error.cause instanceof ZodError ? error.cause.flatten() : null,
-        },
-    }),
+  transformer: superjson,
+  errorFormatter: ({ shape, error }) => ({
+    ...shape,
+    data: {
+      ...shape.data,
+      zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
+    },
+  }),
 })
 
 /**
@@ -112,20 +111,20 @@ export const createTRPCRouter = t.router
  * network latency that would occur in production but not in local development.
  */
 const timingMiddleware = t.middleware(async ({ next, path }) => {
-    const start = Date.now()
+  const start = Date.now()
 
-    //if (t._config.isDev) {
-    //    // artificial delay in dev 100-500ms
-    //    const waitMs = Math.floor(Math.random() * 400) + 100
-    //    await new Promise((resolve) => setTimeout(resolve, waitMs))
-    //}
+  //if (t._config.isDev) {
+  //    // artificial delay in dev 100-500ms
+  //    const waitMs = Math.floor(Math.random() * 400) + 100
+  //    await new Promise((resolve) => setTimeout(resolve, waitMs))
+  //}
 
-    const result = await next()
+  const result = await next()
 
-    const end = Date.now()
-    console.log(`[TRPC] ${path} took ${end - start}ms to execute`)
+  const end = Date.now()
+  console.log(`[TRPC] ${path} took ${end - start}ms to execute`)
 
-    return result
+  return result
 })
 
 /**
@@ -146,12 +145,12 @@ export const publicProcedure = t.procedure.use(timingMiddleware)
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure
-    .use(timingMiddleware)
-    .use(({ ctx, next }) => {
-        if (!ctx.session) {
-            throw new TRPCError({ code: "UNAUTHORIZED" })
-        }
-        return next({
-            ctx: ctx as NonNullableObj<TRPCContext>,
-        })
+  .use(timingMiddleware)
+  .use(({ ctx, next }) => {
+    if (!ctx.session) {
+      throw new TRPCError({ code: "UNAUTHORIZED" })
+    }
+    return next({
+      ctx: ctx as NonNullableObj<TRPCContext>,
     })
+  })
