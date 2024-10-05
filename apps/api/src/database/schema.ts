@@ -1,15 +1,16 @@
 import { relations } from "drizzle-orm"
 import {
-    varchar,
     boolean,
     date,
     integer,
     pgEnum,
     pgTable,
     primaryKey,
+    serial,
     text,
     timestamp,
     uuid,
+    varchar,
 } from "drizzle-orm/pg-core"
 
 function randomUserCode(maxLength: number) {
@@ -37,7 +38,8 @@ export const User = pgTable("user", {
     emailVerified: boolean("email_verified").notNull().default(false),
     userCode: varchar("user_code", { length: 5 })
         .notNull()
-        .$defaultFn(() => randomUserCode(5)),
+        .$defaultFn(() => randomUserCode(5))
+        .unique(),
     imageUrl: text("image_url"),
     userType: UserTypeEnum("user_type").default(UserTypeEnum.enumValues[0]),
     totalPoints: integer("total_points").default(1000),
@@ -49,8 +51,9 @@ export const UserRelations = relations(User, ({ many }) => ({
     sessions: many(Session),
     accounts: many(OAuthAccount),
     recyclingTransactions: many(RecyclingTransaction),
-    p2pTransactions: many(P2PTransaction),
+    
 }))
+//14963
 
 export type OAuthAccountProvider = "google" | "apple" | "github"
 
@@ -108,23 +111,22 @@ export const RecyclingTransactionRelations = relations(
 )
 
 export const P2PTransaction = pgTable("p2p_transaction", {
-    id: uuid("id").primaryKey().defaultRandom(),
-    from: uuid("from")
-        .references(() => User.id)
+    id: serial("id"),
+    from: varchar("from")
+        .references(() => User.userCode)
         .notNull(),
-    to: uuid("to")
-        .references(() => User.id)
+    to: varchar("to")
+        .references(() => User.userCode)
         .notNull(),
     points: integer("points").notNull(),
 })
-
 export const P2PTransactionRelations = relations(P2PTransaction, ({ one }) => ({
     from: one(User, {
-        references: [User.id],
+        references: [User.userCode], 
         fields: [P2PTransaction.from],
     }),
     to: one(User, {
-        references: [User.id],
+        references: [User.userCode], 
         fields: [P2PTransaction.to],
     }),
 }))
