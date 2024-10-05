@@ -19,7 +19,10 @@ const ARGON2_OPTS = {
 
 export const authRouter = {
     getSession: publicProcedure.query(({ ctx }) => {
-        return { session: ctx.session, user: ctx.user }
+        return { 
+            session: ctx.session ?? null, 
+            user: ctx.user ?? null 
+        }
     }),
 
     signOut: protectedProcedure.mutation(async ({ ctx }) => {

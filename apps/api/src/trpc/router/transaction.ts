@@ -69,12 +69,16 @@ export const transactionRouter = {
         }),
 
     // Consultar pontos de um usuário
-    getUserPoints: protectedProcedure.query(async ({ ctx }) => {
+    getUserInformations: protectedProcedure.query(async ({ ctx }) => {
         const user = await db.query.User.findFirst({
             where: (user) => eq(user.id, ctx.session.userId),
         })
 
         return {
+            fullName: user?.fullName,
+            email: user?.email,
+            userCode: user?.userCode,
+            userType: user?.userType,
             points: user?.totalPoints ?? 0,
             canRedeemRewards: user?.canRedeemRewards,
         }
@@ -89,12 +93,12 @@ export const transactionRouter = {
         )
 
         .mutation(async ({ ctx, input }) => {
-            const userID = ctx.session.userId
+            const userCode = ctx.user.userCode
             const sender = await db.query.User.findFirst({
-                where: (user) => eq(user.id, userID),
+                where: (user) => eq(user.userCode, userCode),
             })
             const receiver = await db.query.User.findFirst({
-                where: (user) => eq(user.id, input.receiverId),
+                where: (user) => eq(user.userCode, input.receiverId),
             })
 
             if (!sender) {
@@ -127,7 +131,13 @@ export const transactionRouter = {
                 if (senderPoints < input.amountPoints) {
                     throw new TRPCError({
                         code: "BAD_REQUEST",
-                        message: "O saldo é insuficiente",
+                        message: "O saldo é insuficienteee",
+                    })
+                }
+                if (input.receiverId == userCode){
+                    throw new TRPCError({
+                        code: "CONFLICT",
+                        message: "Você não pode mandar pontos a si mesmo"
                     })
                 }
 
@@ -136,27 +146,29 @@ export const transactionRouter = {
                     .set({
                         totalPoints: sql<number>`
             CASE 
-                WHEN ${User.id} = ${userID} THEN COALESCE(${User.totalPoints}, 0) - ${input.amountPoints}
-                WHEN ${User.id} = ${input.receiverId} THEN COALESCE(${User.totalPoints}, 0) + ${input.amountPoints}
+                WHEN ${User.userCode} = ${userCode} THEN COALESCE(${User.totalPoints}, 0) - ${input.amountPoints}
+                WHEN ${User.userCode} = ${input.receiverId} THEN COALESCE(${User.totalPoints}, 0) + ${input.amountPoints}
             END
         `,
                     })
-                    .where(inArray(User.id, [userID, input.receiverId]))
-            }
+                    .where(inArray(User.userCode, [userCode, input.receiverId]))
+            
 
-            await db.insert(P2PTransaction).values({
-                from: userID,
-                to: input.receiverId,
-                points: -input.amountPoints,
-            })
+                await db.insert(P2PTransaction).values({
+                    from: userCode,
+                    to: input.receiverId,
+                    points: -input.amountPoints,
+                })
+                
 
-            return {
-                success: true,
-                senderId: sender.id,
-                senderFullName: sender.fullName,
-                receiverId: receiver.id,
-                receiverFullName: receiver.fullName,
-                pointsTransferred: input.amountPoints,
+                return {
+                    success: true,
+                    senderId: sender.id,
+                    senderFullName: sender.fullName,
+                    receiverId: receiver.id,
+                    receiverFullName: receiver.fullName,
+                    pointsTransferred: input.amountPoints,
+                }
             }
         }),
 }

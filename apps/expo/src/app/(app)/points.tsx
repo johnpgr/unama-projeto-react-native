@@ -7,8 +7,12 @@ import {
     View,
 } from "react-native"
 import { Link } from "expo-router"
+import { useGetUserInformations } from "~/utils/transaction"
 
 export default function ChatScreen() {
+    const userInfo = useGetUserInformations().data
+    
+
     return (
         <View className="flex-1">
             <ScrollView contentContainerStyle={{ padding: 16 }}>
@@ -30,7 +34,7 @@ export default function ChatScreen() {
                             fontWeight: "bold",
                         }}
                     >
-                        1.000
+                        {userInfo?.points}
                     </Text>
                 </View>
 

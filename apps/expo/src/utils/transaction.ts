@@ -1,7 +1,8 @@
+import { TRPCClientError } from "@trpc/client"
 import { api } from "./api"
 
-export function useGetUserPoints() {
-    return api.transaction.getUserPoints.useQuery()
+export function useGetUserInformations() {
+    return api.transaction.getUserInformations.useQuery()
 }
 
 export interface sendPointParams {
@@ -15,11 +16,13 @@ export function useSendPointsP2P() {
     async function sendPoints(params: sendPointParams) {
         try {
             const res = await mutateAsync(params)
-            console.log("Payload a ser enviado:" + { params })
+            console.log("Resposta recebida:", res)
             return res
         } catch (error) {
             console.error("Erro ao enviar pontos:", error)
-            console.log(error)
+            if (error instanceof TRPCClientError) {
+                console.error("Erro específico de TRPC:", error.message)
+            }
             throw error
         }
     }
