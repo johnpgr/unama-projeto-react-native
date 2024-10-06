@@ -20,6 +20,7 @@
         "strict": true,
         "noUncheckedIndexedAccess": true,
         "checkJs": true,
+        "allowImportingTsExtensions": true,
         /** Transpile using Bundler (not tsc) */
         "module": "Preserve",
         "moduleResolution": "Bundler",

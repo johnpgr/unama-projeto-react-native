@@ -19,6 +19,7 @@
     "@expo/metro-config": "^0.18.11",
     "@hookform/resolvers": "^3.9.0",
     "@projeto/validation": "workspace:^",
+    "@t3-oss/env-core": "^0.11.1",
     "@tanstack/react-query": "catalog:",
     "@trpc/client": "catalog:",
     "@trpc/react-query": "catalog:",
