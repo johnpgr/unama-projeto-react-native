@@ -83,6 +83,26 @@ export const transactionRouter = {
       canRedeemRewards: user?.canRedeemRewards,
     }
   }),
+  getUserTransactions: protectedProcedure.query(async ({ ctx }) => {
+    const transaction_from = await db.query.P2PTransaction.findMany({
+      where: (from) => eq(from.from, ctx.user.userCode),
+    })
+    const transaction_to = await db.query.P2PTransaction.findMany({
+      where: (to) => eq(to.to, ctx.user.userCode),
+    })
+    transaction_from.map((num) => -num.points)
+    transaction_to.map((num) => +num.points)
+    const transactions: {
+      id: number
+      points: number
+      transactionDate: string | null
+      from: string
+      to: string
+    }[] = []
+    transactions.push(...transaction_from)
+    transactions.push(...transaction_to)
+    return transactions
+  }),
 
   sendPointsP2P: protectedProcedure
     .input(
