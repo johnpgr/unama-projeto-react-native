@@ -118,6 +118,7 @@ export const P2PTransaction = pgTable("p2p_transaction", {
     .references(() => User.userCode)
     .notNull(),
   points: integer("points").notNull(),
+  transactionDate: date("transaction_date").defaultNow(),
 })
 export const P2PTransactionRelations = relations(P2PTransaction, ({ one }) => ({
   from: one(User, {

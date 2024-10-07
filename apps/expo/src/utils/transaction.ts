@@ -5,6 +5,9 @@ import { api } from "./api"
 export function useGetUserInformations() {
   return api.transaction.getUserInformations.useQuery()
 }
+export function getUserTransactions() {
+  return api.transaction.getUserTransactions.useQuery()
+}
 
 export interface sendPointParams {
   receiverId: string
