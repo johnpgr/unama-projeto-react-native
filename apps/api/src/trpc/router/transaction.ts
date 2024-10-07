@@ -4,31 +4,41 @@ import { z } from "zod"
 
 import { db } from "../../database/client.ts"
 import {
-  P2PTransaction,
-  RecyclingTransaction,
-  User,
+    P2PTransaction,
+    RecyclingTransaction,
+    User,
 } from "../../database/schema.ts"
-import { protectedProcedure, publicProcedure } from "../trpc.ts"
+import { protectedProcedure } from "../trpc.ts"
 
 export const transactionRouter = {
+  /**
+   * Procedimento para adicionar uma transação de reciclagem.
+   *
+   * Este procedimento permite que um usuário normal adicione uma transação de reciclagem,
+   * calculando os pontos ganhos com base no peso dos materiais reciclados.
+   *
+   * Parâmetros de entrada:
+   * - weight: O peso dos materiais reciclados.
+   *
+   * Retorna:
+   * - Nenhum valor de retorno explícito.
+   *
+   * Lança:
+   * - Error: Se o usuário não for um usuário normal.
+   */
   addRecyclingTransaction: protectedProcedure
     .input(
       z.object({
-        userId: z.string(),
         weight: z.number(),
       }),
     )
-    .mutation(async ({ input }) => {
-      const user = await db.query.User.findFirst({
-        where: (user) => eq(user.id, input.userId),
-      })
-
-      if (user?.userType !== "normal") {
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.userType !== "normal") {
         throw new Error("Apenas usuários normais podem enviar pontos.")
       }
       const pointsEarned = input.weight * 10
       await db.insert(RecyclingTransaction).values({
-        userId: input.userId,
+        userId: ctx.user.id,
         weight: input.weight,
         points: pointsEarned,
       })
@@ -38,22 +48,34 @@ export const transactionRouter = {
         .set({
           totalPoints: sql`${User.totalPoints} + ${pointsEarned}`,
         })
-        .where(eq(User.id, input.userId))
+        .where(eq(User.id, ctx.user.id))
     }),
 
-  addMoneyToCooperative: publicProcedure
+  /**
+   * Procedimento para adicionar dinheiro a uma cooperativa e converter em pontos.
+   *
+   * Este procedimento permite que uma cooperativa adicione dinheiro e receba pontos em troca.
+   * Verifica se o usuário é uma cooperativa e calcula os pontos ganhos com base na quantidade de dinheiro adicionada.
+   *
+   * Parâmetros de entrada:
+   * - amount: A quantidade de dinheiro a ser adicionada.
+   *
+   * Retorna:
+   * - Um objeto contendo:
+   *   - success: Indica se a operação foi bem-sucedida.
+   *   - pointsEarned: A quantidade de pontos ganhos.
+   *
+   * Lança:
+   * - Error: Se o usuário não for uma cooperativa.
+   */
+  addMoneyToCooperative: protectedProcedure
     .input(
       z.object({
-        userId: z.string(),
         amount: z.number(),
       }),
     )
-    .mutation(async ({ input }) => {
-      const user = await db.query.User.findFirst({
-        where: (user) => eq(user.id, input.userId),
-      })
-
-      if (user?.userType !== "cooperative") {
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.userType !== "cooperative") {
         throw new Error(
           "Apenas cooperativas podem enviar dinheiro para ganhar pontos.",
         )
@@ -64,25 +86,57 @@ export const transactionRouter = {
         .set({
           totalPoints: sql`${User.totalPoints} + ${pointsEarned}`,
         })
-        .where(eq(User.id, input.userId))
+        .where(eq(User.id, ctx.user.id))
       return { success: true, pointsEarned }
     }),
 
-  // Consultar pontos de um usuário
-  getUserInformations: protectedProcedure.query(async ({ ctx }) => {
-    const user = await db.query.User.findFirst({
-      where: (user) => eq(user.id, ctx.session.userId),
-    })
+  /**
+   * Procedimento para consultar pontos de um usuário.
+   *
+   * Este procedimento recupera as informações do usuário com base no ID do usuário da sessão atual.
+   *
+   * Retorna:
+   * - Um objeto contendo:
+   *   - fullName: O nome completo do usuário.
+   *   - email: O email do usuário.
+   *   - userCode: O código do usuário.
+   *   - userType: O tipo de usuário.
+   *   - points: Os pontos totais do usuário (padrão 0 se não disponível).
+   *   - canRedeemRewards: Indica se o usuário pode resgatar recompensas.
+   */
+  getUserInformations: protectedProcedure.query(({ ctx }) => {
+    const {
+      fullName,
+      email,
+      canRedeemRewards,
+      userCode,
+      userType,
+      totalPoints,
+    } = ctx.user
 
     return {
-      fullName: user?.fullName,
-      email: user?.email,
-      userCode: user?.userCode,
-      userType: user?.userType,
-      points: user?.totalPoints ?? 0,
-      canRedeemRewards: user?.canRedeemRewards,
+      fullName,
+      email,
+      userCode,
+      userType,
+      points: totalPoints,
+      canRedeemRewards,
     }
   }),
+
+  /**
+   * Procedimento para obter as transações do usuário.
+   *
+   * Este procedimento recupera todas as transações de pontos enviadas e recebidas pelo usuário atual.
+   *
+   * Retorna:
+   * - Um array de objetos contendo:
+   *   - id: O ID da transação.
+   *   - points: A quantidade de pontos transferidos.
+   *   - transactionDate: A data da transação.
+   *   - from: O código do usuário que enviou os pontos.
+   *   - to: O código do usuário que recebeu os pontos.
+   */
   getUserTransactions: protectedProcedure.query(async ({ ctx }) => {
     const transaction_from = await db.query.P2PTransaction.findMany({
       where: (from) => eq(from.from, ctx.user.userCode),
@@ -103,6 +157,32 @@ export const transactionRouter = {
     transactions.push(...transaction_to)
     return transactions
   }),
+
+  /**
+   * Procedimento para enviar pontos de um usuário para outro (P2P).
+   *
+   * Este procedimento permite que um usuário envie pontos para outro usuário,
+   * verificando se ambos os usuários existem, se o remetente tem pontos suficientes,
+   * e se o valor dos pontos é válido. Também impede que um usuário envie pontos para si mesmo.
+   *
+   * Parâmetros de entrada:
+   * - receiverId: O ID do receptor dos pontos.
+   * - amountPoints: A quantidade de pontos a ser transferida.
+   *
+   * Retorna:
+   * - Um objeto contendo:
+   *   - success: Indica se a transferência foi bem-sucedida.
+   *   - senderId: O ID do remetente.
+   *   - senderFullName: O nome completo do remetente.
+   *   - receiverId: O ID do receptor.
+   *   - receiverFullName: O nome completo do receptor.
+   *   - pointsTransferred: A quantidade de pontos transferidos.
+   *
+   * Lança:
+   * - TRPCError: Se o usuário não estiver logado, se o receptor não existir,
+   *   se o valor dos pontos for inválido, se o saldo for insuficiente,
+   *   ou se o usuário tentar enviar pontos para si mesmo.
+   */
 
   sendPointsP2P: protectedProcedure
     .input(
