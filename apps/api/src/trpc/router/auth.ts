@@ -18,6 +18,16 @@ const ARGON2_OPTS = {
 }
 
 export const authRouter = {
+  /**
+   * Procedimento para obter a sessão atual do usuário.
+   *
+   * Este procedimento retorna a sessão atual e as informações do usuário associado.
+   *
+   * Retorna:
+   * - Um objeto contendo:
+   *   - session: A sessão atual.
+   *   - user: As informações do usuário associado à sessão.
+   */
   getSession: publicProcedure.query(({ ctx }) => {
     return {
       session: ctx.session,
@@ -25,6 +35,17 @@ export const authRouter = {
     }
   }),
 
+  /**
+   * Procedimento para encerrar a sessão do usuário.
+   *
+   * Este procedimento invalida a sessão atual do usuário.
+   *
+   * Retorna:
+   * - Uma string "ok" se a sessão for invalidada com sucesso.
+   *
+   * Lança:
+   * - TRPCError: Se ocorrer um erro ao invalidar a sessão.
+   */
   signOut: protectedProcedure.mutation(async ({ ctx }) => {
     try {
       await lucia.invalidateSession(ctx.session.id)
@@ -38,6 +59,20 @@ export const authRouter = {
     }
   }),
 
+  /**
+   * Procedimento para autenticar um usuário.
+   *
+   * Este procedimento verifica as credenciais do usuário e cria uma nova sessão se as credenciais forem válidas.
+   *
+   * Parâmetros de entrada:
+   * - input: Um objeto contendo o email e a senha do usuário.
+   *
+   * Retorna:
+   * - Um objeto contendo a nova sessão criada.
+   *
+   * Lança:
+   * - TRPCError: Se o email ou a senha forem inválidos.
+   */
   signIn: publicProcedure.input(signInSchema).mutation(async ({ input }) => {
     const existingUser = await db.query.User.findFirst({
       where: (user) => eq(user.email, input.email),
@@ -67,6 +102,20 @@ export const authRouter = {
     return { session }
   }),
 
+  /**
+   * Procedimento para registrar um novo usuário.
+   *
+   * Este procedimento cria uma nova conta de usuário e uma nova sessão.
+   *
+   * Parâmetros de entrada:
+   * - input: Um objeto contendo o email, nome completo e senha do usuário.
+   *
+   * Retorna:
+   * - Um objeto contendo o novo usuário e a nova sessão criada.
+   *
+   * Lança:
+   * - TRPCError: Se o email já estiver em uso ou se ocorrer um erro ao criar a conta.
+   */
   signUp: publicProcedure.input(signUpSchema).mutation(async ({ input }) => {
     const userExists = await db.query.User.findFirst({
       where: (user) => eq(user.email, input.email),
@@ -97,7 +146,7 @@ export const authRouter = {
 
     const session = await lucia.createSession(user.id, {})
 
-    //@ts-expect-error ok
+    //@ts-expect-error remove hashedPassword from user
     delete user.hashedPassword
 
     return { user, session }
