@@ -9,8 +9,24 @@ import {
     User,
 } from "../../database/schema.ts"
 import { protectedProcedure } from "../trpc.ts"
-
+import {ChatMistralAI} from "@langchain/mistralai"
 export const transactionRouter = {
+    getLLMResponse: protectedProcedure
+    .input(z.object({ prompt: z.string() }),)    
+    .mutation(async ({ input }) => {
+      const llm = new ChatMistralAI({
+        apiKey: "5jgGUU7PgBs145piZ8kTwELSDPHwnuI0",
+        temperature: 0.5
+      });
+      const question = `${input.prompt}`
+  
+      const response = await llm.invoke(question);
+  
+      // O retorno deve ser a estrutura esperada pela aplicação
+      return { response: response.content };
+    }),
+  
+
   /**
    * Procedimento para adicionar uma transação de reciclagem.
    *
