@@ -16,7 +16,7 @@ export const transactionRouter = {
     .input(z.object({ prompt: z.string() }))
     .mutation(async ({ input }) => {
       const llm = new ChatMistralAI({
-        apiKey: "JsYMKeKBIs5wnFsHOKln4CbRkoN3Gscs",
+        apiKey: "",
         temperature: 0.5,
       })
       const question = `${input.prompt}`
