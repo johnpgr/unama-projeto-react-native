@@ -145,6 +145,7 @@ export default function ChatbotScreen() {
           text: `Você possue poucas transações, você só pode fazer uma previsão com, no mínimo, 5 transações na conta`,
           isUser: false,
         }
+        setMessages((prevMessages) => [botMessage, ...prevMessages])
       } else {
         const prompt = `
     Você é um engenheiro de machine learning especializado em modelos de previsão financeira. Usando técnicas avançadas de regressão e análise de sequências temporais, faça uma previsão curta e objetiva sobre a quantidade de pontos que o usuário pode ganhar ou perder no próximo mês com base nas transações a seguir:
