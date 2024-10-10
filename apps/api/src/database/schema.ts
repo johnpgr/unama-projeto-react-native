@@ -13,7 +13,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core"
 
-function randomUserCode(maxLength: number) {
+export function randomUserCode(maxLength: number) {
   // Ensure maxLength is a positive integer
   if (maxLength <= 0 || !Number.isInteger(maxLength)) {
     throw new Error("maxLength must be a positive integer.")

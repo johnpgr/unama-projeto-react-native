@@ -26,6 +26,7 @@
     "@hono/node-server": "^1.13.0",
     "@hono/trpc-server": "^0.3.2",
     "@hono/zod-validator": "^0.3.0",
+    "@langchain/mistralai": "^0.1.1",
     "@lucia-auth/adapter-drizzle": "^1.1.0",
     "@node-rs/argon2": "^1.8.3",
     "@projeto/validation": "workspace:^",
