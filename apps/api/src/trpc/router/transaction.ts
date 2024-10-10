@@ -1,36 +1,33 @@
+import { ChatMistralAI } from "@langchain/mistralai"
 import { TRPCError } from "@trpc/server"
 import { eq, inArray, sql } from "drizzle-orm"
 import { z } from "zod"
 
 import { db } from "../../database/client.ts"
 import {
-    P2PTransaction,
-    RecyclingTransaction,
-    User,
+  P2PTransaction,
+  RecyclingTransaction,
+  User,
 } from "../../database/schema.ts"
 import { protectedProcedure } from "../trpc.ts"
-import {ChatMistralAI} from "@langchain/mistralai"
+
 export const transactionRouter = {
-    getLLMResponse: protectedProcedure
-    .input(z.object({ prompt: z.string() }),)    
+  getLLMResponse: protectedProcedure
+    .input(z.object({ prompt: z.string() }))
     .mutation(async ({ input }) => {
       const llm = new ChatMistralAI({
-        apiKey: "",
-        temperature: 0.5
-      });
+        apiKey: "JsYMKeKBIs5wnFsHOKln4CbRkoN3Gscs",
+        temperature: 0.5,
+      })
       const question = `${input.prompt}`
-  
-      const response = await llm.invoke(question);
-  
-      // O retorno deve ser a estrutura esperada pela aplicação
-      return { response: response.content };
-    }),
-  
 
-  /**
-   * Procedimento para adicionar uma transação de reciclagem.
-   *
-   * Este procedimento permite que um usuário normal adicione uma transação de reciclagem,
+      const response = await llm.invoke(question)
+
+      // O retorno deve ser a estrutura esperada pela aplicação
+      return { response: response.content }
+    }),
+  /*
+procedimento permite que um usuário normal adicione uma transação de reciclagem,
    * calculando os pontos ganhos com base no peso dos materiais reciclados.
    *
    * Parâmetros de entrada:
