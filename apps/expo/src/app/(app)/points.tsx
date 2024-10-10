@@ -13,7 +13,7 @@ import {
   useGetUserInformations,
 } from "~/utils/transaction"
 
-const notifications: {
+export const notifications: {
   id: number
   points: number
   transactionDate: string | null
