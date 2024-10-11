@@ -36,3 +36,29 @@ export function useSendPointsP2P() {
 //    const {data, status } = api.user.getUserPoints.useQuery()
 //    return { data: data ?? null, status }
 //}
+export function useGetResponseLLM() {
+  const { mutateAsync, error, data, isPending } =
+    api.transaction.getLLMResponse.useMutation()
+
+  async function getResponse(prompt: string) {
+    try {
+      const res = await mutateAsync({ prompt })
+      console.log("Resposta recebida:", res)
+
+      // Acessando o conteúdo da resposta corretamente
+      if (res && typeof res.response === "string") {
+        return res.response // Retorna a resposta diretamente
+      } else {
+        return null // Retorna null se a resposta não for uma string
+      }
+    } catch (err) {
+      console.error("Erro ao receber mensagem da LLM:", err)
+      if (err instanceof TRPCClientError) {
+        console.error("Erro específico de TRPC:", err.message)
+      }
+      throw err // Lança o erro para que o chamador possa lidar com isso
+    }
+  }
+
+  return { getResponse, error, data, isPending }
+}

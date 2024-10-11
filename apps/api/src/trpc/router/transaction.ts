@@ -1,3 +1,4 @@
+import { ChatMistralAI } from "@langchain/mistralai"
 import { TRPCError } from "@trpc/server"
 import { eq, inArray, sql } from "drizzle-orm"
 import { z } from "zod"
@@ -11,6 +12,21 @@ import {
 import { protectedProcedure } from "../trpc.ts"
 
 export const transactionRouter = {
+  getLLMResponse: protectedProcedure
+    .input(z.object({ prompt: z.string() }))
+    .mutation(async ({ input }) => {
+      const llm = new ChatMistralAI({
+        apiKey: "",
+        temperature: 0.5,
+      })
+      const question = `${input.prompt}`
+
+      const response = await llm.invoke(question)
+
+      // O retorno deve ser a estrutura esperada pela aplicação
+      return { response: response.content }
+    }),
+
   /**
    * Procedimento para adicionar uma transação de reciclagem.
    *
