@@ -4,9 +4,9 @@ import { z } from "zod"
 
 import { db } from "../../database/client.ts"
 import {
-    P2PTransaction,
-    RecyclingTransaction,
-    User,
+  P2PTransaction,
+  RecyclingTransaction,
+  User,
 } from "../../database/schema.ts"
 import { protectedProcedure } from "../trpc.ts"
 

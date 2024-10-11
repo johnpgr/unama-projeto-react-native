@@ -1,7 +1,7 @@
 import type { Config } from "drizzle-kit"
 
-import { DATABASE_TYPE } from "./src/database/client"
 import { env } from "./env"
+import { DATABASE_TYPE } from "./src/database/client"
 
 export default {
   schema: "./src/database/schema.ts",
