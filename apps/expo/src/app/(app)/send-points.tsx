@@ -8,21 +8,27 @@ import {
 } from "react-native"
 import { Controller, useForm } from "react-hook-form"
 
-import type { sendPointParams } from "~/utils/transaction"
-import { useSendPointsP2P } from "~/utils/transaction" // O caminho correto do seu hook
+import type { RouterInputs } from "~/utils/api"
+import { api } from "~/utils/api"
+
+type SendPointsInput = RouterInputs["transaction"]["sendPointsP2P"]
 
 export default function SendPointsScreen() {
   const [isAgreed, setIsAgreed] = React.useState(false)
-  const form = useForm<sendPointParams>({
+  const form = useForm<SendPointsInput>({
     defaultValues: { receiverId: "0", amountPoints: 0 },
   })
-  const { sendPoints, error, isPending } = useSendPointsP2P()
+  const {
+    mutateAsync: sendPoints,
+    isPending,
+    error,
+  } = api.transaction.sendPointsP2P.useMutation()
 
-  async function onSubmit(data: sendPointParams) {
+  async function onSubmit(data: SendPointsInput) {
     if (!isAgreed) {
       return
     }
-    const amountPoints = Number(data.amountPoints)
+    const amountPoints = data.amountPoints
     if (isNaN(amountPoints) || amountPoints <= 0) {
       console.error("A quantidade de pontos deve ser um número positivo.")
       return

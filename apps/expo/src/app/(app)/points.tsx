@@ -7,19 +7,11 @@ import {
   View,
 } from "react-native"
 import { Link } from "expo-router"
+import { useAtom } from "jotai"
 
-import {
-  getUserTransactions,
-  useGetUserInformations,
-} from "~/utils/transaction"
+import { notificationsAtom } from "~/state/notifications"
+import { api } from "~/utils/api"
 
-export const notifications: {
-  id: number
-  points: number
-  transactionDate: string | null
-  from: string
-  to: string
-}[] = []
 const months: Record<string, string> = {
   "1": "Janeiro",
   "2": "Fevereiro",
@@ -36,24 +28,30 @@ const months: Record<string, string> = {
 }
 
 export default function ChatScreen() {
-  const userInfo = useGetUserInformations().data
-  const userTransaction = getUserTransactions().data
-  userTransaction?.forEach((element) => {
-    const exists = notifications.find(
-      (notification) => notification.id === element.id,
-    )
+  const [notifications, setNotifications] = useAtom(notificationsAtom)
+  const { data: userSession } = api.auth.getSession.useQuery()
+  const { data: userTransaction } =
+    api.transaction.getUserTransactions.useQuery()
 
-    if (!exists) {
-      notifications.push(element)
-    }
-  })
+  React.useEffect(() => {
+    userTransaction?.forEach((transaction) => {
+      const exists = notifications.find(
+        (notification) => notification.id === transaction.id,
+      )
+
+      if (!exists) {
+        setNotifications((prev) => [...prev, transaction])
+      }
+    })
+  }, [userTransaction, notifications, setNotifications])
+
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
       <ScrollView contentContainerStyle={{ padding: 16 }}>
         <View className="items-center rounded-xl bg-emerald-700 p-4">
           <Text className="text-lg text-white">Pontuação atual</Text>
           <Text className="text-6xl font-bold text-white">
-            {userInfo?.points}
+            {userSession?.user?.totalPoints}
           </Text>
         </View>
 

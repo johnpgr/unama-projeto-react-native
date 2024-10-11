@@ -5,8 +5,8 @@ import * as Browser from "expo-web-browser"
 
 import type { signInSchema, signUpSchema } from "@projeto/validation"
 
-import { api } from "./api"
-import { deleteToken, getToken, setToken } from "./session-store"
+import { api } from "../utils/api"
+import { deleteToken, getToken, setToken } from "../utils/session-store"
 
 export type OAuthAccountProvider = "google" | "apple" | "github"
 

@@ -1,97 +1,85 @@
-import React, { useEffect, useRef, useState } from "react"
-import {
-  ActivityIndicator,
-  FlatList,
-  Platform,
-  Pressable,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native"
+import React from "react"
+import { FlatList, Pressable, Text, TouchableOpacity, View } from "react-native"
 import { useRouter } from "expo-router"
 import { EvilIcons } from "@expo/vector-icons"
-import { randomUserCode } from "node_modules/@projeto/api/src/database/schema"
+import clsx from "clsx"
+import { useAtom } from "jotai"
 
-import { notifications } from "~/app/(app)/points"
-import { useSession } from "~/utils/auth"
-import { getUserTransactions, useGetResponseLLM } from "~/utils/transaction"
+import { useSession } from "~/hooks/auth"
+import { notificationsAtom } from "~/state/notifications"
+import { api } from "~/utils/api"
+import { randomString } from "~/utils/random"
 
-interface Message {
-  id: string
-  text: string
-  isUser: boolean
-  options?: string[]
-  choice?: string
+const enum UserMessageChoice {
+  REQUEST_BALANCE = "Consultar saldo",
+  LIST_TRANSACTIONS = "Ver transações",
+  DOUBT_ABOUT_POINTS = "Dúvidas sobre pontos",
+  REQUEST_POINTS_PREDICTION = "Realizar uma previsão sobre meus pontos",
 }
 
+class BotMessage {
+  public id: string = randomString(8)
+  constructor(public text: string) {}
+}
+
+class UserMessage {
+  public id: string = randomString(8)
+  constructor(
+    public text: string,
+    public options?: UserMessageChoice[],
+  ) {}
+}
+
+type Message = BotMessage | UserMessage
+
+const initialMessages: Message[] = [
+  new BotMessage(
+    "Olá! Eu sou o bot do Eco-Pontos! Eu sou responsável pelas suas finanças, o que você deseja saber sobre os seus pontos?",
+  ),
+  new UserMessage("Essas são algumas opções disponíveis para você:", [
+    UserMessageChoice.REQUEST_BALANCE,
+    UserMessageChoice.LIST_TRANSACTIONS,
+    UserMessageChoice.DOUBT_ABOUT_POINTS,
+    UserMessageChoice.REQUEST_POINTS_PREDICTION,
+  ]),
+]
+
 export default function ChatbotScreen() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [inputText, setInputText] = useState("")
-  const { getResponse, error, isPending } = useGetResponseLLM()
+  const { data: userSession } = useSession()
+  const [notifications, setNotifications] = useAtom(notificationsAtom)
+  const [messages, setMessages] = React.useState<Message[]>(initialMessages)
+  const [inputText, setInputText] = React.useState("")
+  const {
+    mutateAsync: getResponse,
+    data,
+    isPending,
+  } = api.transaction.getLLMResponse.useMutation()
   const router = useRouter()
-  const { data } = useSession()
 
-  const requestMadeRef = useRef(false) // ref para rastrear requisições
-
-  // Mensagem de boas-vindas com opções
-  useEffect(() => {
-    const botMessage: Message = {
-      id: randomUserCode(3),
-      text: "Olá! Eu sou o bot do Eco-Pontos! Eu sou responsável pelas suas finanças, o que você deseja saber sobre os seus pontos?",
-      isUser: false,
-    }
-    const optionsMessage: Message = {
-      id: randomUserCode(3),
-      text: "Essas são algumas opções disponíveis para você:",
-      isUser: true,
-      options: [
-        "Consultar saldo",
-        "Ver transações",
-        "Dúvidas sobre pontos",
-        "Realizar uma previsão sobre meus pontos",
-      ],
-    }
-    setMessages((prevMessages) => [botMessage, ...prevMessages])
-    setMessages((prevMessages) => [optionsMessage, ...prevMessages])
-  }, [])
-
-  const sendMessageLastchance = async (input: string) => {
+  async function sendMessage(input: string) {
     try {
-      const botResponse = await getResponse(input)
-      if (botResponse) {
-        const botMessage: Message = {
-          id: Date.now().toString(),
-          text: botResponse,
-          isUser: false,
-        }
-        setMessages((prevMessages) => [botMessage, ...prevMessages])
-      }
-    } catch (err) {
-      const errorMessage: Message = {
-        id: Date.now().toString(),
-        text: `Error: ${err}`,
-        isUser: false,
-      }
+      const botResponse = await getResponse({ prompt: input })
+      const responseMessage =
+        typeof botResponse.response === "string"
+          ? botResponse.response
+          : botResponse.response.join(", ")
 
-      setMessages((prevMessages) => [errorMessage, ...prevMessages])
+      const botMessage = new BotMessage(responseMessage)
+      setMessages((prevMessages) => [...prevMessages, botMessage])
+    } catch (err) {
+      if (err instanceof Error) {
+        const errorMessage = new BotMessage(`Erro: ${err.message}`)
+
+        setMessages((prevMessages) => [...prevMessages, errorMessage])
+      }
     }
   }
 
-  const handleOptionClick = (option: string) => {
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: `Você escolheu: ${option}`,
-      choice: option.toUpperCase().replace(/\s+/g, ""),
-      isUser: true,
-    }
+  function handleOptionClick(option: UserMessageChoice) {
+    const userMessage = new UserMessage(`Você escolheu: ${option}`)
 
     setMessages((prevMessages) => [userMessage, ...prevMessages])
-    requestMadeRef.current = false // Reset para novas requisições
-  }
 
-  // Efeito para lidar com a escolha do usuário
-  useEffect(() => {
     const transactionDetails = notifications
       .map(
         (notification) =>
@@ -99,113 +87,107 @@ export default function ChatbotScreen() {
       )
       .join("\n")
 
-    if (!messages[0]?.choice || requestMadeRef.current)
-      return console.log("caiu aqui =================") // Evitar chamadas repetidas
-
-    if (messages[0]?.choice === "CONSULTARSALDO") {
-      const botMessage: Message = {
-        id: randomUserCode(3),
-        text: `Seu saldo é de ${data.user?.totalPoints} pontos.`,
-        isUser: false,
-      }
-      setMessages((prevMessages) => [botMessage, ...prevMessages])
-    }
-
-    if (messages[0]?.choice === "VERTRANSAÇÕES") {
-      if (notifications.length <= 0) {
-        const botMessage: Message = {
-          id: randomUserCode(3),
-          text: "Você não possui nenhuma transação salva em sua conta",
-          isUser: false,
-        }
+    switch (option) {
+      case UserMessageChoice.REQUEST_BALANCE: {
+        const botMessage = new BotMessage(
+          `Seu saldo é de ${userSession.user?.totalPoints} pontos.`,
+        )
         setMessages((prevMessages) => [botMessage, ...prevMessages])
-      } else {
-        const botMessage: Message = {
-          id: randomUserCode(3),
-          text: `Essas são todas as transações da sua conta:\n${transactionDetails}`,
-          isUser: false,
-        }
-        setMessages((prevMessages) => [botMessage, ...prevMessages])
+        return
       }
-    }
-
-    if (messages[0]?.choice === "DÚVIDASSOBREPONTOS") {
-      const botMessage: Message = {
-        id: randomUserCode(3),
-        text: `Você pode consultar seu saldo e ver todas as suas transações em sua conta.`,
-        isUser: false,
-      }
-      setMessages((prevMessages) => [botMessage, ...prevMessages])
-    }
-
-    if (messages[0]?.choice === "REALIZARUMAPREVISÃOSOBREMEUSPONTOS") {
-      if (notifications.length <= 4) {
-        const botMessage: Message = {
-          id: randomUserCode(3),
-          text: `Você possue poucas transações, você só pode fazer uma previsão com, no mínimo, 5 transações na conta`,
-          isUser: false,
+      case UserMessageChoice.LIST_TRANSACTIONS: {
+        if (notifications.length <= 0) {
+          const botMessage = new BotMessage(
+            "Você não possui nenhuma transação salva em sua conta",
+          )
+          setMessages((prevMessages) => [botMessage, ...prevMessages])
+          return
         }
+
+        const botMessage = new BotMessage(
+          `Essas são todas as transações da sua conta:\n${transactionDetails}`,
+        )
         setMessages((prevMessages) => [botMessage, ...prevMessages])
-      } else {
+        return
+      }
+      case UserMessageChoice.DOUBT_ABOUT_POINTS: {
+        const botMessage = new BotMessage(
+          `Você pode consultar seu saldo e ver todas as suas transações em sua conta.`,
+        )
+        setMessages((prevMessages) => [botMessage, ...prevMessages])
+        return
+      }
+      case UserMessageChoice.REQUEST_POINTS_PREDICTION: {
+        if (notifications.length <= 4) {
+          const botMessage = new BotMessage(
+            `Você possue poucas transações, você só pode fazer uma previsão com, no mínimo, 5 transações na conta`,
+          )
+          setMessages((prevMessages) => [botMessage, ...prevMessages])
+          return
+        }
         const prompt = `
-    Você é um engenheiro de machine learning especializado em modelos de previsão financeira. Usando técnicas avançadas de regressão e análise de sequências temporais, faça uma previsão curta e objetiva sobre a quantidade de pontos que o usuário pode ganhar ou perder no próximo mês com base nas transações a seguir:
-    
-    ${transactionDetails}
+Você é um engenheiro de machine learning especializado em modelos de previsão financeira. Usando técnicas avançadas de regressão e análise de sequências temporais, faça uma previsão curta e objetiva sobre a quantidade de pontos que o usuário pode ganhar ou perder no próximo mês com base nas transações a seguir:
 
-    Nome do usuário: ${data.user?.fullName}
+${transactionDetails}
 
-    Responda apenas no seguinte formato: 
-    "Usando modelos sofisticados de regressão (machine learning), no próximo mês, seguindo a sua sequência, você {ganharia/perderia} {X} pontos."
-  `
-        sendMessageLastchance(prompt)
+Nome do usuário: ${userSession.user?.fullName}
+
+Responda apenas no seguinte formato: 
+"Usando modelos sofisticados de regressão (machine learning), no próximo mês, seguindo a sua sequência, você {ganharia/perderia} {X} pontos."
+`.trim()
+
+        void sendMessage(prompt)
+        return
       }
     }
+  }
 
-    requestMadeRef.current = true // Marcar que a requisição foi feita
-  }, [messages[0]?.choice])
-
-  const renderMessage = ({ item }: { item: Message }) => (
-    <View
-      className={`mb-2 max-w-[80%] rounded-2xl p-3 ${
-        item.isUser ? "self-end bg-gray-200" : "self-start bg-emerald-700"
-      }`}
-    >
-      <Text className={item.isUser ? "text-black" : "text-white"}>
-        {item.text}
-      </Text>
-      {item.options && (
-        <View className="mt-2">
-          {item.options.map((option, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => handleOptionClick(option)}
-              className="mb-2 rounded-xl bg-white p-2"
-            >
-              <Text className="text-black">{option}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-    </View>
-  )
+  function renderMessage({ item }: { item: Message }) {
+    return (
+      <View
+        className={clsx("mb-2 max-w-[80%] rounded-2xl p-3", {
+          "self-end bg-gray-200": item instanceof UserMessage,
+          "self-start bg-emerald-700": item instanceof BotMessage,
+        })}
+      >
+        <Text
+          className={item instanceof UserMessage ? "text-black" : "text-white"}
+        >
+          {item.text}
+        </Text>
+        {item instanceof UserMessage && item.options ? (
+          <View className="mt-2">
+            {item.options.map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => handleOptionClick(option)}
+                className="mb-2 rounded-xl bg-white p-2"
+              >
+                <Text className="text-black">{option}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : null}
+      </View>
+    )
+  }
 
   return (
-    <View className="flex-1 bg-gray-100">
-      <View className="flex-row items-center justify-between p-4">
+    <View className="flex-1 flex-col gap-4 px-4">
+      <View className="flex-row items-center justify-between">
         <Pressable onPress={() => router.back()}>
           <EvilIcons name="chevron-left" size={40} />
         </Pressable>
 
-        <Text className="text-lg font-bold">Chatbot</Text>
         <Pressable onPress={() => setMessages([])}>
           <EvilIcons name="trash" size={32} />
         </Pressable>
       </View>
       <FlatList
+        className="mb-4"
         data={messages}
         renderItem={renderMessage}
         keyExtractor={(item) => item.id}
-        className="mb-10 flex-1 px-4"
         inverted
       />
     </View>

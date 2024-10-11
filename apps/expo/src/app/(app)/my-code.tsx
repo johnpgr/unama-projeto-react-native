@@ -5,7 +5,7 @@ import { useRouter } from "expo-router"
 import { EvilIcons } from "@expo/vector-icons"
 import QRCode from "react-qr-code"
 
-import { useSession } from "~/utils/auth"
+import { useSession } from "~/hooks/auth"
 
 export default function MyCodeScreen() {
   const { data } = useSession()

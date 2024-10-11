@@ -74,6 +74,7 @@
     "globalEnv": [
         "API_URL",
         "EXPO_PUBLIC_REDIRECT_URL",
+        "MISTRAL_API_KEY",
         "AUTH_GOOGLE_ID",
         "AUTH_GOOGLE_SECRET",
         "PORT"

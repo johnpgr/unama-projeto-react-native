@@ -19,10 +19,10 @@ import { Controller, useForm } from "react-hook-form"
 
 import { signUpSchema } from "@projeto/validation"
 
-import type { SignUpParams } from "~/utils/auth"
+import type { SignUpParams } from "~/hooks/auth"
 import { SigninOAuthButtons } from "~/components/buttons-signin-oauth"
-import { useSignUp } from "~/utils/auth"
-import { useIsKeyboardOpen } from "~/utils/keyboard"
+import { useSignUp } from "~/hooks/auth"
+import { useIsKeyboardOpen } from "~/hooks/keyboard"
 
 export default function SignUpScreen() {
   const [isAgreed, setIsAgreed] = React.useState(false)

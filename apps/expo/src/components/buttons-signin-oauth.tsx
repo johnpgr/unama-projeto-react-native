@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Image, Pressable, Text, View } from "react-native"
 
-import { useSignInOAuth } from "~/utils/auth"
+import { useSignInOAuth } from "~/hooks/auth"
 
 export function SigninOAuthButtons() {
   const signIn = useSignInOAuth()

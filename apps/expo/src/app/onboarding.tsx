@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { Link, Redirect } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 
-import { useSession } from "~/utils/auth"
+import { useSession } from "~/hooks/auth"
 
 export default function OnboardingScreen() {
   const { data, isLoading } = useSession()

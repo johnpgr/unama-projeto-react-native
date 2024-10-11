@@ -17,8 +17,8 @@ import { Link, Redirect, Slot, usePathname } from "expo-router"
 import { AntDesign, Entypo, Feather, Ionicons } from "@expo/vector-icons"
 import { useAtom } from "jotai"
 
+import { useSession } from "~/hooks/auth"
 import { searchAtom } from "~/state/search"
-import { useSession } from "~/utils/auth"
 
 const ScreenTitles = {
   "/": "ECOPoints",
@@ -140,7 +140,7 @@ function AppSearch() {
   if (!isSearchOpen) return null
 
   return (
-    <KeyboardAvoidingView className="absolute top-7 z-10 w-screen">
+    <KeyboardAvoidingView className="absolute top-7 z-10 w-full">
       <Animated.View
         className="flex w-full flex-row items-center gap-4 bg-white p-6"
         entering={FadeInUp.duration(100)}
@@ -152,7 +152,7 @@ function AppSearch() {
         >
           <Feather name="arrow-left" size={24} />
         </TouchableOpacity>
-        <View className="flex flex-1 flex-row items-center gap-2 rounded bg-zinc-200 px-2 py-1">
+        <View className="flex-1 flex-row items-center gap-2 rounded bg-zinc-200 px-2 py-1">
           <Feather name="search" size={16} />
           <TextInput
             value={search}
@@ -187,7 +187,7 @@ export default function AppLayout() {
   if (!data.session) return <Redirect href={"/onboarding"} />
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <AppHeader />
       <AppSearch />
       <Slot />

@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server"
 import { eq, inArray, sql } from "drizzle-orm"
 import { z } from "zod"
 
+import { env } from "../../../env.ts"
 import { db } from "../../database/client.ts"
 import {
   P2PTransaction,
@@ -16,14 +17,13 @@ export const transactionRouter = {
     .input(z.object({ prompt: z.string() }))
     .mutation(async ({ input }) => {
       const llm = new ChatMistralAI({
-        apiKey: "",
+        apiKey: env.MISTRAL_API_KEY,
         temperature: 0.5,
       })
-      const question = `${input.prompt}`
 
-      const response = await llm.invoke(question)
+      // TODO: Sanitize the input against LLM prompt injection
+      const response = await llm.invoke(input.prompt)
 
-      // O retorno deve ser a estrutura esperada pela aplicação
       return { response: response.content }
     }),
 
@@ -105,40 +105,6 @@ export const transactionRouter = {
         .where(eq(User.id, ctx.user.id))
       return { success: true, pointsEarned }
     }),
-
-  /**
-   * Procedimento para consultar pontos de um usuário.
-   *
-   * Este procedimento recupera as informações do usuário com base no ID do usuário da sessão atual.
-   *
-   * Retorna:
-   * - Um objeto contendo:
-   *   - fullName: O nome completo do usuário.
-   *   - email: O email do usuário.
-   *   - userCode: O código do usuário.
-   *   - userType: O tipo de usuário.
-   *   - points: Os pontos totais do usuário (padrão 0 se não disponível).
-   *   - canRedeemRewards: Indica se o usuário pode resgatar recompensas.
-   */
-  getUserInformations: protectedProcedure.query(({ ctx }) => {
-    const {
-      fullName,
-      email,
-      canRedeemRewards,
-      userCode,
-      userType,
-      totalPoints,
-    } = ctx.user
-
-    return {
-      fullName,
-      email,
-      userCode,
-      userType,
-      points: totalPoints,
-      canRedeemRewards,
-    }
-  }),
 
   /**
    * Procedimento para obter as transações do usuário.

@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react"
-import { Image, Pressable, Text, View } from "react-native"
+import { Image, Pressable, ScrollView, Text, View } from "react-native"
 import { Link } from "expo-router"
 import { MaterialIcons } from "@expo/vector-icons"
 
-import { useSession, useSignOut } from "~/utils/auth"
+import { useSession, useSignOut } from "~/hooks/auth"
 
 export default function Index() {
   const { data } = useSession()
@@ -15,8 +15,8 @@ export default function Index() {
   const avatarUrl = user.imageUrl
 
   return (
-    <View className="flex flex-col gap-8 px-4">
-      <View className="flex flex-row items-center gap-4">
+    <View className="h-full w-full gap-8 px-4">
+      <View className="flex-row items-center gap-4">
         <Image
           source={
             avatarUrl
@@ -34,7 +34,7 @@ export default function Index() {
           <MaterialIcons name="logout" size={20} />
         </Pressable>
       </View>
-      <View className="flex flex-col gap-2">
+      <ScrollView className="flex-col gap-2">
         <Text className="text-lg">Campanhas perto de você</Text>
         <View className="flex flex-row p-4">
           <Link href={"/campaigns/1"} asChild>
@@ -67,7 +67,7 @@ export default function Index() {
           </Text>
           <View className="h-48 w-40 rounded-2xl bg-zinc-200"></View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   )
 }
