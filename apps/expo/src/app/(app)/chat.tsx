@@ -32,16 +32,18 @@ class UserMessage {
 
 type Message = BotMessage | UserMessage
 
-const initialMessages: Message[] = [
-  new BotMessage(
-    "Olá! Eu sou o bot do Eco-Pontos! Eu sou responsável pelas suas finanças, o que você deseja saber sobre os seus pontos?",
-  ),
-  new UserMessage("Essas são algumas opções disponíveis para você:", [
+const choicesMessage = () => new UserMessage("Essas são algumas opções disponíveis para você:", [
     UserMessageChoice.REQUEST_BALANCE,
     UserMessageChoice.LIST_TRANSACTIONS,
     UserMessageChoice.DOUBT_ABOUT_POINTS,
     UserMessageChoice.REQUEST_POINTS_PREDICTION,
-  ]),
+])
+
+const initialMessages: Message[] = [
+  new BotMessage(
+    "Olá! Eu sou o bot do Eco-Pontos! Eu sou responsável pelas suas finanças, o que você deseja saber sobre os seus pontos?",
+  ),
+  choicesMessage(),
 ]
 
 export default function ChatbotScreen() {
@@ -75,7 +77,7 @@ export default function ChatbotScreen() {
     }
   }
 
-  function handleOptionClick(option: UserMessageChoice) {
+  async function handleOptionClick(option: UserMessageChoice) {
     const userMessage = new UserMessage(`Você escolheu: ${option}`)
 
     setMessages((prevMessages) => [userMessage, ...prevMessages])
@@ -93,7 +95,7 @@ export default function ChatbotScreen() {
           `Seu saldo é de ${userSession.user?.totalPoints} pontos.`,
         )
         setMessages((prevMessages) => [botMessage, ...prevMessages])
-        return
+        break
       }
       case UserMessageChoice.LIST_TRANSACTIONS: {
         if (notifications.length <= 0) {
@@ -101,21 +103,21 @@ export default function ChatbotScreen() {
             "Você não possui nenhuma transação salva em sua conta",
           )
           setMessages((prevMessages) => [botMessage, ...prevMessages])
-          return
+          break
         }
 
         const botMessage = new BotMessage(
           `Essas são todas as transações da sua conta:\n${transactionDetails}`,
         )
         setMessages((prevMessages) => [botMessage, ...prevMessages])
-        return
+        break
       }
       case UserMessageChoice.DOUBT_ABOUT_POINTS: {
         const botMessage = new BotMessage(
           `Você pode consultar seu saldo e ver todas as suas transações em sua conta.`,
         )
         setMessages((prevMessages) => [botMessage, ...prevMessages])
-        return
+        break
       }
       case UserMessageChoice.REQUEST_POINTS_PREDICTION: {
         if (notifications.length <= 4) {
@@ -123,7 +125,7 @@ export default function ChatbotScreen() {
             `Você possue poucas transações, você só pode fazer uma previsão com, no mínimo, 5 transações na conta`,
           )
           setMessages((prevMessages) => [botMessage, ...prevMessages])
-          return
+          break
         }
         const prompt = `
 Você é um engenheiro de machine learning especializado em modelos de previsão financeira. Usando técnicas avançadas de regressão e análise de sequências temporais, faça uma previsão curta e objetiva sobre a quantidade de pontos que o usuário pode ganhar ou perder no próximo mês com base nas transações a seguir:
@@ -136,10 +138,11 @@ Responda apenas no seguinte formato:
 "Usando modelos sofisticados de regressão (machine learning), no próximo mês, seguindo a sua sequência, você {ganharia/perderia} {X} pontos."
 `.trim()
 
-        void sendMessage(prompt)
-        return
+        await sendMessage(prompt)
+        break
       }
     }
+    setMessages((prev)=> [choicesMessage(), ...prev])
   }
 
   function renderMessage({ item }: { item: Message }) {
