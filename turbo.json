@@ -72,6 +72,7 @@
         }
     },
     "globalEnv": [
+        "API_URL",
         "EXPO_PUBLIC_REDIRECT_URL",
         "AUTH_GOOGLE_ID",
         "AUTH_GOOGLE_SECRET",
