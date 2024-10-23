@@ -29,7 +29,11 @@ export function randomUserCode(maxLength: number) {
   return result
 }
 
-export const UserTypeEnum = pgEnum("user_type", ["normal", "cooperative"])
+export const UserTypeEnum = pgEnum("user_type", [
+  "normal",
+  "cooperative",
+  "admin",
+])
 export const User = pgTable("user", {
   id: uuid("id").primaryKey().defaultRandom(),
   fullName: text("full_name").notNull(),
@@ -41,7 +45,7 @@ export const User = pgTable("user", {
     .$defaultFn(() => randomUserCode(5))
     .unique(),
   imageUrl: text("image_url"),
-  userType: UserTypeEnum("user_type").default(UserTypeEnum.enumValues[0]),
+  userType: UserTypeEnum("user_type").default(UserTypeEnum.enumValues[2]),
   totalPoints: integer("total_points").default(1000),
   canRedeemRewards: boolean("can_redeem_rewards").default(true),
 })
@@ -110,7 +114,7 @@ export const RecyclingTransactionRelations = relations(
 )
 
 export const P2PTransaction = pgTable("p2p_transaction", {
-  id: serial("id"),
+  id: serial("id").unique(),
   from: varchar("from")
     .references(() => User.userCode)
     .notNull(),
@@ -130,3 +134,20 @@ export const P2PTransactionRelations = relations(P2PTransaction, ({ one }) => ({
     fields: [P2PTransaction.to],
   }),
 }))
+
+export const UserRewards = pgTable("user_rewards", {
+  id: serial("id"),
+  rewardsId: integer("reward_id").references(() => Rewards.rewardsId),
+  userCode: varchar("user_code").references(() => User.userCode),
+  reward: varchar("reward"),
+  points: integer("points"),
+  transactionDate: date("transaction_date").defaultNow(),
+})
+//13834
+export const Rewards = pgTable("rewards", {
+  rewardsId: serial("reward_id").unique(),
+  reward: varchar("reward"),
+  points: integer("points").notNull(),
+  description: varchar("description"),
+  image: varchar("image"),
+})

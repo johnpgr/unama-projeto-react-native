@@ -1,16 +1,20 @@
+import type { get } from "http"
 import { ChatMistralAI } from "@langchain/mistralai"
 import { TRPCError } from "@trpc/server"
-import { eq, inArray, sql } from "drizzle-orm"
+import { asc, eq, inArray, sql } from "drizzle-orm"
 import { z } from "zod"
 
+import type { TransactionType } from "../../../../expo/src/state/notifications.ts"
 import { env } from "../../../env.ts"
 import { db } from "../../database/client.ts"
 import {
   P2PTransaction,
   RecyclingTransaction,
+  Rewards,
   User,
+  UserRewards,
 } from "../../database/schema.ts"
-import { protectedProcedure } from "../trpc.ts"
+import { protectedProcedure, publicProcedure } from "../trpc.ts"
 
 export const transactionRouter = {
   getLLMResponse: protectedProcedure
@@ -132,8 +136,9 @@ export const transactionRouter = {
       id: number
       points: number
       transactionDate: string | null
-      from: string
-      to: string
+      from?: string
+      to?: string
+      type?: TransactionType
     }[] = []
     transactions.push(...transaction_from)
     transactions.push(...transaction_to)
@@ -201,7 +206,11 @@ export const transactionRouter = {
 
       const receiverUserType = receiver.userType
 
-      if (senderUserType === "normal" && receiverUserType === "normal") {
+      if (
+        (senderUserType === "normal" && receiverUserType === "normal") ||
+        senderUserType === "admin" ||
+        receiverUserType === "admin"
+      ) {
         if (input.amountPoints <= 0) {
           throw new TRPCError({
             code: "BAD_GATEWAY",
@@ -213,7 +222,7 @@ export const transactionRouter = {
         if (senderPoints < input.amountPoints) {
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: "O saldo é insuficienteee",
+            message: "O saldo é insuficiente",
           })
         }
         if (input.receiverId == userCode) {
@@ -249,6 +258,98 @@ export const transactionRouter = {
           receiverFullName: receiver.fullName,
           pointsTransferred: input.amountPoints,
         }
+      } else {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Apenas usuários normais podem enviar pontos.",
+        })
       }
+    }),
+
+  getAvailableRewards: publicProcedure.query(async () => {
+    return await db.select().from(Rewards).orderBy(asc(Rewards.points))
+  }),
+  getUserRewards: protectedProcedure.query(async ({ ctx }) => {
+    const userRewards = await db.query.UserRewards.findMany({
+      where: (userRewards) => eq(userRewards.userCode, ctx.user.userCode),
+    })
+    return userRewards
+  }),
+  exchangePointsForReward: protectedProcedure
+    .input(
+      z.object({
+        rewardId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userCode = ctx.user.userCode
+
+      const user = await db.query.User.findFirst({
+        where: (user) => eq(user.userCode, userCode),
+      })
+
+      const reward = await db.query.Rewards.findFirst({
+        where: (reward) => eq(reward.rewardsId, input.rewardId),
+      })
+
+      if (!user) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Usuário não encontrado",
+        })
+      }
+
+      if (!reward) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Recompensa não encontrada",
+        })
+      }
+
+      const userPoints = user.totalPoints ?? 0
+
+      if (userPoints < reward.points) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Pontos insuficientes para esta recompensa",
+        })
+      }
+
+      await db
+        .update(User)
+        .set({
+          totalPoints: sql<number>`COALESCE(${User.totalPoints}, 0) - ${reward.points}`,
+        })
+        .where(eq(User.userCode, userCode))
+
+      await db.insert(UserRewards).values({
+        rewardsId: reward.rewardsId,
+        userCode: userCode,
+        reward: reward.reward,
+        points: -reward.points,
+      })
+
+      return {
+        success: true,
+        rewardName: reward.reward,
+        pointsSpent: reward.points,
+        remainingPoints: userPoints - reward.points,
+      }
+    }),
+  createReward: protectedProcedure
+    .input(
+      z.object({
+        rewardName: z.string(),
+        points: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.userType !== "admin") {
+        throw new Error("Apenas administradores podem criar recompensas.")
+      }
+      await db.insert(Rewards).values({
+        reward: input.rewardName,
+        points: input.points,
+      })
     }),
 }
