@@ -67,8 +67,8 @@ importers:
   apps/api:
     dependencies:
       '@electric-sql/pglite':
-        specifier: ^0.2.7
-        version: 0.2.7
+        specifier: ^0.2.12
+        version: 0.2.12
       '@hono/node-server':
         specifier: ^1.13.2
         version: 1.13.2(hono@4.6.6)
@@ -83,7 +83,7 @@ importers:
         version: 0.1.1(@langchain/core@0.3.9)(encoding@0.1.13)
       '@lucia-auth/adapter-drizzle':
         specifier: ^1.1.0
-        version: 1.1.0(drizzle-orm@0.33.0(@electric-sql/pglite@0.2.7)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.4)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.0)(react@18.3.1))(lucia@3.2.0)
+        version: 1.1.0(drizzle-orm@0.33.0(@electric-sql/pglite@0.2.12)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.4)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.0)(react@18.3.1))(lucia@3.2.0)
       '@node-rs/argon2':
         specifier: ^1.8.3
         version: 1.8.3
@@ -101,7 +101,7 @@ importers:
         version: 1.9.2
       drizzle-orm:
         specifier: ^0.33.0
-        version: 0.33.0(@electric-sql/pglite@0.2.7)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.4)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.0)(react@18.3.1)
+        version: 0.33.0(@electric-sql/pglite@0.2.12)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.4)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.0)(react@18.3.1)
       hono:
         specifier: ^4.6.5
         version: 4.6.6
@@ -1231,8 +1231,8 @@ packages:
     resolution: {integrity: sha512-XQsZgjm2EcVUiZQf11UBJQfmZeEmOW8DpI1gsFeln6w0ae0ii4dMQEQ0kjl6DspdWX1aGY1/loyXnP0JS06e/A==}
     engines: {node: '>=0.8.0'}
 
-  '@electric-sql/pglite@0.2.7':
-    resolution: {integrity: sha512-8Il//XHTAtZ8VeQF+6P1UjsIoaAJyO4LwOMoXhSFaHpmkwKs63cUhHHNzLzUmcZvP/ZTmlT3+xTiWfU/EyoxwQ==}
+  '@electric-sql/pglite@0.2.12':
+    resolution: {integrity: sha512-J/X42ujcoFEbOkgRyoNqZB5qcqrnJRWVlwpH3fKYoJkTz49N91uAK/rDSSG/85WRas9nC9mdV4FnMTxnQWE/rw==}
 
   '@emnapi/core@0.45.0':
     resolution: {integrity: sha512-DPWjcUDQkCeEM4VnljEOEcXdAD7pp8zSZsgOujk/LGIwCXWbXJngin+MO4zbH429lzeC3WbYLGjE2MaUOwzpyw==}
@@ -8053,7 +8053,7 @@ snapshots:
     dependencies:
       '@types/hammerjs': 2.0.45
 
-  '@electric-sql/pglite@0.2.7': {}
+  '@electric-sql/pglite@0.2.12': {}
 
   '@emnapi/core@0.45.0':
     dependencies:
@@ -8818,9 +8818,9 @@ snapshots:
   '@libsql/win32-x64-msvc@0.4.1':
     optional: true
 
-  '@lucia-auth/adapter-drizzle@1.1.0(drizzle-orm@0.33.0(@electric-sql/pglite@0.2.7)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.4)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.0)(react@18.3.1))(lucia@3.2.0)':
+  '@lucia-auth/adapter-drizzle@1.1.0(drizzle-orm@0.33.0(@electric-sql/pglite@0.2.12)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.4)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.0)(react@18.3.1))(lucia@3.2.0)':
     dependencies:
-      drizzle-orm: 0.33.0(@electric-sql/pglite@0.2.7)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.4)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.0)(react@18.3.1)
+      drizzle-orm: 0.33.0(@electric-sql/pglite@0.2.12)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.4)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.0)(react@18.3.1)
       lucia: 3.2.0
 
   '@mistralai/mistralai@0.4.0(encoding@0.1.13)':
@@ -10758,9 +10758,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.33.0(@electric-sql/pglite@0.2.7)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.4)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.0)(react@18.3.1):
+  drizzle-orm@0.33.0(@electric-sql/pglite@0.2.12)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.4)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.0)(react@18.3.1):
     optionalDependencies:
-      '@electric-sql/pglite': 0.2.7
+      '@electric-sql/pglite': 0.2.12
       '@libsql/client': 0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       '@neondatabase/serverless': 0.9.4
       '@types/pg': 8.11.10

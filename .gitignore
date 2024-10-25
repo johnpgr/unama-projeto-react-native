@@ -49,4 +49,6 @@ dist/
 
 # turbo
 .turbo
-./apps/api/database/pg-data/
+
+# PGLite data directory
+apps/api/database/pg-data

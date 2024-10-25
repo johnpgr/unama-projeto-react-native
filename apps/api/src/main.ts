@@ -1,4 +1,4 @@
-import "../env.ts"
+import "./env.ts"
 
 import { serve } from "@hono/node-server"
 import { trpcServer } from "@hono/trpc-server"

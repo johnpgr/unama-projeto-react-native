@@ -22,7 +22,7 @@
   "author": "johnpgr",
   "license": "MIT",
   "dependencies": {
-    "@electric-sql/pglite": "^0.2.7",
+    "@electric-sql/pglite": "^0.2.12",
     "@hono/node-server": "^1.13.2",
     "@hono/trpc-server": "^0.3.2",
     "@hono/zod-validator": "^0.3.0",

@@ -11,7 +11,7 @@ import {
   User,
   UserRewards,
 } from "../../database/schema.ts"
-import { env } from "../../env.ts"
+import { env } from "../env.ts"
 import { protectedProcedure, publicProcedure } from "../trpc.ts"
 
 export const transactionRouter = {
