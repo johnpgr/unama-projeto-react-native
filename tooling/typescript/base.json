@@ -24,7 +24,8 @@
         /** Transpile using Bundler (not tsc) */
         "module": "Preserve",
         "moduleResolution": "Bundler",
-        "noEmit": true
+        "noEmit": true,
+        "types": ["@total-typescript/ts-reset"]
     },
     "exclude": [
         "node_modules",

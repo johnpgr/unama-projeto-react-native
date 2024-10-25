@@ -12,7 +12,6 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "types": [
-            "@total-typescript/ts-reset",
             "@types/node"
         ]
     },

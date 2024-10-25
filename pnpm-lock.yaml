@@ -127,9 +127,6 @@ importers:
       '@projeto/tsconfig':
         specifier: workspace:^
         version: link:../../tooling/typescript
-      '@total-typescript/ts-reset':
-        specifier: ^0.6.1
-        version: 0.6.1
       '@types/node':
         specifier: ^22.5.5
         version: 22.5.5
@@ -299,9 +296,6 @@ importers:
       '@projeto/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/typescript
-      '@total-typescript/ts-reset':
-        specifier: ^0.6.1
-        version: 0.6.1
       '@types/babel__core':
         specifier: ^7.20.5
         version: 7.20.5
@@ -441,7 +435,11 @@ importers:
         specifier: 'catalog:'
         version: 5.5.4
 
-  tooling/typescript: {}
+  tooling/typescript:
+    devDependencies:
+      '@total-typescript/ts-reset':
+        specifier: ^0.6.1
+        version: 0.6.1
 
 packages:
 
