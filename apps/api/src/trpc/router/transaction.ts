@@ -1,4 +1,3 @@
-import type { get } from "http"
 import { ChatMistralAI } from "@langchain/mistralai"
 import { TRPCError } from "@trpc/server"
 import { asc, eq, inArray, sql } from "drizzle-orm"
@@ -318,7 +317,7 @@ export const transactionRouter = {
       await db
         .update(User)
         .set({
-          totalPoints: sql<number>`COALESCE(${User.totalPoints}, 0) - ${reward.points}`,
+          totalPoints: sql<number>`${User.totalPoints} - ${reward.points}`,
         })
         .where(eq(User.userCode, userCode))
 

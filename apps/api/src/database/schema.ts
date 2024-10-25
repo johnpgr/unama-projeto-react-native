@@ -114,7 +114,7 @@ export const RecyclingTransactionRelations = relations(
 )
 
 export const P2PTransaction = pgTable("p2p_transaction", {
-  id: serial("id").unique(),
+  id: serial("id"),
   from: varchar("from")
     .references(() => User.userCode)
     .notNull(),
@@ -135,19 +135,21 @@ export const P2PTransactionRelations = relations(P2PTransaction, ({ one }) => ({
   }),
 }))
 
-export const UserRewards = pgTable("user_rewards", {
-  id: serial("id"),
-  rewardsId: integer("reward_id").references(() => Rewards.rewardsId),
-  userCode: varchar("user_code").references(() => User.userCode),
-  reward: varchar("reward"),
-  points: integer("points"),
-  transactionDate: date("transaction_date").defaultNow(),
-})
-//13834
 export const Rewards = pgTable("rewards", {
-  rewardsId: serial("reward_id").unique(),
+  rewardsId: serial("reward_id").primaryKey(),
   reward: varchar("reward"),
   points: integer("points").notNull(),
   description: varchar("description"),
   image: varchar("image"),
+})
+
+export const UserRewards = pgTable("user_rewards", {
+  id: serial("id"),
+  rewardId: integer("reward_id")
+    .references(() => Rewards.rewardsId)
+    .notNull(),
+  userCode: varchar("user_code").references(() => User.userCode),
+  reward: varchar("reward"),
+  points: integer("points"),
+  transactionDate: date("transaction_date").defaultNow(),
 })
