@@ -16,12 +16,13 @@ type SendPointsInput = RouterInputs["transaction"]["sendPointsP2P"]
 export default function SendPointsScreen() {
   const [isAgreed, setIsAgreed] = React.useState(false)
   const form = useForm<SendPointsInput>({
-    defaultValues: { receiverId: "0", amountPoints: 0 },
+    defaultValues: { receiverId: "", amountPoints: 0 },
   })
   const {
     mutateAsync: sendPoints,
     isPending,
     error,
+    isSuccess,
   } = api.transaction.sendPointsP2P.useMutation()
 
   async function onSubmit(data: SendPointsInput) {
@@ -30,8 +31,7 @@ export default function SendPointsScreen() {
     }
     const amountPoints = data.amountPoints
     if (isNaN(amountPoints) || amountPoints <= 0) {
-      console.error("A quantidade de pontos deve ser um número positivo.")
-      return
+      throw new Error("A quantidade de pontos deve ser um número positivo.")
     }
     await sendPoints(data)
   }
@@ -68,6 +68,7 @@ export default function SendPointsScreen() {
           />
         )}
       />
+      {isSuccess && <Text>Pontos enviados com sucesso!</Text>}
       {error && <Text>Erro: {error.message}</Text>}
 
       <Pressable onPress={() => setIsAgreed(!isAgreed)}>
