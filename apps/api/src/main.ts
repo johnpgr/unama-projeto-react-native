@@ -1,5 +1,4 @@
 import "../env.ts"
-import "@total-typescript/ts-reset"
 
 import { serve } from "@hono/node-server"
 import { trpcServer } from "@hono/trpc-server"
@@ -8,10 +7,10 @@ import { cors } from "hono/cors"
 import { logger } from "hono/logger"
 
 import type { AppContext } from "./context.ts"
-import { AuthController } from "./auth/controller.ts"
-import { AuthMiddleware } from "./auth/middleware.ts"
-import { appRouter } from "./trpc/router/root.ts"
-import { createTRPCContext } from "./trpc/trpc.ts"
+import { AuthController } from "./auth/auth.routes.hono.ts"
+import { AuthMiddleware } from "./auth/auth.middleware.ts"
+import { appRouter } from "./router.ts" 
+import { createTRPCContext } from "./trpc.ts" 
 
 const app = new Hono<AppContext>()
   .use(logger())

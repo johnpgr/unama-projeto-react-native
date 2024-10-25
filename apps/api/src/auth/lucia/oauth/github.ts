@@ -2,11 +2,12 @@ import type { Session } from "lucia"
 import { GitHub } from "arctic"
 import { eq } from "drizzle-orm"
 
-import type { DatabaseUserAttributes } from "./lucia.ts"
-import { db } from "../database/client.ts"
-import { OAuthAccount, User } from "../database/schema.ts"
-import { CreateSessionError } from "./errors.ts"
-import { lucia } from "./lucia.ts"
+import type { DatabaseUserAttributes } from "../index.ts"
+import { db } from "../../../../database/client.ts"
+import { User } from "../../../user/user.schema.ts"
+import { OAuthAccount } from "../../auth.schema.ts"
+import { CreateSessionError } from "../../errors.ts"
+import { lucia } from "../index.ts"
 
 export const githubAuth = new GitHub(
   process.env.AUTH_GITHUB_ID ?? "NOOP_NO_GITHUB_CLIENT_ID",

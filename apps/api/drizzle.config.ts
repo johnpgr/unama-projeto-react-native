@@ -1,14 +1,17 @@
 import type { Config } from "drizzle-kit"
 
-import { env } from "./env"
-import { DATABASE_TYPE } from "./src/database/client"
+import { env } from "./env.ts"
 
 export default {
-  schema: "./src/database/schema.ts",
-  out: "./src/database/migrations",
+  schema: "./database/schema.ts",
+  out: "./database/migrations",
   dialect: "postgresql",
-  ...{
-    driver: DATABASE_TYPE === "pg_default" ? undefined : "pglite",
-  },
-  dbCredentials: { url: env.DATABASE_URL },
+  ...(env.DATABASE_URL
+    ? {}
+    : {
+        driver: "pglite",
+      }),
+  dbCredentials: env.DATABASE_URL
+    ? { url: env.DATABASE_URL }
+    : { url: "./database/pg-data/" },
 } satisfies Config

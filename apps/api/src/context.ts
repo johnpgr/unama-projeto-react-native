@@ -1,8 +1,8 @@
 import type { Session, User } from "lucia"
 
-import type { DatabaseUserAttributes } from "./auth/lucia.ts"
+import type { DatabaseUserAttributes } from "./auth/lucia/index.ts"
 
-interface Variables {
+export interface Variables {
   user: (User & DatabaseUserAttributes) | null
   session: Session | null
 }

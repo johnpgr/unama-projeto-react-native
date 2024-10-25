@@ -1,3 +1,4 @@
+import assert from "assert"
 import { zValidator } from "@hono/zod-validator"
 import { generateCodeVerifier, generateState } from "arctic"
 import { Hono } from "hono"
@@ -6,11 +7,17 @@ import { verifyRequestOrigin } from "lucia"
 import { z } from "zod"
 
 import type { AppContext } from "../context.ts"
-import { createAppleSession, getAppleAuthorizationUrl } from "./apple.ts"
 import { CreateSessionError } from "./errors.ts"
-import { createGithubSession, getGithubAuthorizationUrl } from "./github.ts"
-import { createGoogleSession, getGoogleAuthorizationUrl } from "./google.ts"
-import { lucia } from "./lucia.ts"
+import { lucia } from "./lucia/index.ts"
+import { createAppleSession, getAppleAuthorizationUrl } from "./lucia/oauth/apple.ts"
+import {
+  createGithubSession,
+  getGithubAuthorizationUrl,
+} from "./lucia/oauth/github.ts"
+import {
+  createGoogleSession,
+  getGoogleAuthorizationUrl,
+} from "./lucia/oauth/google.ts"
 
 const COOKIE_OPTS = {
   httpOnly: true,
@@ -117,9 +124,10 @@ export const AuthController = new Hono<AppContext>()
             return c.redirect(redirectUrl.toString())
           }
           case "google": {
+            assert(codeVerifierCookie !== undefined)
             const session = await createGoogleSession(
               code,
-              codeVerifierCookie!,
+              codeVerifierCookie,
               sessionTokenCookie,
             )
             if (session instanceof CreateSessionError) {

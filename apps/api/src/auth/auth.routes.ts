@@ -5,9 +5,9 @@ import { eq } from "drizzle-orm"
 
 import { signInSchema, signUpSchema } from "@projeto/validation"
 
-import { lucia } from "../../auth/lucia.ts"
+import { lucia } from "../auth/lucia/index.ts" 
 import { db } from "../../database/client.ts"
-import { User } from "../../database/schema.ts"
+import { User } from "../user/user.schema.ts"
 import { protectedProcedure, publicProcedure } from "../trpc.ts"
 
 const ARGON2_OPTS = {

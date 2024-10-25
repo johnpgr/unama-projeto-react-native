@@ -1,6 +1,6 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 
-import type { appRouter } from "./src/trpc/router/root.ts"
+import type { appRouter } from "./src/router.ts"
 
 // export type definition of API
 export type AppRouter = typeof appRouter
@@ -20,3 +20,5 @@ export type RouterInputs = inferRouterInputs<AppRouter>
  *      ^? Post[]
  **/
 export type RouterOutputs = inferRouterOutputs<AppRouter>
+
+export type { TransactionType } from "./src/transaction/transaction.schema.ts"

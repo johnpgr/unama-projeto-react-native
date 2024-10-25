@@ -1,8 +1,8 @@
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle"
 import { Lucia, TimeSpan } from "lucia"
-
-import { db } from "../database/client.ts"
-import { Session, User } from "../database/schema.ts"
+import { db } from "../../../database/client.ts"
+import { Session } from "../auth.schema.ts"
+import { User } from "../../user/user.schema.ts"
 
 const adapter = new DrizzlePostgreSQLAdapter(db, Session, User)
 
@@ -14,6 +14,7 @@ declare module "lucia" {
 }
 export type DatabaseUserAttributes = typeof User.$inferSelect
 
+export type LuciaAuth = typeof lucia
 export const lucia = new Lucia(adapter, {
   sessionExpiresIn: new TimeSpan(7, "d"),
   sessionCookie: {
@@ -31,4 +32,3 @@ export const lucia = new Lucia(adapter, {
     canRedeemRewards: attributes.canRedeemRewards,
   }),
 })
-export type LuciaAuth = typeof lucia

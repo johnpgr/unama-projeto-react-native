@@ -49,5 +49,4 @@ dist/
 
 # turbo
 .turbo
-
-apps/api/src/database/data/
+./apps/api/database/pg-data/

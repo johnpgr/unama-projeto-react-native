@@ -2,8 +2,8 @@ import type { Context } from "hono"
 import type { User } from "lucia"
 
 import type { AppContext } from "../context.ts"
-import type { DatabaseUserAttributes } from "./lucia.ts"
-import { lucia } from "./lucia.ts"
+import type { DatabaseUserAttributes } from "./lucia/index.ts" 
+import { lucia } from "./lucia/index.ts" 
 
 export const AuthMiddleware = async (
   c: Context<AppContext>,

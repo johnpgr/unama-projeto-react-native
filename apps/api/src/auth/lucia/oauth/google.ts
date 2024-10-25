@@ -2,11 +2,12 @@ import type { Session } from "lucia"
 import { Google } from "arctic"
 import { eq } from "drizzle-orm"
 
-import type { DatabaseUserAttributes } from "./lucia.ts"
-import { db } from "../database/client.ts"
-import { OAuthAccount, User } from "../database/schema.ts"
-import { CreateSessionError } from "./errors.ts"
-import { lucia } from "./lucia.ts"
+import type { DatabaseUserAttributes } from "../index.ts" 
+import { db } from "../../../../database/client.ts" 
+import { OAuthAccount } from "../../auth.schema.ts"
+import { User } from "../../../user/user.schema.ts"
+import { CreateSessionError } from "../../errors.ts" 
+import { lucia } from "../index.ts"
 
 export const googleAuth = new Google(
   process.env.AUTH_GOOGLE_ID ?? "NOOP_NO_GOOGLE_ID",

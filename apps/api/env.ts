@@ -3,7 +3,7 @@ import { z } from "zod"
 
 export const env = createEnv({
   server: {
-    DATABASE_URL: z.string().min(1),
+    DATABASE_URL: z.string().optional(),
     MISTRAL_API_KEY: z.string().min(1),
     REDIRECT_URL: z.string().url().optional(),
     AUTH_GOOGLE_ID: z.string().optional(),

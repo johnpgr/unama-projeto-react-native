@@ -18,9 +18,9 @@
         "tsBuildInfoFile": "${configDir}/.cache/tsbuildinfo.json",
         /** Strictness */
         "strict": true,
+        "strictNullChecks": true,
         "noUncheckedIndexedAccess": true,
         "checkJs": true,
-        "allowImportingTsExtensions": true,
         /** Transpile using Bundler (not tsc) */
         "module": "Preserve",
         "moduleResolution": "Bundler",

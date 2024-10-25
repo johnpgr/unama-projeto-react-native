@@ -77,6 +77,15 @@
         "MISTRAL_API_KEY",
         "AUTH_GOOGLE_ID",
         "AUTH_GOOGLE_SECRET",
+        "AUTH_GITHUB_ID",
+        "AUTH_GITHUB_SECRET",
+        "REDIRECT_URL",
+        "AUTH_APPLE_WEB_CLIENT_ID",
+        "AUTH_APPLE_TEAM_ID",
+        "AUTH_APPLE_KEY_ID",
+        "AUTH_APPLE_PRIVATE_KEY",
+        "APPLE_CLIENT_ID",
+        "APPLE_WEB_CLIENT_ID",
         "PORT"
     ],
     "globalPassThroughEnv": [

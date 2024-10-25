@@ -4,11 +4,12 @@ import jwt from "@tsndr/cloudflare-worker-jwt"
 import { Apple } from "arctic"
 import { eq } from "drizzle-orm"
 
-import type { DatabaseUserAttributes } from "./lucia.ts"
-import { db } from "../database/client.ts"
-import { OAuthAccount, User } from "../database/schema.ts"
-import { CreateSessionError } from "./errors.ts"
-import { lucia } from "./lucia.ts"
+import type { DatabaseUserAttributes } from "../index.ts"
+import { db } from "../../../../database/client.ts"
+import { User } from "../../../user/user.schema.ts"
+import { OAuthAccount } from "../../auth.schema.ts"
+import { CreateSessionError } from "../../errors.ts"
+import { lucia } from "../index.ts"
 
 export const appleAuth = new Apple(
   {
@@ -73,11 +74,11 @@ export async function createAppleSession(params: {
     !payload ||
     payload.iss !== "https://appleid.apple.com" ||
     !(
-      payload?.aud === process.env.APPLE_CLIENT_ID ||
+      payload.aud === process.env.APPLE_CLIENT_ID ||
       payload.aud === process.env.APPLE_WEB_CLIENT_ID
     ) ||
     !payload.exp ||
-    payload?.exp < Date.now() / 1000
+    payload.exp < Date.now() / 1000
   ) {
     return new CreateSessionError("Invalid payload")
   }

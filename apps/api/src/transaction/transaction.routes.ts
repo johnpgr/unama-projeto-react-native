@@ -1,18 +1,17 @@
 import { ChatMistralAI } from "@langchain/mistralai"
 import { TRPCError } from "@trpc/server"
-import { asc, eq, inArray, sql } from "drizzle-orm"
+import { asc, eq, inArray, or, sql } from "drizzle-orm"
 import { z } from "zod"
 
-import type { TransactionType } from "../../../../expo/src/state/notifications.ts"
-import { env } from "../../../env.ts"
 import { db } from "../../database/client.ts"
 import {
   P2PTransaction,
   RecyclingTransaction,
-  Rewards,
+  Reward,
   User,
   UserRewards,
 } from "../../database/schema.ts"
+import { env } from "../../env.ts"
 import { protectedProcedure, publicProcedure } from "../trpc.ts"
 
 export const transactionRouter = {
@@ -123,25 +122,23 @@ export const transactionRouter = {
    *   - to: O código do usuário que recebeu os pontos.
    */
   getUserTransactions: protectedProcedure.query(async ({ ctx }) => {
-    const transaction_from = await db.query.P2PTransaction.findMany({
-      where: (from) => eq(from.from, ctx.user.userCode),
+    const transactions = await db.query.P2PTransaction.findMany({
+      where: (transaction) =>
+        or(
+          eq(transaction.from, ctx.user.userCode),
+          eq(transaction.to, ctx.user.userCode),
+        ),
     })
-    const transaction_to = await db.query.P2PTransaction.findMany({
-      where: (to) => eq(to.to, ctx.user.userCode),
-    })
-    transaction_from.map((num) => -num.points)
-    transaction_to.map((num) => +num.points)
-    const transactions: {
-      id: number
-      points: number
-      transactionDate: string | null
-      from?: string
-      to?: string
-      type?: TransactionType
-    }[] = []
-    transactions.push(...transaction_from)
-    transactions.push(...transaction_to)
-    return transactions
+
+    const formattedTransactions = transactions.map((transaction) => ({
+      ...transaction,
+      points:
+        transaction.from === ctx.user.userCode
+          ? -transaction.points
+          : transaction.points,
+    }))
+
+    return formattedTransactions
   }),
 
   /**
@@ -217,7 +214,7 @@ export const transactionRouter = {
           })
         }
 
-        const senderPoints = sender.totalPoints ?? 0
+        const senderPoints = sender.totalPoints
         if (senderPoints < input.amountPoints) {
           throw new TRPCError({
             code: "BAD_REQUEST",
@@ -266,37 +263,24 @@ export const transactionRouter = {
     }),
 
   getAvailableRewards: publicProcedure.query(async () => {
-    return await db.select().from(Rewards).orderBy(asc(Rewards.points))
+    return await db.select().from(Reward).orderBy(asc(Reward.points))
   }),
   getUserRewards: protectedProcedure.query(async ({ ctx }) => {
     const userRewards = await db.query.UserRewards.findMany({
-      where: (userRewards) => eq(userRewards.userCode, ctx.user.userCode),
+      where: (userRewards) => eq(userRewards.userId, ctx.user.id),
     })
     return userRewards
   }),
   exchangePointsForReward: protectedProcedure
     .input(
       z.object({
-        rewardId: z.number(),
+        rewardId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const userCode = ctx.user.userCode
-
-      const user = await db.query.User.findFirst({
-        where: (user) => eq(user.userCode, userCode),
+      const reward = await db.query.Reward.findFirst({
+        where: (reward) => eq(reward.id, input.rewardId),
       })
-
-      const reward = await db.query.Rewards.findFirst({
-        where: (reward) => eq(reward.rewardsId, input.rewardId),
-      })
-
-      if (!user) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Usuário não encontrado",
-        })
-      }
 
       if (!reward) {
         throw new TRPCError({
@@ -305,7 +289,7 @@ export const transactionRouter = {
         })
       }
 
-      const userPoints = user.totalPoints ?? 0
+      const userPoints = ctx.user.totalPoints
 
       if (userPoints < reward.points) {
         throw new TRPCError({
@@ -319,13 +303,11 @@ export const transactionRouter = {
         .set({
           totalPoints: sql<number>`${User.totalPoints} - ${reward.points}`,
         })
-        .where(eq(User.userCode, userCode))
+        .where(eq(User.id, ctx.user.id))
 
       await db.insert(UserRewards).values({
-        rewardsId: reward.rewardsId,
-        userCode: userCode,
-        reward: reward.reward,
-        points: -reward.points,
+        rewardId: reward.id,
+        userId: ctx.user.id,
       })
 
       return {
@@ -346,7 +328,7 @@ export const transactionRouter = {
       if (ctx.user.userType !== "admin") {
         throw new Error("Apenas administradores podem criar recompensas.")
       }
-      await db.insert(Rewards).values({
+      await db.insert(Reward).values({
         reward: input.rewardName,
         points: input.points,
       })
