@@ -10,14 +10,6 @@ import {
 
 import { User } from "../user/user.schema.ts"
 
-// Node.js + typescript nativo não suporta Enums
-export const TransactionType = {
-  P2REWARD: "P2REWARD",
-  P2P: "P2P",
-} as const
-export type TransactionType =
-  (typeof TransactionType)[keyof typeof TransactionType]
-
 export type RecyclingTransaction = typeof RecyclingTransaction.$inferSelect
 export const RecyclingTransaction = pgTable("recycling_transaction", {
   id: uuid("id").primaryKey().defaultRandom(),

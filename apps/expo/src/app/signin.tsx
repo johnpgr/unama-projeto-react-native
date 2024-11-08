@@ -20,7 +20,7 @@ import { Controller, useForm } from "react-hook-form"
 import { signInSchema } from "@projeto/validation"
 
 import type { SignInParams } from "~/hooks/auth"
-import { SigninOAuthButtons } from "~/components/buttons-signin-oauth"
+import { SigninOAuthButtons } from "~/app/_components/SigninOAuthButtons"
 import { useSignIn } from "~/hooks/auth"
 import { useIsKeyboardOpen } from "~/hooks/keyboard"
 
@@ -39,118 +39,112 @@ export default function SignUpScreen() {
   }
 
   return (
-    <SafeAreaView>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="h-full w-full bg-primary"
+    >
       <Stack.Screen
-        options={{
-          headerShown: false,
-          statusBarColor: "#02391E",
-        }}
+        options={{ statusBarColor: "#02391E", statusBarStyle: "light" }}
       />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="h-full w-full bg-primary"
-      >
-        {isKeyboardOpen ? null : (
-          <Image
-            source={require("../../assets/icon.png")}
-            style={{ width: 200, height: 200, alignSelf: "center" }}
-          />
-        )}
+      {isKeyboardOpen ? null : (
+        <Image
+          source={require("../../assets/icon.png")}
+          style={{ width: 200, height: 200, alignSelf: "center" }}
+        />
+      )}
+      <View className="mt-auto flex max-h-[550px] rounded-t-[3rem] bg-white p-8">
+        <Text className="mt-4 text-center text-4xl font-bold text-green-900">
+          Bem-vindo de volta
+        </Text>
 
-        <View className="mt-auto flex max-h-[550px] rounded-t-[3rem] bg-white p-8">
-          <Text className="mt-4 text-center text-4xl font-bold text-green-900">
-            Bem-vindo de volta
-          </Text>
-
-          <Controller
-            name="email"
-            control={form.control}
-            render={({ field }) => (
-              <View className="mt-4">
-                <Text className="text-lg">Email</Text>
-                <TextInput
-                  className="rounded-xl border border-border px-4 py-2"
-                  placeholder="Seu email de acesso"
-                  onChangeText={field.onChange}
-                  value={field.value}
-                  onBlur={field.onBlur}
-                />
-                {form.formState.errors.email ? (
-                  <Text className="text-destructive">
-                    {form.formState.errors.email.message}
-                  </Text>
-                ) : null}
-              </View>
-            )}
-          />
-
-          <Controller
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <View className="mt-4">
-                <Text className="text-lg">Senha</Text>
-                <TextInput
-                  secureTextEntry
-                  className="rounded-xl border border-border px-4 py-2"
-                  placeholder="Sua senha"
-                  onChangeText={field.onChange}
-                  value={field.value}
-                  onBlur={field.onBlur}
-                />
-                {form.formState.errors.password ? (
-                  <Text className="text-destructive">
-                    {form.formState.errors.password.message}
-                  </Text>
-                ) : null}
-              </View>
-            )}
-          />
-
-          <View className="mt-2 flex w-full flex-row items-center justify-between py-4">
-            <View className="flex flex-row gap-2">
-              <Checkbox
-                value={remember}
-                onValueChange={(value) => setRemember(value)}
-                color="#14542E"
+        <Controller
+          name="email"
+          control={form.control}
+          render={({ field }) => (
+            <View className="mt-4">
+              <Text className="text-lg">Email</Text>
+              <TextInput
+                className="rounded-xl border border-border px-4 py-2"
+                placeholder="Seu email de acesso"
+                onChangeText={field.onChange}
+                value={field.value}
+                onBlur={field.onBlur}
               />
-              <Text>Lembrar de mim?</Text>
+              {form.formState.errors.email ? (
+                <Text className="text-destructive">
+                  {form.formState.errors.email.message}
+                </Text>
+              ) : null}
             </View>
-            <Text className="font-medium text-green-900">
-              Esqueceu sua senha?
-            </Text>
-          </View>
+          )}
+        />
 
-          <Pressable
-            className="relative mt-4 flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 disabled:opacity-80"
-            onPress={form.handleSubmit(onSubmit)}
-            disabled={isPending}
-          >
-            {isPending ? (
-              <ActivityIndicator
-                className="absolute left-[35%]"
-                size="small"
-                color="#FFFFFF"
+        <Controller
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <View className="mt-4">
+              <Text className="text-lg">Senha</Text>
+              <TextInput
+                secureTextEntry
+                className="rounded-xl border border-border px-4 py-2"
+                placeholder="Sua senha"
+                onChangeText={field.onChange}
+                value={field.value}
+                onBlur={field.onBlur}
               />
-            ) : null}
-            <Text className="text-xl font-bold text-white">Entrar</Text>
-          </Pressable>
+              {form.formState.errors.password ? (
+                <Text className="text-destructive">
+                  {form.formState.errors.password.message}
+                </Text>
+              ) : null}
+            </View>
+          )}
+        />
 
-          {signInError ? (
-            <Text className="mt-4 text-center text-destructive">
-              {signInError.message}
-            </Text>
-          ) : null}
-
-          <SigninOAuthButtons />
-          <View className="flex flex-row items-center justify-center gap-2">
-            <Text>Não possui uma conta?</Text>
-            <Link href="/signup" className="font-medium text-green-900">
-              Crie uma
-            </Link>
+        <View className="mt-2 flex w-full flex-row items-center justify-between py-4">
+          <View className="flex flex-row gap-2">
+            <Checkbox
+              value={remember}
+              onValueChange={(value) => setRemember(value)}
+              color="#14542E"
+            />
+            <Text>Lembrar de mim?</Text>
           </View>
+          <Text className="font-medium text-green-900">
+            Esqueceu sua senha?
+          </Text>
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+
+        <Pressable
+          className="relative mt-4 flex flex-row items-center justify-center rounded-3xl bg-green-900 py-4 disabled:opacity-80"
+          onPress={form.handleSubmit(onSubmit)}
+          disabled={isPending}
+        >
+          {isPending ? (
+            <ActivityIndicator
+              className="absolute left-[35%]"
+              size="small"
+              color="#FFFFFF"
+            />
+          ) : null}
+          <Text className="text-xl font-bold text-white">Entrar</Text>
+        </Pressable>
+
+        {signInError ? (
+          <Text className="mt-4 text-center text-destructive">
+            {signInError.message}
+          </Text>
+        ) : null}
+
+        <SigninOAuthButtons />
+        <View className="flex flex-row items-center justify-center gap-2">
+          <Text>Não possui uma conta?</Text>
+          <Link href="/signup" className="font-medium text-green-900">
+            Crie uma
+          </Link>
+        </View>
+      </View>
+    </KeyboardAvoidingView>
   )
 }

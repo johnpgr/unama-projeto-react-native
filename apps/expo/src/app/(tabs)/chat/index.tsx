@@ -32,12 +32,13 @@ class UserMessage {
 
 type Message = BotMessage | UserMessage
 
-const choicesMessage = () => new UserMessage("Essas são algumas opções disponíveis para você:", [
+const choicesMessage = () =>
+  new UserMessage("Essas são algumas opções disponíveis para você:", [
     UserMessageChoice.REQUEST_BALANCE,
     UserMessageChoice.LIST_TRANSACTIONS,
     UserMessageChoice.DOUBT_ABOUT_POINTS,
     UserMessageChoice.REQUEST_POINTS_PREDICTION,
-])
+  ])
 
 const initialMessages: Message[] = [
   new BotMessage(
@@ -142,7 +143,7 @@ Responda apenas no seguinte formato:
         break
       }
     }
-    setMessages((prev)=> [choicesMessage(), ...prev])
+    setMessages((prev) => [choicesMessage(), ...prev])
   }
 
   function renderMessage({ item }: { item: Message }) {

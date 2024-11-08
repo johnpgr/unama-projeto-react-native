@@ -114,7 +114,7 @@ function LoadingSpinner() {
   return <ActivityIndicator size="large" color="#0000ff" />
 }
 
-export default function RewardsPage() {
+export function RewardsPage() {
   // Rest of the code remains the same
   const [popupState, setPopupState] = useState({
     isVisible: false,
@@ -179,7 +179,7 @@ export default function RewardsPage() {
     switch (true) {
       case isLoadingRewards || isExchanging || !rewards:
         return <LoadingSpinner />
-      case rewards!.length === 0:
+      case rewards?.length === 0:
         return <EmptyRewardsList />
       default:
         return (

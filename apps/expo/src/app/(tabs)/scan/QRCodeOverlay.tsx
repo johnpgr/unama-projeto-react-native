@@ -1,24 +1,11 @@
 import React from "react"
-import {
-  Animated,
-  Dimensions,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native"
-import {
-  BarcodeScanningResult,
-  CameraView,
-  useCameraPermissions,
-} from "expo-camera"
-import { Link, useRouter } from "expo-router"
-import { MaterialIcons } from "@expo/vector-icons"
+import { Animated, Dimensions, StyleSheet, View } from "react-native"
 
 const { width, height } = Dimensions.get("window")
 const OVERLAY_RATIO = 0.7
+const VERTICAL_OFFSET = height * 0.1
 
-const QRCodeOverlay = () => {
+export function QRCodeOverlay() {
   const scaleAnim = React.useRef(new Animated.Value(1)).current
   React.useEffect(() => {
     const breatheAnimation = Animated.sequence([
@@ -67,7 +54,7 @@ const styles = StyleSheet.create({
   },
   cornerTopLeft: {
     position: "absolute",
-    top: height / 2 - (width * OVERLAY_RATIO) / 2,
+    top: height / 2 - (width * OVERLAY_RATIO) / 2 - VERTICAL_OFFSET,
     left: width / 2 - (width * OVERLAY_RATIO) / 2,
     width: 40,
     height: 40,
@@ -78,7 +65,7 @@ const styles = StyleSheet.create({
   },
   cornerTopRight: {
     position: "absolute",
-    top: height / 2 - (width * OVERLAY_RATIO) / 2,
+    top: height / 2 - (width * OVERLAY_RATIO) / 2 - VERTICAL_OFFSET,
     right: width / 2 - (width * OVERLAY_RATIO) / 2,
     width: 40,
     height: 40,
@@ -89,7 +76,7 @@ const styles = StyleSheet.create({
   },
   cornerBottomLeft: {
     position: "absolute",
-    bottom: height / 2 - (width * OVERLAY_RATIO) / 2,
+    bottom: height / 2 - (width * OVERLAY_RATIO) / 2 + VERTICAL_OFFSET,
     left: width / 2 - (width * OVERLAY_RATIO) / 2,
     width: 40,
     height: 40,
@@ -100,7 +87,7 @@ const styles = StyleSheet.create({
   },
   cornerBottomRight: {
     position: "absolute",
-    bottom: height / 2 - (width * OVERLAY_RATIO) / 2,
+    bottom: height / 2 - (width * OVERLAY_RATIO) / 2 + VERTICAL_OFFSET,
     right: width / 2 - (width * OVERLAY_RATIO) / 2,
     width: 40,
     height: 40,
@@ -110,54 +97,3 @@ const styles = StyleSheet.create({
     borderColor: "white",
   },
 })
-export default function ScanScreen() {
-  const router = useRouter()
-  const [permission, requestPermission] = useCameraPermissions()
-  const [torchEnabled, setTorchEnabled] = React.useState(false)
-
-  function onBarCodeScannedHandler(res: BarcodeScanningResult) {
-    console.log("Scanned:", res.data)
-  }
-
-  React.useEffect(() => {
-    void requestPermission()
-  }, [requestPermission])
-
-  if (!permission) return null
-
-  return (
-    <View className="relative flex-1">
-      <CameraView
-        enableTorch={torchEnabled}
-        onBarcodeScanned={onBarCodeScannedHandler}
-        style={{ flex: 1 }}
-        facing={"back"}
-        barcodeScannerSettings={{
-          barcodeTypes: ["qr"],
-        }}
-      />
-      <QRCodeOverlay />
-      <Link asChild href={"/my-code"}>
-        <Pressable className="absolute bottom-8 right-1/2 translate-x-1/2 rounded-full bg-black/30 p-6 px-10">
-          <Text className="font-bold text-white">Mostrar código</Text>
-        </Pressable>
-      </Link>
-      <Pressable
-        onPress={() => router.back()}
-        className="absolute bottom-8 right-8 rounded-full bg-black/30 p-4"
-      >
-        <MaterialIcons name="close" size={32} color={"white"} />
-      </Pressable>
-      <Pressable
-        onPress={() => setTorchEnabled(!torchEnabled)}
-        className="absolute bottom-8 left-8 rounded-full bg-black/30 p-4"
-      >
-        <MaterialIcons
-          name={torchEnabled ? "flash-on" : "flash-off"}
-          size={32}
-          color={"white"}
-        />
-      </Pressable>
-    </View>
-  )
-}

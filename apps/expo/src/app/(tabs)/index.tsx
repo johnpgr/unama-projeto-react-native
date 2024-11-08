@@ -11,11 +11,13 @@ import { useSession, useSignOut } from "~/hooks/auth"
 export default function Index() {
   const { data } = useSession()
   const signOut = useSignOut()
-  const user = data.user! // user aqui não pode ser nulo, devido ao layout
+  const user = data.user
+
+  if (!user) return null
   const avatarUrl = user.imageUrl
 
   return (
-    <View className="h-full w-full gap-8 px-4">
+    <View className="mt-4 h-full w-full gap-8 px-4">
       <View className="flex-row items-center gap-4">
         <Image
           source={

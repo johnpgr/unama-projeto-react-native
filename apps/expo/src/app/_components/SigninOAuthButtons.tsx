@@ -15,7 +15,7 @@ export function SigninOAuthButtons() {
       >
         <Text className="text-border">Entrar com</Text>
         <Image
-          source={require("../../assets/logo_google.png")}
+          source={require("../../../assets/logo_google.png")}
           className="h-8 w-8"
         />
       </Pressable>
@@ -25,7 +25,7 @@ export function SigninOAuthButtons() {
       >
         <Text className="text-border">Entrar com</Text>
         <Image
-          source={require("../../assets/logo_github.png")}
+          source={require("../../../assets/logo_github.png")}
           className="h-8 w-8"
         />
       </Pressable>
