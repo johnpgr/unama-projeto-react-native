@@ -12,6 +12,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Ionicons } from "@expo/vector-icons"
 
+import type { schema } from "@projeto/api"
+
 import { api } from "~/utils/api"
 
 interface PopupProps {
@@ -19,12 +21,6 @@ interface PopupProps {
   onClose: () => void
   message: string
   type: "success" | "error"
-}
-
-interface Reward {
-  rewardsId: number
-  reward: string | null
-  points: number
 }
 
 const enum POPUP_TYPES {
@@ -37,79 +33,89 @@ const ICON_CONFIG = {
   color: "#4B5563",
 } as const
 
-const PopupHeader: React.FC<{
+function PopupHeader(props: {
   type: PopupProps["type"]
-  onClose: () => void
-}> = ({ type, onClose }) => (
-  <View className="mb-3 flex-row items-center justify-between">
-    <Text className="text-lg font-semibold">
-      {type === POPUP_TYPES.SUCCESS ? "Sucesso!" : "Erro"}
-    </Text>
-    <TouchableOpacity onPress={onClose}>
-      <Ionicons
-        name="close"
-        size={ICON_CONFIG.size}
-        color={ICON_CONFIG.color}
-      />
-    </TouchableOpacity>
-  </View>
-)
-
-const Popup: React.FC<PopupProps> = ({ visible, onClose, message, type }) => (
-  <Modal
-    transparent
-    visible={visible}
-    animationType="fade"
-    onRequestClose={onClose}
-  >
-    <Pressable
-      className="flex-1 items-center justify-center bg-black/50"
-      onPress={onClose}
-    >
-      <Pressable
-        className="w-4/5 rounded-lg bg-white p-4 shadow-lg"
-        onPress={(e) => e.stopPropagation()}
-      >
-        <PopupHeader type={type} onClose={onClose} />
-        <Text className="text-gray-600">{message}</Text>
-      </Pressable>
-    </Pressable>
-  </Modal>
-)
-
-const RewardCard: React.FC<{
-  reward: Reward
-  onRedeem: (id: number) => void
-}> = ({ reward, onRedeem }) => (
-  <View className="w-1/2 p-2">
-    <View className="items-center rounded-lg bg-gray-100 p-4">
-      <Ionicons name="car-outline" size={50} color={ICON_CONFIG.color} />
-      <Text className="mt-2 text-lg font-semibold">{reward.reward}</Text>
-      <Text className="mb-2 text-sm text-gray-600">
-        Pontos: {reward.points}
+  onClose: PopupProps["onClose"]
+}) {
+  return (
+    <View className="mb-3 flex-row items-center justify-between">
+      <Text className="text-lg font-semibold">
+        {props.type === POPUP_TYPES.SUCCESS ? "Sucesso!" : "Erro"}
       </Text>
-      <TouchableOpacity
-        className="rounded-md bg-blue-500 px-4 py-2"
-        onPress={() => onRedeem(reward.rewardsId)}
-      >
-        <Text className="font-bold text-white">Resgatar</Text>
+      <TouchableOpacity onPress={props.onClose}>
+        <Ionicons
+          name="close"
+          size={ICON_CONFIG.size}
+          color={ICON_CONFIG.color}
+        />
       </TouchableOpacity>
     </View>
-  </View>
-)
+  )
+}
 
-const EmptyRewardsList: React.FC = () => (
-  <View className="flex items-center justify-center p-4">
-    <Text className="text-lg font-semibold">No available rewards</Text>
-  </View>
-)
+function Popup(props: PopupProps) {
+  return (
+    <Modal
+      transparent
+      visible={props.visible}
+      animationType="fade"
+      onRequestClose={props.onClose}
+    >
+      <Pressable
+        className="flex-1 items-center justify-center bg-black/50"
+        onPress={props.onClose}
+      >
+        <Pressable
+          className="w-4/5 rounded-lg bg-white p-4 shadow-lg"
+          onPress={(e) => e.stopPropagation()}
+        >
+          <PopupHeader type={props.type} onClose={props.onClose} />
+          <Text className="text-gray-600">{props.message}</Text>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  )
+}
 
-const LoadingSpinner: React.FC = () => (
-  <ActivityIndicator size="large" color="#0000ff" />
-)
+function RewardCard(props: {
+  reward: schema.Reward
+  onRedeem: (id: string) => void
+}) {
+  return (
+    <View className="w-1/2 p-2">
+      <View className="items-center rounded-lg bg-gray-100 p-4">
+        <Ionicons name="car-outline" size={50} color={ICON_CONFIG.color} />
+        <Text className="mt-2 text-lg font-semibold">
+          {props.reward.reward}
+        </Text>
+        <Text className="mb-2 text-sm text-gray-600">
+          Pontos: {props.reward.points}
+        </Text>
+        <TouchableOpacity
+          className="rounded-md bg-blue-500 px-4 py-2"
+          onPress={() => props.onRedeem(props.reward.id)}
+        >
+          <Text className="font-bold text-white">Resgatar</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
+}
+
+function EmptyRewardsList() {
+  return (
+    <View className="flex items-center justify-center p-4">
+      <Text className="text-lg font-semibold">No available rewards</Text>
+    </View>
+  )
+}
+
+function LoadingSpinner() {
+  return <ActivityIndicator size="large" color="#0000ff" />
+}
 
 export default function RewardsPage() {
-  // State
+  // Rest of the code remains the same
   const [popupState, setPopupState] = useState({
     isVisible: false,
     message: "",
@@ -117,8 +123,7 @@ export default function RewardsPage() {
   })
   const [isExchanging, setIsExchanging] = useState(false)
 
-  // Queries & Mutations
-  const { data: rewards = [], isLoading: isLoadingRewards } =
+  const { data: rewards, isLoading: isLoadingRewards } =
     api.transaction.getAvailableRewards.useQuery()
 
   const { mutate: exchangePoints } =
@@ -149,7 +154,7 @@ export default function RewardsPage() {
       },
     })
 
-  const handleRedeemReward = (rewardId: number) => {
+  function handleRedeemReward(rewardId: string) {
     Alert.alert("Confirmar Resgate", "Deseja resgatar esta recompensa?", [
       {
         text: "Cancelar",
@@ -162,7 +167,7 @@ export default function RewardsPage() {
     ])
   }
 
-  const handleClosePopup = () => {
+  function handleClosePopup() {
     setPopupState({
       isVisible: false,
       message: "",
@@ -170,11 +175,11 @@ export default function RewardsPage() {
     })
   }
 
-  const renderContent = () => {
+  function RewardList() {
     switch (true) {
-      case isLoadingRewards || isExchanging:
+      case isLoadingRewards || isExchanging || !rewards:
         return <LoadingSpinner />
-      case rewards.length === 0:
+      case rewards!.length === 0:
         return <EmptyRewardsList />
       default:
         return (
@@ -182,9 +187,9 @@ export default function RewardsPage() {
             <View className="flex-row flex-wrap">
               {rewards.map((reward) => (
                 <RewardCard
-                  key={reward.rewardsId}
+                  key={reward.id}
                   reward={reward}
-                  onRedeem={handleRedeemReward}
+                  onRedeem={() => handleRedeemReward(reward.id)}
                 />
               ))}
             </View>
@@ -195,7 +200,7 @@ export default function RewardsPage() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
-      {renderContent()}
+      <RewardList />
       <Popup
         visible={popupState.isVisible}
         onClose={handleClosePopup}

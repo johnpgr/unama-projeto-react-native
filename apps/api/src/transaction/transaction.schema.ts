@@ -1,9 +1,13 @@
 import { relations } from "drizzle-orm"
 import {
-    date,
-    integer, pgTable, serial, uuid,
-    varchar
+  date,
+  integer,
+  pgTable,
+  serial,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core"
+
 import { User } from "../user/user.schema.ts"
 
 // Node.js + typescript nativo não suporta Enums
@@ -14,6 +18,7 @@ export const TransactionType = {
 export type TransactionType =
   (typeof TransactionType)[keyof typeof TransactionType]
 
+export type RecyclingTransaction = typeof RecyclingTransaction.$inferSelect
 export const RecyclingTransaction = pgTable("recycling_transaction", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
@@ -34,6 +39,7 @@ export const RecyclingTransactionRelations = relations(
   }),
 )
 
+export type P2PTransaction = typeof P2PTransaction.$inferSelect
 export const P2PTransaction = pgTable("p2p_transaction", {
   id: serial("id"),
   from: varchar("from")

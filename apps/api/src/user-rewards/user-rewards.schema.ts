@@ -7,6 +7,7 @@ import { User } from "../user/user.schema.ts"
 /**
  * Many-to-Many table to track rewards that users have redeemed
  */
+export type UserRewards = typeof UserRewards.$inferSelect
 export const UserRewards = pgTable("user_rewards", {
   id: uuid("id").defaultRandom().primaryKey(),
   rewardId: uuid("reward_id")

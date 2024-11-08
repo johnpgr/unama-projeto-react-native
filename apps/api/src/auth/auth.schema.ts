@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm"
 import { pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core"
+
 import { User } from "../user/user.schema.ts"
 
 export type OAuthAccountProvider = "google" | "apple" | "github"
@@ -21,6 +22,7 @@ export const OAuthAccountRelations = relations(OAuthAccount, ({ one }) => ({
   user: one(User, { references: [User.id], fields: [OAuthAccount.userId] }),
 }))
 
+export type Session = typeof Session.$inferSelect
 export const Session = pgTable("session", {
   id: text("id").primaryKey(),
   userId: uuid("user_id")
@@ -31,7 +33,6 @@ export const Session = pgTable("session", {
     mode: "date",
   }).notNull(),
 })
-export type Session = typeof Session.$inferSelect
 
 export const SessionRelations = relations(Session, ({ one }) => ({
   user: one(User, { references: [User.id], fields: [Session.userId] }),

@@ -22,3 +22,5 @@ export type RouterInputs = inferRouterInputs<AppRouter>
 export type RouterOutputs = inferRouterOutputs<AppRouter>
 
 export type { TransactionType } from "./src/transaction/transaction.schema.ts"
+
+export type * as schema from "./database/schema.ts"

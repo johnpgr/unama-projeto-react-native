@@ -1,7 +1,9 @@
 import { relations } from "drizzle-orm"
 import { integer, pgTable, uuid, varchar } from "drizzle-orm/pg-core"
+
 import { UserRewards } from "../user-rewards/user-rewards.schema.ts"
 
+export type Reward = typeof Reward.$inferSelect
 export const Reward = pgTable("rewards", {
   id: uuid("id").primaryKey().defaultRandom(),
   reward: varchar("reward"),
@@ -11,5 +13,5 @@ export const Reward = pgTable("rewards", {
 })
 
 export const RewardRelations = relations(Reward, ({ many }) => ({
-    userRewards: many(UserRewards)
+  userRewards: many(UserRewards),
 }))
