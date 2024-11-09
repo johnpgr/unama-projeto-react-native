@@ -5,25 +5,11 @@ import { AntDesign, Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons"
 import { useAtom } from "jotai"
 
 import { useSession } from "~/hooks/auth"
-import { useRouteObserver } from "~/hooks/routes"
 import { searchAtom } from "~/state/search"
-import { CurrentScanView } from "./scan/CurrentScanView"
 
 export default function TabLayout() {
   const { data, isLoading } = useSession()
   const [isSearchOpen, setIsSearchOpen] = useAtom(searchAtom)
-  const [currentScanView, setCurrentScanView] = useAtom(CurrentScanView)
-
-  useRouteObserver((current, previous) => {
-    //Resets the scan view to default "SCAN" mode when navigating away from scan screen
-    if (
-      previous === "/scan" &&
-      previous !== current &&
-      currentScanView === "MY_CODE"
-    ) {
-      setCurrentScanView("SCAN")
-    }
-  })
 
   React.useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -82,6 +68,17 @@ export default function TabLayout() {
           title: "Escanear",
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="qr-code-scanner" size={32} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="scan/my-code"
+        options={{
+          title: "Meu código",
+          href: null,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="qr-code" size={32} color={color} />
           ),
         }}
       />

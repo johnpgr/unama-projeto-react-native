@@ -177,7 +177,7 @@ Responda apenas no seguinte formato:
   }
 
   return (
-    <View className="flex-1 flex-col gap-4 px-4">
+    <View className="mt-4 flex-1 flex-col gap-4 px-4">
       <View className="flex-row items-center justify-between">
         <Pressable onPress={() => router.back()}>
           <EvilIcons name="chevron-left" size={40} />
