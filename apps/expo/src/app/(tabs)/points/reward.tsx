@@ -114,7 +114,7 @@ function LoadingSpinner() {
   return <ActivityIndicator size="large" color="#0000ff" />
 }
 
-export function RewardsPage() {
+export default function RewardsScreen() {
   // Rest of the code remains the same
   const [popupState, setPopupState] = useState({
     isVisible: false,

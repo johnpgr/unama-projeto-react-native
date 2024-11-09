@@ -13,7 +13,7 @@ import { api } from "~/utils/api"
 
 type SendPointsInput = RouterInputs["transaction"]["sendPointsP2P"]
 
-export function SendPointsScreen() {
+export default function SendPointsScreen() {
   const [isAgreed, setIsAgreed] = React.useState(false)
   const form = useForm<SendPointsInput>({
     defaultValues: { receiverId: "", amountPoints: 0 },

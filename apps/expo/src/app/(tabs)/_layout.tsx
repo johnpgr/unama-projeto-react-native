@@ -4,11 +4,11 @@ import { Redirect, Tabs } from "expo-router"
 import { AntDesign, Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons"
 import { useAtom } from "jotai"
 
-import { useSession } from "~/hooks/auth"
+import { useAuth } from "~/hooks/auth"
 import { searchAtom } from "~/state/search"
 
 export default function TabLayout() {
-  const { data, isLoading } = useSession()
+  const { session, isPending } = useAuth()
   const [isSearchOpen, setIsSearchOpen] = useAtom(searchAtom)
 
   React.useEffect(() => {
@@ -24,8 +24,8 @@ export default function TabLayout() {
     return () => backHandler.remove()
   }, [isSearchOpen, setIsSearchOpen])
 
-  if (isLoading) return null
-  if (!data.session) return <Redirect href={"/onboarding"} />
+  if (isPending) return null
+  if (!session) return <Redirect href={"/onboarding"} />
 
   return (
     <Tabs
@@ -59,6 +59,22 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Entypo name="wallet" size={32} color={color} />
           ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="points/send"
+        options={{
+          title: "Enviar Pontos",
+          href: null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="points/reward"
+        options={{
+          title: "Recompensas",
+          href: null,
         }}
       />
 
@@ -100,6 +116,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Entypo name="menu" size={32} color={color} />
           ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="campaigns/[slug]/index"
+        options={{
+          href: null,
+          title: "Campanha",
         }}
       />
     </Tabs>

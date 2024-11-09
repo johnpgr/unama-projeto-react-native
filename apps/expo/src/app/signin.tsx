@@ -11,7 +11,6 @@ import {
   TextInput,
   View,
 } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
 import Checkbox from "expo-checkbox"
 import { Link, Stack } from "expo-router"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,7 +25,7 @@ import { useIsKeyboardOpen } from "~/hooks/keyboard"
 
 export default function SignUpScreen() {
   const [remember, setRemember] = React.useState(false)
-  const { signIn, error: signInError, isPending } = useSignIn()
+  const { signIn, isPending, error } = useSignIn()
   const form = useForm<SignInParams>({
     resolver: zodResolver(signInSchema),
     mode: "onSubmit",
@@ -131,9 +130,9 @@ export default function SignUpScreen() {
           <Text className="text-xl font-bold text-white">Entrar</Text>
         </Pressable>
 
-        {signInError ? (
+        {error ? (
           <Text className="mt-4 text-center text-destructive">
-            {signInError.message}
+            {error.message}
           </Text>
         ) : null}
 

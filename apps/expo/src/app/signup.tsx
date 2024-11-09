@@ -25,7 +25,7 @@ import { useIsKeyboardOpen } from "~/hooks/keyboard"
 
 export default function SignUpScreen() {
   const [isAgreed, setIsAgreed] = React.useState(false)
-  const { signUp, error: signUpError, isPending } = useSignUp()
+  const { signUp, error, isPending } = useSignUp()
   const form = useForm<SignUpParams>({
     resolver: zodResolver(signUpSchema),
     mode: "onSubmit",
@@ -126,10 +126,8 @@ export default function SignUpScreen() {
           )}
         />
 
-        {signUpError ? (
-          <Text className="mt-4 text-center text-red-500">
-            {signUpError.message}
-          </Text>
+        {error ? (
+          <Text className="mt-4 text-center text-red-500">{error.message}</Text>
         ) : null}
 
         <View className="mt-2 flex flex-row items-center gap-2 py-4">

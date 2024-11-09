@@ -5,14 +5,14 @@ import {
   pgEnum,
   pgTable,
   text,
-  uuid,
+  timestamp,
   varchar,
 } from "drizzle-orm/pg-core"
+import { nanoid } from "nanoid"
 
 import { OAuthAccount, Session } from "../auth/auth.schema.ts"
 import { RecyclingTransaction } from "../transaction/transaction.schema.ts"
 import { UserRewards } from "../user-rewards/user-rewards.schema.ts"
-import { randomUserCode } from "./codes.ts"
 
 export const UserTypeEnum = pgEnum("user_type", [
   "normal",
@@ -22,19 +22,18 @@ export const UserTypeEnum = pgEnum("user_type", [
 
 export type User = typeof User.$inferSelect
 export const User = pgTable("user", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: varchar({ length: 21 })
+    .primaryKey()
+    .$default(() => nanoid()),
   fullName: text("full_name").notNull(),
-  email: text("email").notNull().unique(),
+  email: varchar({ length: 255 }).notNull().unique(),
   hashedPassword: text("hashed_password"),
-  emailVerified: boolean("email_verified").notNull().default(false),
-  userCode: varchar("user_code", { length: 5 })
-    .notNull()
-    .$defaultFn(() => randomUserCode(5))
-    .unique(),
+  emailVerified: timestamp("email_verified", {
+    mode: "date",
+    withTimezone: true,
+  }),
   imageUrl: text("image_url"),
-  userType: UserTypeEnum("user_type")
-    .notNull()
-    .default(UserTypeEnum.enumValues[2]),
+  userType: UserTypeEnum("user_type").notNull().default("normal"),
   totalPoints: integer("total_points").notNull().default(1000),
   canRedeemRewards: boolean("can_redeem_rewards").notNull().default(true),
 })

@@ -5,10 +5,10 @@ import { eq } from "drizzle-orm"
 
 import { signInSchema, signUpSchema } from "@projeto/validation"
 
-import { lucia } from "../auth/lucia/index.ts" 
 import { db } from "../../database/client.ts"
-import { User } from "../user/user.schema.ts"
+import { lucia } from "../auth/lucia/index.ts"
 import { protectedProcedure, publicProcedure } from "../trpc.ts"
+import { User } from "../user/user.schema.ts"
 
 const ARGON2_OPTS = {
   memoryCost: 19456,

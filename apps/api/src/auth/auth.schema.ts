@@ -1,5 +1,11 @@
 import { relations } from "drizzle-orm"
-import { pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import {
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core"
 
 import { User } from "../user/user.schema.ts"
 
@@ -8,10 +14,10 @@ export type OAuthAccountProvider = "google" | "apple" | "github"
 export const OAuthAccount = pgTable(
   "oauth_account",
   {
-    userId: uuid("user_id")
+    userId: varchar("user_id", { length: 21 })
       .notNull()
       .references(() => User.id),
-    provider: text("provider").$type<OAuthAccountProvider>().notNull(),
+    provider: text().$type<OAuthAccountProvider>().notNull(),
     providerUserId: text("provider_user_id").notNull(),
   },
   (table) => ({
@@ -24,8 +30,8 @@ export const OAuthAccountRelations = relations(OAuthAccount, ({ one }) => ({
 
 export type Session = typeof Session.$inferSelect
 export const Session = pgTable("session", {
-  id: text("id").primaryKey(),
-  userId: uuid("user_id")
+  id: text().primaryKey(),
+  userId: varchar("user_id", { length: 21 })
     .notNull()
     .references(() => User.id),
   expiresAt: timestamp("expires_at", {

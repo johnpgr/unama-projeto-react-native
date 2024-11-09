@@ -124,16 +124,13 @@ export const transactionRouter = {
   getUserTransactions: protectedProcedure.query(async ({ ctx }) => {
     const transactions = await db.query.P2PTransaction.findMany({
       where: (transaction) =>
-        or(
-          eq(transaction.from, ctx.user.userCode),
-          eq(transaction.to, ctx.user.userCode),
-        ),
+        or(eq(transaction.from, ctx.user.id), eq(transaction.to, ctx.user.id)),
     })
 
     const formattedTransactions = transactions.map((transaction) => ({
       ...transaction,
       points:
-        transaction.from === ctx.user.userCode
+        transaction.from === ctx.user.id
           ? -transaction.points
           : transaction.points,
     }))
@@ -176,101 +173,95 @@ export const transactionRouter = {
     )
 
     .mutation(async ({ ctx, input }) => {
-      const userCode = ctx.user.userCode
-      const sender = await db.query.User.findFirst({
-        where: (user) => eq(user.userCode, userCode),
-      })
+      const sender = ctx.user
       const receiver = await db.query.User.findFirst({
-        where: (user) => eq(user.userCode, input.receiverId),
+        where: (user) => eq(user.id, input.receiverId),
       })
-
-      if (!sender) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Usuário não está logado",
-        })
-      }
 
       if (!receiver) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "O código inserido não pertence a nenhuma conta",
+          message: "Usuário receptor não encontrado",
         })
       }
 
       const senderUserType = ctx.user.userType
-
       const receiverUserType = receiver.userType
 
       if (
-        (senderUserType === "normal" && receiverUserType === "normal") ||
-        senderUserType === "admin" ||
-        receiverUserType === "admin"
+        !(senderUserType === "normal" && receiverUserType === "normal") &&
+        senderUserType !== "admin" &&
+        receiverUserType !== "admin"
       ) {
-        if (input.amountPoints <= 0) {
-          throw new TRPCError({
-            code: "BAD_GATEWAY",
-            message: "O valor inserido não é válido",
-          })
-        }
-
-        const senderPoints = sender.totalPoints
-        if (senderPoints < input.amountPoints) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "O saldo é insuficiente",
-          })
-        }
-        if (input.receiverId == userCode) {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: "Você não pode mandar pontos a si mesmo",
-          })
-        }
-
-        await db
-          .update(User)
-          .set({
-            totalPoints: sql<number>`
-            CASE 
-                WHEN ${User.userCode} = ${userCode} THEN COALESCE(${User.totalPoints}, 0) - ${input.amountPoints}
-                WHEN ${User.userCode} = ${input.receiverId} THEN COALESCE(${User.totalPoints}, 0) + ${input.amountPoints}
-            END
-        `,
-          })
-          .where(inArray(User.userCode, [userCode, input.receiverId]))
-
-        await db.insert(P2PTransaction).values({
-          from: userCode,
-          to: input.receiverId,
-          points: -input.amountPoints,
-        })
-
-        return {
-          success: true,
-          senderId: sender.id,
-          senderFullName: sender.fullName,
-          receiverId: receiver.id,
-          receiverFullName: receiver.fullName,
-          pointsTransferred: input.amountPoints,
-        }
-      } else {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Apenas usuários normais podem enviar pontos.",
         })
+      }
+
+      if (input.amountPoints <= 0) {
+        throw new TRPCError({
+          code: "BAD_GATEWAY",
+          message: "O valor inserido não é válido",
+        })
+      }
+
+      const senderPoints = sender.totalPoints
+      if (senderPoints < input.amountPoints) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "O saldo é insuficiente",
+        })
+      }
+
+      if (input.receiverId == sender.id) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Você não pode mandar pontos a si mesmo",
+        })
+      }
+
+      db.transaction(async (t) => {
+        await t
+          .update(User)
+          .set({
+            totalPoints: sql<number>`
+        CASE 
+            WHEN ${User.id} = ${sender.id} THEN COALESCE(${User.totalPoints}, 0) - ${input.amountPoints}
+            WHEN ${User.id} = ${input.receiverId} THEN COALESCE(${User.totalPoints}, 0) + ${input.amountPoints}
+        END
+    `,
+          })
+          .where(inArray(User.id, [sender.id, input.receiverId]))
+
+        await t.insert(P2PTransaction).values({
+          from: sender.id,
+          to: input.receiverId,
+          points: -input.amountPoints,
+        })
+      })
+
+      return {
+        senderId: sender.id,
+        senderFullName: sender.fullName,
+        receiverId: receiver.id,
+        receiverFullName: receiver.fullName,
+        pointsTransferred: input.amountPoints,
       }
     }),
 
   getAvailableRewards: publicProcedure.query(async () => {
     return await db.select().from(Reward).orderBy(asc(Reward.points))
   }),
+
   getUserRewards: protectedProcedure.query(async ({ ctx }) => {
     const userRewards = await db.query.UserRewards.findMany({
       where: (userRewards) => eq(userRewards.userId, ctx.user.id),
+      with: { reward: { columns: { points: true } } },
     })
     return userRewards
   }),
+
   exchangePointsForReward: protectedProcedure
     .input(
       z.object({

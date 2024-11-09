@@ -1,8 +1,9 @@
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle"
 import { Lucia, TimeSpan } from "lucia"
+
 import { db } from "../../../database/client.ts"
-import { Session } from "../auth.schema.ts"
 import { User } from "../../user/user.schema.ts"
+import { Session } from "../auth.schema.ts"
 
 const adapter = new DrizzlePostgreSQLAdapter(db, Session, User)
 
@@ -25,7 +26,6 @@ export const lucia = new Lucia(adapter, {
   getUserAttributes: (attributes) => ({
     fullName: attributes.fullName,
     email: attributes.email,
-    userCode: attributes.userCode,
     imageUrl: attributes.imageUrl,
     userType: attributes.userType,
     totalPoints: attributes.totalPoints,

@@ -6,12 +6,11 @@ import { Image, Pressable, ScrollView, Text, View } from "react-native"
 import { Link } from "expo-router"
 import { MaterialIcons } from "@expo/vector-icons"
 
-import { useSession, useSignOut } from "~/hooks/auth"
+import { useAuth, useSignOut } from "~/hooks/auth"
 
 export default function Index() {
-  const { data } = useSession()
-  const signOut = useSignOut()
-  const user = data.user
+  const { user } = useAuth()
+  const { signOut } = useSignOut()
 
   if (!user) return null
   const avatarUrl = user.imageUrl

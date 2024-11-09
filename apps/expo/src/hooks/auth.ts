@@ -1,98 +1,103 @@
 import type { z } from "zod"
+import React from "react"
 import * as Linking from "expo-linking"
 import { useRouter } from "expo-router"
 import * as Browser from "expo-web-browser"
 
 import type { signInSchema, signUpSchema } from "@projeto/validation"
 
-import { api } from "../utils/api"
+import { AuthContext } from "~/state/auth-context"
+import { api } from "~/utils/api"
+import { unreachable } from "~/utils/unreachable"
 import { deleteToken, getToken, setToken } from "../utils/session-store"
 
 export type OAuthAccountProvider = "google" | "apple" | "github"
-
 export type SignInParams = z.infer<typeof signInSchema>
-
 export type SignUpParams = z.infer<typeof signUpSchema>
 
-export function useSession() {
-  const { data, isLoading } = api.auth.getSession.useQuery()
-  return { data: data ?? { user: null, session: null }, isLoading }
-}
+export function useAuth() {
+  const ctx =
+    React.useContext(AuthContext) ??
+    unreachable("useAuth must be used inside an AuthProvider")
 
-export function useSignUp() {
-  const utils = api.useUtils()
-  const router = useRouter()
-  const signUpMut = api.auth.signUp.useMutation()
-
-  async function signUp(params: SignUpParams) {
-    try {
-      const res = await signUpMut.mutateAsync(params)
-      setToken(res.session.id)
-      await utils.invalidate()
-      router.replace("/")
-    } catch (error) {
-      console.error(error)
-      if (error instanceof Error) console.error(error.stack)
-    }
-  }
-
-  return {
-    signUp,
-    error: signUpMut.error,
-    data: signUpMut.data,
-    isPending: signUpMut.isPending,
-  }
+  return ctx
 }
 
 export function useSignIn() {
   const utils = api.useUtils()
   const router = useRouter()
-  const signInMut = api.auth.signIn.useMutation()
 
-  async function signIn(params: SignInParams) {
-    try {
-      const res = await signInMut.mutateAsync(params)
+  const signInMutation = api.auth.signIn.useMutation({
+    onSuccess: async (res) => {
       setToken(res.session.id)
       await utils.invalidate()
       router.replace("/")
-    } catch (error) {
-      console.error(error)
-      if (error instanceof Error) console.error(error.stack)
-    }
-  }
+    },
+  })
 
   return {
-    signIn,
-    error: signInMut.error,
-    data: signInMut.data,
-    isPending: signInMut.isPending,
-  }
+    signIn: signInMutation.mutateAsync,
+    isPending: signInMutation.isPending,
+    error: signInMutation.error,
+  } as const
+}
+
+export function useSignUp() {
+  const utils = api.useUtils()
+  const router = useRouter()
+
+  const signUpMutation = api.auth.signUp.useMutation({
+    onSuccess: async (res) => {
+      setToken(res.session.id)
+      await utils.invalidate()
+      router.replace("/")
+    },
+  })
+
+  return {
+    signUp: signUpMutation.mutateAsync,
+    isPending: signUpMutation.isPending,
+    error: signUpMutation.error,
+  } as const
 }
 
 export function useSignOut() {
   const utils = api.useUtils()
-  const signOut = api.auth.signOut.useMutation()
   const router = useRouter()
 
-  return async () => {
-    try {
-      await signOut.mutateAsync()
+  const signOutMutation = api.auth.signOut.useMutation({
+    onSuccess: async () => {
       await deleteToken()
       await utils.invalidate()
       router.replace("/")
-    } catch (error) {
-      console.error(error)
-      if (error instanceof Error) console.error(error.stack)
-    }
+    },
+  })
+
+  return {
+    signOut: signOutMutation.mutateAsync,
+    isPending: signOutMutation.isPending,
+    error: signOutMutation.error,
+  } as const
+}
+
+export function useOAuthSignIn() {
+  const utils = api.useUtils()
+  const router = useRouter()
+
+  return async (...params: Parameters<typeof handleOAuthSignin>) => {
+    const { success, token } = await handleOAuthSignin(...params)
+    if (!success) return
+    setToken(token)
+    await utils.invalidate()
+    router.replace("/")
   }
 }
 
-Browser.maybeCompleteAuthSession()
-
-async function signInOAuth(
+async function handleOAuthSignin(
   provider: OAuthAccountProvider,
   redirect = Linking.createURL(""),
 ) {
+  Browser.maybeCompleteAuthSession()
   const signInUrl = new URL(
     `${process.env.EXPO_PUBLIC_REDIRECT_URL}/auth/${provider}?redirect=${redirect}`,
   )
@@ -120,17 +125,4 @@ async function signInOAuth(
   }
 
   return { success: true, token: sessionToken } as const
-}
-
-export function useSignInOAuth() {
-  const utils = api.useUtils()
-  const router = useRouter()
-
-  return async (...params: Parameters<typeof signInOAuth>) => {
-    const { success, token } = await signInOAuth(...params)
-    if (!success) return
-    setToken(token)
-    await utils.invalidate()
-    router.replace("/")
-  }
 }

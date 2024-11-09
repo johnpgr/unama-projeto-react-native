@@ -126,7 +126,7 @@ export async function createAppleSession(params: {
       .values({
         fullName: params.user?.fullName ?? "unknown apple user",
         email: payload.email,
-        emailVerified: Boolean(payload.email_verified),
+        emailVerified: new Date(payload.email_verified),
         imageUrl: null,
       })
       .returning()

@@ -7,7 +7,7 @@ import { useLocalSearchParams } from "expo-router"
 const campaigns = [
   {
     slug: "1",
-    cover: require("../../../../assets/card_1.png"),
+    cover: require("../../../../../assets/card_1.png"),
     content: `
 ## Você já se deparou com aquela situação em que está segurando um lixo, mas não encontra uma lixeira por perto?
 ### Isso acontece com mais frequência do que imaginamos, mas o que podemos fazer nessas situações? Aqui vão algumas dicas simples para ajudar o meio ambiente e fazer a diferença:

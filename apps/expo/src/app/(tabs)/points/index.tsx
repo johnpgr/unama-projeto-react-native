@@ -9,6 +9,13 @@ import {
 import { Link } from "expo-router"
 import { useAtom } from "jotai"
 
+import type {
+  Notification,
+  P2PNotification,
+  UserRewardNotification,
+} from "~/state/notifications"
+import type { RouterOutputs } from "~/utils/api"
+import { useAuth } from "~/hooks/auth"
 import { notificationsAtom, TransactionType } from "~/state/notifications"
 import { api } from "~/utils/api"
 
@@ -27,10 +34,30 @@ const months: Record<string, string> = {
   "12": "Dezembro",
 }
 
+const mapUserRewardToNotification = (
+  reward: RouterOutputs["transaction"]["getUserRewards"][number],
+): UserRewardNotification => ({
+  id: reward.id,
+  points: reward.reward.points,
+  transactionDate: reward.createdAt,
+  type: TransactionType.P2REWARD,
+})
+
+const mapP2PTransactionToNotification = (
+  transaction: RouterOutputs["transaction"]["getUserTransactions"][number],
+): P2PNotification => ({
+  id: transaction.id,
+  points: transaction.points,
+  transactionDate: transaction.createdAt,
+  type: TransactionType.P2P,
+  from: transaction.from,
+  to: transaction.to,
+})
+
 export default function PointsPage() {
   const [notifications, setNotifications] = useAtom(notificationsAtom)
   const [activeTab, setActiveTab] = useState("Rewards") // State for active tab
-  const { data: userSession } = api.auth.getSession.useQuery()
+  const { user } = useAuth()
 
   const { data: userRewards } = api.transaction.getUserRewards.useQuery()
   const { data: p2pTransactions } =
@@ -38,25 +65,10 @@ export default function PointsPage() {
 
   useEffect(() => {
     if (userRewards && p2pTransactions) {
-      const combinedNotifications = [
-        ...userRewards.map((reward) => ({
-          id: `reward-${reward.id}`, // Ensure unique ID for rewards
-          points: reward.points ?? 0,
-          transactionDate: reward.transactionDate,
-          type: TransactionType.P2REWARD,
-          from: undefined,
-          to: undefined,
-          reward: reward.reward,
-        })),
-        ...p2pTransactions.map((transaction) => ({
-          id: `p2p-${transaction.id}`, // Ensure unique ID for P2P transactions
-          points: transaction.points ?? 0,
-          transactionDate: transaction.transactionDate,
-          type: TransactionType.P2P,
-          from: transaction.from,
-          to: transaction.to,
-        })),
-      ]
+      const combinedNotifications = ([] as Notification[])
+        .concat(userRewards.map(mapUserRewardToNotification))
+        .concat(p2pTransactions.map(mapP2PTransactionToNotification))
+
       setNotifications(combinedNotifications)
     }
   }, [userRewards, p2pTransactions, setNotifications])
@@ -67,24 +79,26 @@ export default function PointsPage() {
       ? notifications.filter((item) => item.type === TransactionType.P2REWARD)
       : notifications.filter((item) => item.type === TransactionType.P2P)
 
+  if (!user) return null
+
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
       <View className="items-center rounded-xl bg-emerald-700 p-4">
         <Text className="text-lg text-white">Pontuação atual</Text>
         <Text className="text-6xl font-bold text-white">
-          {userSession?.user?.totalPoints}
+          {user.totalPoints}
         </Text>
       </View>
 
       <View className="my-4 flex-row justify-around">
         <TouchableOpacity className="rounded-lg bg-gray-200 p-3">
-          <Link href={"/my-code"}>Receber</Link>
+          <Link href="/scan/my-code">Receber</Link>
         </TouchableOpacity>
         <TouchableOpacity className="rounded-lg bg-gray-200 p-3">
-          <Link href={"/send-points"}>Enviar</Link>
+          <Link href="/points/send">Enviar</Link>
         </TouchableOpacity>
         <TouchableOpacity className="rounded-lg bg-gray-200 p-3">
-          <Link href={"/reward"}>Resgatar</Link>
+          <Link href="/points/reward">Resgatar</Link>
         </TouchableOpacity>
       </View>
 

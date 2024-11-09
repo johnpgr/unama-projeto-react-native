@@ -5,18 +5,17 @@ import { Link, useRouter } from "expo-router"
 import { EvilIcons } from "@expo/vector-icons"
 import QRCode from "react-qr-code"
 
-import { useSession } from "~/hooks/auth"
+import { useAuth } from "~/hooks/auth"
 import { TODO } from "~/utils/todo"
 
 export default function MyCodeScreen() {
   const router = useRouter()
-  const { data } = useSession()
+  const { user } = useAuth()
+  if (!user) return null
 
   function onPressShareHandler() {
     TODO("Implement share handler")
   }
-
-  const user = data.user!
 
   return (
     <View className="mt-4 flex flex-1 flex-col items-center gap-10 px-4">
@@ -34,12 +33,12 @@ export default function MyCodeScreen() {
       </View>
       <View className="mx-auto flex h-96 w-11/12 items-center justify-center rounded-lg bg-gray-200">
         <View className="rounded-lg bg-white p-8">
-          <QRCode size={200} value={user.userCode} />
+          <QRCode size={200} value={user.id} />
         </View>
       </View>
       <Text className="text-center text-lg">
         Meu código é: {"\n"}
-        <Text className="font-bold tracking-widest">{user.userCode}</Text>
+        <Text className="font-bold tracking-widest">{user.id}</Text>
       </Text>
       <Link
         href="/scan"

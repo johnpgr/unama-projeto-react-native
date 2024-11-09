@@ -83,7 +83,7 @@ importers:
         version: 0.1.1(@langchain/core@0.3.9)(encoding@0.1.13)
       '@lucia-auth/adapter-drizzle':
         specifier: ^1.1.0
-        version: 1.1.0(drizzle-orm@0.35.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.12)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.1)(react@18.3.1))(lucia@3.2.0)
+        version: 1.1.0(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.12)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.1)(react@18.3.1))(lucia@3.2.0)
       '@node-rs/argon2':
         specifier: ^1.8.3
         version: 1.8.3
@@ -100,14 +100,17 @@ importers:
         specifier: ^1.9.2
         version: 1.9.2
       drizzle-orm:
-        specifier: ^0.35.1
-        version: 0.35.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.12)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.1)(react@18.3.1)
+        specifier: ^0.36.1
+        version: 0.36.1(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.12)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.1)(react@18.3.1)
       hono:
         specifier: ^4.6.9
         version: 4.6.9
       lucia:
         specifier: ^3.2.0
         version: 3.2.0
+      nanoid:
+        specifier: ^5.0.8
+        version: 5.0.8
       pg:
         specifier: ^8.13.1
         version: 8.13.1
@@ -137,8 +140,8 @@ importers:
         specifier: ^7.4.2
         version: 7.4.2
       drizzle-kit:
-        specifier: ^0.24.0
-        version: 0.24.2
+        specifier: ^0.28.0
+        version: 0.28.0
       eslint:
         specifier: 'catalog:'
         version: 9.14.0(jiti@1.21.6)
@@ -1222,8 +1225,8 @@ packages:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
 
-  '@drizzle-team/brocli@0.10.1':
-    resolution: {integrity: sha512-AHy0vjc+n/4w/8Mif+w86qpppHuF3AyXbcWW+R/W7GNA3F5/p2nuhlkCJaTXSLZheB4l1rtHzOfr9A7NwoR/Zg==}
+  '@drizzle-team/brocli@0.10.2':
+    resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
 
   '@egjs/hammerjs@2.0.17':
     resolution: {integrity: sha512-XQsZgjm2EcVUiZQf11UBJQfmZeEmOW8DpI1gsFeln6w0ae0ii4dMQEQ0kjl6DspdWX1aGY1/loyXnP0JS06e/A==}
@@ -3481,16 +3484,16 @@ packages:
     resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
 
-  drizzle-kit@0.24.2:
-    resolution: {integrity: sha512-nXOaTSFiuIaTMhS8WJC2d4EBeIcN9OSt2A2cyFbQYBAZbi7lRsVGJNqDpEwPqYfJz38yxbY/UtbvBBahBfnExQ==}
+  drizzle-kit@0.28.0:
+    resolution: {integrity: sha512-KqI+CS2Ga9GYIrXpxpCDUJJrH/AT/k4UY0Pb4oRgQEGkgN1EdCnqp664cXgwPWjDr5RBtTsjZipw8+8C//K63A==}
     hasBin: true
 
-  drizzle-orm@0.35.3:
-    resolution: {integrity: sha512-Uv6N+b36x4BaZlxc96e+ag7RnMapBLGhc4SSi2F7RDwqYJipWjaU/P68RUp1FbW9r+mxoDp8nMz2Eece8PJxfA==}
+  drizzle-orm@0.36.1:
+    resolution: {integrity: sha512-F4hbimnMEhyWzDowQB4xEuVJJWXLHZYD7FYwvo8RImY+N7pStGqsbfmT95jDbec1s4qKmQbiuxEDZY90LRrfIw==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=3'
-      '@electric-sql/pglite': '>=0.1.1'
+      '@electric-sql/pglite': '>=0.2.0'
       '@libsql/client': '>=0.10.0'
       '@libsql/client-wasm': '>=0.10.0'
       '@neondatabase/serverless': '>=0.1'
@@ -3525,6 +3528,8 @@ packages:
       '@electric-sql/pglite':
         optional: true
       '@libsql/client':
+        optional: true
+      '@libsql/client-wasm':
         optional: true
       '@neondatabase/serverless':
         optional: true
@@ -5214,6 +5219,11 @@ packages:
   nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
+  nanoid@5.0.8:
+    resolution: {integrity: sha512-TcJPw+9RV9dibz1hHUzlLVy8N4X9TnwirAjrU08Juo6BNKggzVfP2ZJ/3ZUSq15Xl5i85i+Z89XBO90pB2PghQ==}
+    engines: {node: ^18 || >=20}
     hasBin: true
 
   nativewind@4.0.36:
@@ -8068,7 +8078,7 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
-  '@drizzle-team/brocli@0.10.1': {}
+  '@drizzle-team/brocli@0.10.2': {}
 
   '@egjs/hammerjs@2.0.17':
     dependencies:
@@ -8807,6 +8817,7 @@ snapshots:
     dependencies:
       '@libsql/core': 0.14.0
       js-base64: 3.7.7
+    optional: true
 
   '@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)':
     dependencies:
@@ -8828,6 +8839,7 @@ snapshots:
   '@libsql/core@0.14.0':
     dependencies:
       js-base64: 3.7.7
+    optional: true
 
   '@libsql/darwin-arm64@0.3.19':
     optional: true
@@ -8894,9 +8906,9 @@ snapshots:
   '@libsql/win32-x64-msvc@0.4.1':
     optional: true
 
-  '@lucia-auth/adapter-drizzle@1.1.0(drizzle-orm@0.35.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.12)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.1)(react@18.3.1))(lucia@3.2.0)':
+  '@lucia-auth/adapter-drizzle@1.1.0(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.12)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.1)(react@18.3.1))(lucia@3.2.0)':
     dependencies:
-      drizzle-orm: 0.35.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.12)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.1)(react@18.3.1)
+      drizzle-orm: 0.36.1(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.12)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.1)(react@18.3.1)
       lucia: 3.2.0
 
   '@mistralai/mistralai@0.4.0(encoding@0.1.13)':
@@ -10827,21 +10839,20 @@ snapshots:
 
   dotenv@16.4.5: {}
 
-  drizzle-kit@0.24.2:
+  drizzle-kit@0.28.0:
     dependencies:
-      '@drizzle-team/brocli': 0.10.1
+      '@drizzle-team/brocli': 0.10.2
       '@esbuild-kit/esm-loader': 2.6.5
       esbuild: 0.19.12
       esbuild-register: 3.6.0(esbuild@0.19.12)
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.35.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.12)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.1)(react@18.3.1):
-    dependencies:
-      '@libsql/client-wasm': 0.14.0
+  drizzle-orm@0.36.1(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@libsql/client@0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(@neondatabase/serverless@0.9.4)(@types/pg@8.11.10)(@types/react@18.3.12)(@vercel/postgres@0.9.0)(bun-types@1.1.27)(pg@8.13.1)(react@18.3.1):
     optionalDependencies:
       '@electric-sql/pglite': 0.2.12
       '@libsql/client': 0.10.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+      '@libsql/client-wasm': 0.14.0
       '@neondatabase/serverless': 0.9.4
       '@types/pg': 8.11.10
       '@types/react': 18.3.12
@@ -12244,7 +12255,8 @@ snapshots:
       '@types/react': 18.3.12
       react: 18.3.1
 
-  js-base64@3.7.7: {}
+  js-base64@3.7.7:
+    optional: true
 
   js-tiktoken@1.0.15:
     dependencies:
@@ -12886,6 +12898,8 @@ snapshots:
       thenify-all: 1.6.0
 
   nanoid@3.3.7: {}
+
+  nanoid@5.0.8: {}
 
   nativewind@4.0.36(@babel/core@7.25.2)(react-native-reanimated@3.10.1(@babel/core@7.25.2)(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.3.12)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.3.1))(react@18.3.1))(react-native-safe-area-context@4.10.5(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.3.12)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.3.1))(react@18.3.1))(react-native-svg@15.2.0(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.3.12)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.3.1))(react@18.3.1))(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.3.12)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.14(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))):
     dependencies:

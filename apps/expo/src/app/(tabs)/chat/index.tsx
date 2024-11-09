@@ -5,10 +5,11 @@ import { EvilIcons } from "@expo/vector-icons"
 import clsx from "clsx"
 import { useAtom } from "jotai"
 
-import { useSession } from "~/hooks/auth"
+import { useAuth } from "~/hooks/auth"
 import { notificationsAtom } from "~/state/notifications"
 import { api } from "~/utils/api"
 import { randomString } from "~/utils/random"
+import { PROMPT } from "./prompt"
 
 const enum UserMessageChoice {
   REQUEST_BALANCE = "Consultar saldo",
@@ -48,7 +49,7 @@ const initialMessages: Message[] = [
 ]
 
 export default function ChatbotScreen() {
-  const { data: userSession } = useSession()
+  const { user } = useAuth()
   const [notifications, setNotifications] = useAtom(notificationsAtom)
   const [messages, setMessages] = React.useState<Message[]>(initialMessages)
   const [inputText, setInputText] = React.useState("")
@@ -58,6 +59,8 @@ export default function ChatbotScreen() {
     isPending,
   } = api.transaction.getLLMResponse.useMutation()
   const router = useRouter()
+
+  if (!user) return null
 
   async function sendMessage(input: string) {
     try {
@@ -93,7 +96,7 @@ export default function ChatbotScreen() {
     switch (option) {
       case UserMessageChoice.REQUEST_BALANCE: {
         const botMessage = new BotMessage(
-          `Seu saldo é de ${userSession.user?.totalPoints} pontos.`,
+          `Seu saldo é de ${user.totalPoints} pontos.`,
         )
         setMessages((prevMessages) => [botMessage, ...prevMessages])
         break
@@ -128,16 +131,7 @@ export default function ChatbotScreen() {
           setMessages((prevMessages) => [botMessage, ...prevMessages])
           break
         }
-        const prompt = `
-Você é um engenheiro de machine learning especializado em modelos de previsão financeira. Usando técnicas avançadas de regressão e análise de sequências temporais, faça uma previsão curta e objetiva sobre a quantidade de pontos que o usuário pode ganhar ou perder no próximo mês com base nas transações a seguir:
-
-${transactionDetails}
-
-Nome do usuário: ${userSession.user?.fullName}
-
-Responda apenas no seguinte formato: 
-"Usando modelos sofisticados de regressão (machine learning), no próximo mês, seguindo a sua sequência, você {ganharia/perderia} {X} pontos."
-`.trim()
+        const prompt = PROMPT(transactionDetails, user.fullName)
 
         await sendMessage(prompt)
         break

@@ -4,12 +4,12 @@ import { Image, Text, View } from "react-native"
 import { Link, Redirect } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 
-import { useSession } from "~/hooks/auth"
+import { useAuth } from "~/hooks/auth"
 
 export default function OnboardingScreen() {
-  const { data, isLoading } = useSession()
-  if (isLoading) return null
-  if (data.session) return <Redirect href={"/"} />
+  const { session, isPending } = useAuth()
+  if (isPending) return null
+  if (session) return <Redirect href={"/"} />
 
   return (
     <View className="flex h-full w-full flex-1 flex-col items-center bg-background bg-white p-8 pb-8">

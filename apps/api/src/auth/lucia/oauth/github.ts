@@ -101,7 +101,7 @@ export async function createGithubSession(
         fullName: githubUserResponse.name,
         imageUrl: githubUserResponse.avatar_url,
         email: primaryEmail.email,
-        emailVerified: Boolean(primaryEmail.verified),
+        emailVerified: primaryEmail.verified ? new Date() : null,
       })
       .returning()
     if (!insertedUser)

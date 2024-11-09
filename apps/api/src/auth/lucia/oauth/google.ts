@@ -2,11 +2,11 @@ import type { Session } from "lucia"
 import { Google } from "arctic"
 import { eq } from "drizzle-orm"
 
-import type { DatabaseUserAttributes } from "../index.ts" 
-import { db } from "../../../../database/client.ts" 
-import { OAuthAccount } from "../../auth.schema.ts"
+import type { DatabaseUserAttributes } from "../index.ts"
+import { db } from "../../../../database/client.ts"
 import { User } from "../../../user/user.schema.ts"
-import { CreateSessionError } from "../../errors.ts" 
+import { OAuthAccount } from "../../auth.schema.ts"
+import { CreateSessionError } from "../../errors.ts"
 import { lucia } from "../index.ts"
 
 export const googleAuth = new Google(
@@ -83,7 +83,7 @@ export async function createGoogleSession(
       .values({
         fullName: user.name,
         email: user.email,
-        emailVerified: Boolean(user.email_verified),
+        emailVerified: user.email_verified ? new Date() : null,
         imageUrl: user.picture,
       })
       .returning()
