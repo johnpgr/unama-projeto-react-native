@@ -7,6 +7,8 @@ import { TRPCProvider } from "~/utils/api"
 
 import "../styles.css"
 
+import React from "react"
+
 import { AuthProvider } from "~/state/auth-context"
 
 // This is the main layout of the app

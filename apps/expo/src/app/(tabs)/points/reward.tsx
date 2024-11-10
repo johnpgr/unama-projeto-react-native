@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import {
   ActivityIndicator,
   Alert,
@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
 import { Ionicons } from "@expo/vector-icons"
 
 import type { schema } from "@projeto/api"
@@ -115,13 +114,12 @@ function LoadingSpinner() {
 }
 
 export default function RewardsScreen() {
-  // Rest of the code remains the same
-  const [popupState, setPopupState] = useState({
+  const [popupState, setPopupState] = React.useState({
     isVisible: false,
     message: "",
     type: POPUP_TYPES.SUCCESS as PopupProps["type"],
   })
-  const [isExchanging, setIsExchanging] = useState(false)
+  const [isExchanging, setIsExchanging] = React.useState(false)
 
   const { data: rewards, isLoading: isLoadingRewards } =
     api.transaction.getAvailableRewards.useQuery()
@@ -199,7 +197,7 @@ export default function RewardsScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
+    <View className="mt-4 flex-1 bg-gray-100">
       <RewardList />
       <Popup
         visible={popupState.isVisible}
@@ -207,6 +205,6 @@ export default function RewardsScreen() {
         message={popupState.message}
         type={popupState.type}
       />
-    </SafeAreaView>
+    </View>
   )
 }

@@ -16,8 +16,8 @@ export default function Index() {
   const avatarUrl = user.imageUrl
 
   return (
-    <View className="mt-4 h-full w-full gap-8 px-4">
-      <View className="flex-row items-center gap-4">
+    <View className="flex-1 gap-8 bg-background px-4 pt-4">
+      <View className="flex flex-row items-center gap-4">
         <Image
           source={
             avatarUrl

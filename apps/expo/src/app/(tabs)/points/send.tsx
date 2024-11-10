@@ -30,7 +30,7 @@ export default function SendPointsScreen() {
       return
     }
     const amountPoints = data.amountPoints
-    if (isNaN(amountPoints) || amountPoints <= 0) {
+    if (Number.isNaN(amountPoints) || amountPoints <= 0) {
       throw new Error("A quantidade de pontos deve ser um número positivo.")
     }
     await sendPoints(data)

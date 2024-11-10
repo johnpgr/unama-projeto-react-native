@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react"
 import { FlatList, Pressable, Text, TouchableOpacity, View } from "react-native"
 import { useRouter } from "expo-router"
@@ -6,7 +7,7 @@ import clsx from "clsx"
 import { useAtom } from "jotai"
 
 import { useAuth } from "~/hooks/auth"
-import { notificationsAtom } from "~/state/notifications"
+import { notificationsAtom, TransactionType } from "~/state/notifications"
 import { api } from "~/utils/api"
 import { randomString } from "~/utils/random"
 import { PROMPT } from "./prompt"
@@ -87,16 +88,17 @@ export default function ChatbotScreen() {
     setMessages((prevMessages) => [userMessage, ...prevMessages])
 
     const transactionDetails = notifications
+      .filter((notification) => notification.type === TransactionType.P2P)
       .map(
         (notification) =>
-          `Transação de ${notification.points} pontos em ${notification.transactionDate ?? "data desconhecida"} de ${notification.from} para ${notification.to}.`,
+          `Transação de ${notification.points} pontos em ${notification.transactionDate.formatted()} de ${notification.from} para ${notification.to}.`,
       )
       .join("\n")
 
     switch (option) {
       case UserMessageChoice.REQUEST_BALANCE: {
         const botMessage = new BotMessage(
-          `Seu saldo é de ${user.totalPoints} pontos.`,
+          `Seu saldo é de ${user!.totalPoints} pontos.`,
         )
         setMessages((prevMessages) => [botMessage, ...prevMessages])
         break
@@ -131,7 +133,7 @@ export default function ChatbotScreen() {
           setMessages((prevMessages) => [botMessage, ...prevMessages])
           break
         }
-        const prompt = PROMPT(transactionDetails, user.fullName)
+        const prompt = PROMPT(transactionDetails, user!.fullName)
 
         await sendMessage(prompt)
         break

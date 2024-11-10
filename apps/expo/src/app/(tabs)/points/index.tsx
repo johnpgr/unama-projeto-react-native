@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import {
   FlatList,
   SafeAreaView,
@@ -18,21 +18,6 @@ import type { RouterOutputs } from "~/utils/api"
 import { useAuth } from "~/hooks/auth"
 import { notificationsAtom, TransactionType } from "~/state/notifications"
 import { api } from "~/utils/api"
-
-const months: Record<string, string> = {
-  "1": "Janeiro",
-  "2": "Fevereiro",
-  "3": "Março",
-  "4": "Abril",
-  "5": "Maio",
-  "6": "Junho",
-  "7": "Julho",
-  "8": "Agosto",
-  "9": "Setembro",
-  "10": "Outubro",
-  "11": "Novembro",
-  "12": "Dezembro",
-}
 
 const mapUserRewardToNotification = (
   reward: RouterOutputs["transaction"]["getUserRewards"][number],
@@ -54,16 +39,23 @@ const mapP2PTransactionToNotification = (
   to: transaction.to,
 })
 
+const enum PointsPageTab {
+  Rewards,
+  Transactions,
+}
+
 export default function PointsPage() {
   const [notifications, setNotifications] = useAtom(notificationsAtom)
-  const [activeTab, setActiveTab] = useState("Rewards") // State for active tab
+  const [activeTab, setActiveTab] = React.useState<PointsPageTab>(
+    PointsPageTab.Rewards,
+  )
   const { user } = useAuth()
 
   const { data: userRewards } = api.transaction.getUserRewards.useQuery()
   const { data: p2pTransactions } =
     api.transaction.getUserTransactions.useQuery()
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (userRewards && p2pTransactions) {
       const combinedNotifications = ([] as Notification[])
         .concat(userRewards.map(mapUserRewardToNotification))
@@ -73,9 +65,8 @@ export default function PointsPage() {
     }
   }, [userRewards, p2pTransactions, setNotifications])
 
-  // Filter notifications based on the active tab
-  const filteredNotifications =
-    activeTab === "Rewards"
+  const filteredNotifications: Notification[] =
+    activeTab === PointsPageTab.Rewards
       ? notifications.filter((item) => item.type === TransactionType.P2REWARD)
       : notifications.filter((item) => item.type === TransactionType.P2P)
 
@@ -108,24 +99,24 @@ export default function PointsPage() {
 
       <View className="flex-row justify-around bg-white p-2">
         <TouchableOpacity
-          onPress={() => setActiveTab("Rewards")}
+          onPress={() => setActiveTab(PointsPageTab.Rewards)}
           className={`flex-1 p-2 text-center ${
-            activeTab === "Rewards"
+            activeTab === PointsPageTab.Rewards
               ? "bg-emerald-700 text-white"
               : "bg-gray-200"
           }`}
         >
-          <Text className="font-bold">Rewards</Text>
+          <Text className="font-bold">Recompensas</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => setActiveTab("Transactions")}
+          onPress={() => setActiveTab(PointsPageTab.Transactions)}
           className={`flex-1 p-2 text-center ${
-            activeTab === "Transactions"
+            activeTab === PointsPageTab.Transactions
               ? "bg-emerald-700 text-white"
               : "bg-gray-200"
           }`}
         >
-          <Text className="font-bold">Transactions</Text>
+          <Text className="font-bold">Transações</Text>
         </TouchableOpacity>
       </View>
 
@@ -133,13 +124,13 @@ export default function PointsPage() {
         {filteredNotifications.length === 0 ? (
           <View className="p-4">
             <Text className="text-center text-gray-500">
-              You don't have any notifications yet
+              Nehuma notificação encontrada
             </Text>
           </View>
         ) : (
           <FlatList
             data={filteredNotifications}
-            keyExtractor={(item) => item.id} // Use unique IDs for keys
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View className="flex-row justify-between border-b border-gray-200 p-4">
                 <View>
@@ -148,10 +139,7 @@ export default function PointsPage() {
                     {item.points} pontos . {item.type}
                   </Text>
                   <Text className="text-gray-500">
-                    Data:{" "}
-                    {`${item.transactionDate?.split("-")[2]} de ${
-                      months[item.transactionDate?.split("-")[1] ?? ""]
-                    } de ${item.transactionDate?.split("-")[0]}`}
+                    Data: {item.transactionDate.formatted()}
                   </Text>
                 </View>
                 <TouchableOpacity>
@@ -159,7 +147,7 @@ export default function PointsPage() {
                 </TouchableOpacity>
               </View>
             )}
-            contentContainerStyle={{ paddingBottom: 20 }} // Space at the bottom
+            contentContainerStyle={{ paddingBottom: 20 }}
           />
         )}
       </View>
