@@ -11,6 +11,7 @@ import { User } from "../user/user.schema.ts"
 
 export type OAuthAccountProvider = "google" | "apple" | "github"
 
+export type OAuthAccount = typeof OAuthAccount.$inferSelect
 export const OAuthAccount = pgTable(
   "oauth_account",
   {

@@ -1,28 +1,12 @@
 import React from "react"
-import { BackHandler, Pressable, View } from "react-native"
+import { View } from "react-native"
 import { Redirect, Tabs } from "expo-router"
-import { AntDesign, Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons"
-import { useAtom } from "jotai"
+import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons"
 
 import { useAuth } from "~/hooks/auth"
-import { searchAtom } from "~/state/search"
 
 export default function TabLayout() {
   const { session, isPending } = useAuth()
-  const [isSearchOpen, setIsSearchOpen] = useAtom(searchAtom)
-
-  React.useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        if (!isSearchOpen) return false
-
-        setIsSearchOpen(false)
-        return true
-      },
-    )
-    return () => backHandler.remove()
-  }, [isSearchOpen, setIsSearchOpen])
 
   if (isPending) return null
   if (!session) return <Redirect href={"/onboarding"} />
@@ -38,12 +22,13 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "ECOPoints",
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
           headerRight: () => (
-            <View className="mr-4 flex flex-row items-center gap-4">
-              <Pressable onPress={() => setIsSearchOpen((prev) => !prev)}>
-                <AntDesign name="search1" size={24} />
-              </Pressable>
-              <Ionicons name="notifications-outline" size={26} />
+            <View className="mr-4 flex flex-row items-center gap-2">
+              <MaterialIcons name="notifications" size={26} />
+              <MaterialIcons name="more-vert" size={26} />
             </View>
           ),
           tabBarIcon: ({ color }) => (
