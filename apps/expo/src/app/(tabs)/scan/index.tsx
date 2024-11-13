@@ -13,7 +13,7 @@ export default function ScanScreen() {
   const [torchEnabled, setTorchEnabled] = React.useState(false)
 
   function onBarCodeScannedHandler(res: BarcodeScanningResult) {
-    console.log("Scanned:", res.data)
+    router.push(`/points/send?receiverId=${res.data}`)
   }
 
   React.useEffect(() => {

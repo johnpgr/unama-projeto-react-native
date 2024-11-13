@@ -6,6 +6,7 @@ import {
   TextInput,
   View,
 } from "react-native"
+import { useLocalSearchParams } from "expo-router"
 import { Controller, useForm } from "react-hook-form"
 
 import type { RouterInputs } from "~/utils/api"
@@ -15,8 +16,12 @@ type SendPointsInput = RouterInputs["transaction"]["sendPointsP2P"]
 
 export default function SendPointsScreen() {
   const [isAgreed, setIsAgreed] = React.useState(false)
+  const { receiverId } = useLocalSearchParams()
   const form = useForm<SendPointsInput>({
-    defaultValues: { receiverId: "", amountPoints: 0 },
+    defaultValues: {
+      receiverId: typeof receiverId === "string" ? receiverId : "",
+      amountPoints: 0,
+    },
   })
   const {
     mutateAsync: sendPoints,

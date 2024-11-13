@@ -9,6 +9,7 @@ import { useAtom } from "jotai"
 import { useAuth } from "~/hooks/auth"
 import { notificationsAtom, TransactionType } from "~/state/notifications"
 import { api } from "~/utils/api"
+import { formatDatePTBR } from "~/utils/date"
 import { randomString } from "~/utils/random"
 import { PROMPT } from "./prompt"
 
@@ -91,7 +92,7 @@ export default function ChatbotScreen() {
       .filter((notification) => notification.type === TransactionType.P2P)
       .map(
         (notification) =>
-          `Transação de ${notification.points} pontos em ${notification.transactionDate.formatted()} de ${notification.from} para ${notification.to}.`,
+          `Transação de ${notification.points} pontos em ${formatDatePTBR(notification.transactionDate)} de ${notification.from} para ${notification.to}.`,
       )
       .join("\n")
 

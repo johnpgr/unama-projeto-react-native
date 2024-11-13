@@ -39,6 +39,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
   },
   plugins: [
+    "expo-secure-store",
     "expo-router",
     [
       "expo-camera",

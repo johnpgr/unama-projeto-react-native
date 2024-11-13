@@ -1,20 +1,29 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react"
 import { Platform, Pressable, Text, View } from "react-native"
-import { Link, useRouter } from "expo-router"
+import { Link, Redirect, useRouter } from "expo-router"
 import { EvilIcons } from "@expo/vector-icons"
 import QRCode from "react-qr-code"
 
 import { useAuth } from "~/hooks/auth"
+import { api } from "~/utils/api"
 import { TODO } from "~/utils/todo"
 
 export default function MyCodeScreen() {
   const router = useRouter()
+  const onTransaction = api.transaction.onP2PTransaction.useSubscription()
   const { user } = useAuth()
   if (!user) return null
 
   function onPressShareHandler() {
     TODO("Implement share handler")
+  }
+
+  if (onTransaction.data) {
+    return (
+      <Redirect
+        href={`/scan/received-points?points=${onTransaction.data.pointsTransferred}&sender=${onTransaction.data.senderId}`}
+      />
+    )
   }
 
   return (
@@ -40,6 +49,7 @@ export default function MyCodeScreen() {
         Meu código é: {"\n"}
         <Text className="font-bold tracking-widest">{user.id}</Text>
       </Text>
+      <Text>{JSON.stringify(onTransaction.error, null, 2)}</Text>
       <Link
         href="/scan"
         className="rounded-2xl bg-primary p-4 px-16 transition-colors active:bg-primary/90"

@@ -1,5 +1,6 @@
+import EventEmitter, { on } from "node:events"
 import { ChatMistralAI } from "@langchain/mistralai"
-import { TRPCError } from "@trpc/server"
+import { tracked, TRPCError } from "@trpc/server"
 import { asc, eq, inArray, or, sql } from "drizzle-orm"
 import { z } from "zod"
 
@@ -13,6 +14,45 @@ import {
 } from "../../database/schema.ts"
 import { env } from "../env.ts"
 import { protectedProcedure, publicProcedure } from "../trpc.ts"
+
+export interface TransactionEvents {
+  sendPointsP2P: (args: {
+    id: string
+    senderId: string
+    receiverId: string
+    pointsTransferred: number
+  }) => void
+}
+
+declare interface TransactionEventEmitter {
+  on<TEv extends keyof TransactionEvents>(
+    event: TEv,
+    listener: TransactionEvents[TEv],
+  ): this
+  off<TEv extends keyof TransactionEvents>(
+    event: TEv,
+    listener: TransactionEvents[TEv],
+  ): this
+  once<TEv extends keyof TransactionEvents>(
+    event: TEv,
+    listener: TransactionEvents[TEv],
+  ): this
+  emit<TEv extends keyof TransactionEvents>(
+    event: TEv,
+    ...args: Parameters<TransactionEvents[TEv]>
+  ): boolean
+}
+
+class TransactionEventEmitter extends EventEmitter {
+  public toIterable<TEv extends keyof TransactionEvents>(
+    event: TEv,
+    opts: NonNullable<Parameters<typeof on>[2]>,
+  ): AsyncIterable<Parameters<TransactionEvents[TEv]>> {
+    return on(this, event, opts) as any
+  }
+}
+
+export const transactionEvents = new TransactionEventEmitter()
 
 export const transactionRouter = {
   getLLMResponse: protectedProcedure
@@ -163,7 +203,6 @@ export const transactionRouter = {
    *   se o valor dos pontos for inválido, se o saldo for insuficiente,
    *   ou se o usuário tentar enviar pontos para si mesmo.
    */
-
   sendPointsP2P: protectedProcedure
     .input(
       z.object({
@@ -226,7 +265,7 @@ export const transactionRouter = {
           .update(User)
           .set({
             totalPoints: sql<number>`
-        CASE 
+        CASE
             WHEN ${User.id} = ${sender.id} THEN COALESCE(${User.totalPoints}, 0) - ${input.amountPoints}
             WHEN ${User.id} = ${input.receiverId} THEN COALESCE(${User.totalPoints}, 0) + ${input.amountPoints}
         END
@@ -234,10 +273,22 @@ export const transactionRouter = {
           })
           .where(inArray(User.id, [sender.id, input.receiverId]))
 
-        await t.insert(P2PTransaction).values({
-          from: sender.id,
-          to: input.receiverId,
-          points: -input.amountPoints,
+        const [transaction] = await t
+          .insert(P2PTransaction)
+          .values({
+            from: sender.id,
+            to: input.receiverId,
+            points: -input.amountPoints,
+          })
+          .returning()
+
+        if (!transaction) return
+
+        transactionEvents.emit("sendPointsP2P", {
+          id: transaction.id,
+          pointsTransferred: transaction.points,
+          senderId: transaction.from,
+          receiverId: transaction.to,
         })
       })
 
@@ -249,6 +300,17 @@ export const transactionRouter = {
         pointsTransferred: input.amountPoints,
       }
     }),
+
+  onP2PTransaction: protectedProcedure.subscription(async function* (opts) {
+    for await (const [transaction] of transactionEvents.toIterable(
+      "sendPointsP2P",
+      { signal: opts.signal },
+    )) {
+      if (transaction.receiverId === opts.ctx.user.id) {
+        yield transaction
+      }
+    }
+  }),
 
   getAvailableRewards: publicProcedure.query(async () => {
     return await db.select().from(Reward).orderBy(asc(Reward.points))

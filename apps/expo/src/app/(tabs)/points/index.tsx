@@ -18,6 +18,7 @@ import type { RouterOutputs } from "~/utils/api"
 import { useAuth } from "~/hooks/auth"
 import { notificationsAtom, TransactionType } from "~/state/notifications"
 import { api } from "~/utils/api"
+import { formatDatePTBR } from "~/utils/date"
 
 const mapUserRewardToNotification = (
   reward: RouterOutputs["transaction"]["getUserRewards"][number],
@@ -139,7 +140,7 @@ export default function PointsPage() {
                     {item.points} pontos . {item.type}
                   </Text>
                   <Text className="text-gray-500">
-                    Data: {item.transactionDate.formatted()}
+                    Data: {formatDatePTBR(item.transactionDate)}
                   </Text>
                 </View>
                 <TouchableOpacity>

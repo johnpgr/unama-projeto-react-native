@@ -1,6 +1,11 @@
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { httpBatchLink, loggerLink } from "@trpc/client"
+import {
+  httpBatchLink,
+  loggerLink,
+  splitLink,
+  unstable_httpSubscriptionLink,
+} from "@trpc/client"
 import { createTRPCReact } from "@trpc/react-query"
 import superjson from "superjson"
 
@@ -30,18 +35,37 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
             (opts.direction === "down" && opts.result instanceof Error),
           colorMode: "ansi",
         }),
-        httpBatchLink({
-          transformer: superjson,
-          url: `${getBaseUrl()}/trpc`,
-          headers() {
-            const headers = new Map<string, string>()
-            headers.set("x-trpc-source", "expo-react")
+        splitLink({
+          condition: (op) => op.type === "subscription",
+          true: unstable_httpSubscriptionLink({
+            transformer: superjson,
+            url: `/${getBaseUrl()}/trpc`,
 
-            const token = getToken()
-            if (token) headers.set("Authorization", `Bearer ${token}`)
+            eventSourceOptions: () => {
+              const headers = new Map<string, string>()
+              headers.set("x-trpc-source", "expo-react")
 
-            return Object.fromEntries(headers)
-          },
+              const token = getToken()
+              if (token) headers.set("Authorization", `Bearer ${token}`)
+
+              return {
+                headers: Object.fromEntries(headers),
+              }
+            },
+          }),
+          false: httpBatchLink({
+            transformer: superjson,
+            url: `${getBaseUrl()}/trpc`,
+            headers() {
+              const headers = new Map<string, string>()
+              headers.set("x-trpc-source", "expo-react")
+
+              const token = getToken()
+              if (token) headers.set("Authorization", `Bearer ${token}`)
+
+              return Object.fromEntries(headers)
+            },
+          }),
         }),
       ],
     }),

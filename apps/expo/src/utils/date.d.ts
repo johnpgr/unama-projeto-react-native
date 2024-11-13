@@ -1,3 +1,0 @@
-interface Date {
-  formatted(): string
-}

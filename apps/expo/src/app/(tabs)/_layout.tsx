@@ -74,13 +74,18 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="scan/received-points"
+        options={{
+          title: "Pontos Recebidos",
+          href: null,
+        }}
+      />
+
+      <Tabs.Screen
         name="scan/my-code"
         options={{
           title: "Meu código",
           href: null,
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="qr-code" size={32} color={color} />
-          ),
         }}
       />
 
