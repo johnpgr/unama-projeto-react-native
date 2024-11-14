@@ -1,6 +1,6 @@
 packages:
-  - apps/*
-  - packages/*
+  - api/
+  - expo/
   - tooling/*
 
 catalog:
