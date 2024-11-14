@@ -1,4 +1,4 @@
-import type { ConfigContext, ExpoConfig } from "@expo/config"
+import type { ConfigContext, ExpoConfig } from "expo/config"
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -20,11 +20,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   assetBundlePatterns: ["**/*"],
   ios: {
-    bundleIdentifier: "your.bundle.identifier",
+    bundleIdentifier: "com.anonymous.ecopoints",
     supportsTablet: true,
   },
   android: {
-    package: "your.bundle.identifier",
+    package: "com.anonymous.ecopoints",
     adaptiveIcon: {
       foregroundImage: "./assets/icon.png",
       backgroundColor: "#02391E",
