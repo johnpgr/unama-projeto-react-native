@@ -1,9 +1,9 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 
-import type { AppRouter } from "./src/index.ts"
+import type { AppRouter } from "../src/index.ts"
 
 // export type definition of API
-export type { AppRouter } from "./src/index.ts"
+export type { AppRouter } from "../src/index.ts"
 
 /**
  * Inference helpers for input types
@@ -21,4 +21,8 @@ export type RouterInputs = inferRouterInputs<AppRouter>
  **/
 export type RouterOutputs = inferRouterOutputs<AppRouter>
 
-export type * as schema from "./drizzle/schema.ts"
+//Export the drizzle schema
+export type * from "../drizzle/schema.ts"
+
+//Export the auth validation
+export * from "../src/auth/auth.validation.ts"

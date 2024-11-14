@@ -16,24 +16,24 @@ import { Link, Stack } from "expo-router"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 
-import { signInSchema } from "@projeto/validation"
+import { LoginSchema } from "@projeto/api"
 
-import type { SignInParams } from "~/hooks/auth"
-import { SigninOAuthButtons } from "~/app/_components/SigninOAuthButtons"
-import { useSignIn } from "~/hooks/auth"
-import { useIsKeyboardOpen } from "~/hooks/keyboard"
+import type { LoginParams } from "../hooks/auth"
+import { useLogin } from "../hooks/auth"
+import { useIsKeyboardOpen } from "../hooks/keyboard"
+import { SigninOAuthButtons } from "./_components/SigninOAuthButtons"
 
 export default function SignUpScreen() {
   const [remember, setRemember] = React.useState(false)
-  const { signIn, isPending, error } = useSignIn()
-  const form = useForm<SignInParams>({
-    resolver: zodResolver(signInSchema),
+  const { signIn, isPending, error } = useLogin()
+  const form = useForm<LoginParams>({
+    resolver: zodResolver(LoginSchema),
     mode: "onSubmit",
     criteriaMode: "all",
   })
   const isKeyboardOpen = useIsKeyboardOpen()
 
-  async function onSubmit(data: SignInParams) {
+  async function onSubmit(data: LoginParams) {
     await signIn(data)
   }
 
@@ -43,7 +43,10 @@ export default function SignUpScreen() {
       className="h-full w-full bg-primary"
     >
       <Stack.Screen
-        options={{ statusBarColor: "#02391E", statusBarStyle: "light" }}
+        options={{
+          statusBarBackgroundColor: "#02391E",
+          statusBarStyle: "light",
+        }}
       />
       {isKeyboardOpen ? null : (
         <Image
@@ -139,7 +142,7 @@ export default function SignUpScreen() {
         <SigninOAuthButtons />
         <View className="flex flex-row items-center justify-center gap-2">
           <Text>Não possui uma conta?</Text>
-          <Link href="/signup" className="font-medium text-green-900">
+          <Link href="/register" className="font-medium text-green-900">
             Crie uma
           </Link>
         </View>

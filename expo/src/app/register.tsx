@@ -16,24 +16,24 @@ import { Link, Stack } from "expo-router"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 
-import { signUpSchema } from "@projeto/validation"
+import { RegisterSchema } from "@projeto/api"
 
-import type { SignUpParams } from "~/hooks/auth"
-import { SigninOAuthButtons } from "~/app/_components/SigninOAuthButtons"
-import { useSignUp } from "~/hooks/auth"
-import { useIsKeyboardOpen } from "~/hooks/keyboard"
+import type { RegisterParams } from "../hooks/auth"
+import { useRegister } from "../hooks/auth"
+import { useIsKeyboardOpen } from "../hooks/keyboard"
+import { SigninOAuthButtons } from "./_components/SigninOAuthButtons"
 
 export default function SignUpScreen() {
   const [isAgreed, setIsAgreed] = React.useState(false)
-  const { signUp, error, isPending } = useSignUp()
-  const form = useForm<SignUpParams>({
-    resolver: zodResolver(signUpSchema),
+  const { signUp, error, isPending } = useRegister()
+  const form = useForm<RegisterParams>({
+    resolver: zodResolver(RegisterSchema),
     mode: "onSubmit",
     criteriaMode: "all",
   })
   const isKeyboardOpen = useIsKeyboardOpen()
 
-  async function onSubmit(data: SignUpParams) {
+  async function onSubmit(data: RegisterParams) {
     if (!isAgreed) {
       return
     }
@@ -46,7 +46,10 @@ export default function SignUpScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <Stack.Screen
-        options={{ statusBarColor: "#02391E", statusBarStyle: "light" }}
+        options={{
+          statusBarBackgroundColor: "#02391E",
+          statusBarStyle: "light",
+        }}
       />
       {isKeyboardOpen ? null : (
         <Image

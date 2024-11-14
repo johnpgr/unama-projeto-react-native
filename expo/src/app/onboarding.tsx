@@ -45,7 +45,7 @@ export default function OnboardingScreen() {
           className="h-12 w-12"
           resizeMode="contain"
         />
-        <Link href="/signin">
+        <Link href="/login">
           <View className="flex flex-row items-center justify-center rounded-[2rem] bg-primary p-4">
             <Text className="text-lg font-medium text-white">
               Vamos Começar
