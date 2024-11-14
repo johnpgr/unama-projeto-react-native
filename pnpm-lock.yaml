@@ -166,6 +166,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.9.0
         version: 3.9.1(react-hook-form@7.53.2(react@18.3.1))
+      '@projeto/api':
+        specifier: workspace:^
+        version: link:../api
       '@t3-oss/env-core':
         specifier: ^0.11.1
         version: 0.11.1(typescript@5.6.3)(zod@3.23.8)
@@ -290,9 +293,6 @@ importers:
       '@babel/runtime':
         specifier: ^7.25.0
         version: 7.26.0
-      '@projeto/api':
-        specifier: workspace:^
-        version: link:../api
       '@projeto/eslint-config':
         specifier: workspace:*
         version: link:../tooling/eslint
@@ -343,7 +343,7 @@ importers:
         version: 7.37.2(eslint@9.14.0(jiti@1.21.6))
       eslint-plugin-react-hooks:
         specifier: rc
-        version: 5.1.0-rc.1(eslint@9.14.0(jiti@1.21.6))
+        version: 5.1.0-rc-b01722d5-20241114(eslint@9.14.0(jiti@1.21.6))
       eslint-plugin-turbo:
         specifier: ^2.0.13
         version: 2.2.3(eslint@9.14.0(jiti@1.21.6))
@@ -3767,8 +3767,8 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9
 
-  eslint-plugin-react-hooks@5.1.0-rc.1:
-    resolution: {integrity: sha512-nAD017D/00XFwjP4F7cXaIbCxQ9A4pGaqjLs5347px37w/WclOtPqz8bBiTQFoj+teVQei6Ahr1h1aZiuaXMSw==}
+  eslint-plugin-react-hooks@5.1.0-rc-b01722d5-20241114:
+    resolution: {integrity: sha512-MtdHtFrEaX6i0WWpz+heHCuAQIvMoCKICIgB39VaiPrwqrMMlWLn01KXSCBhu9aRx0ZQUZbtVV+A/LNR+1FJWA==}
     engines: {node: '>=10'}
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
@@ -11119,7 +11119,7 @@ snapshots:
       safe-regex-test: 1.0.3
       string.prototype.includes: 2.0.1
 
-  eslint-plugin-react-hooks@5.1.0-rc.1(eslint@9.14.0(jiti@1.21.6)):
+  eslint-plugin-react-hooks@5.1.0-rc-b01722d5-20241114(eslint@9.14.0(jiti@1.21.6)):
     dependencies:
       eslint: 9.14.0(jiti@1.21.6)
 

@@ -4,7 +4,7 @@ import * as Linking from "expo-linking"
 import { useRouter } from "expo-router"
 import * as Browser from "expo-web-browser"
 
-import type { signInSchema, signUpSchema } from "@projeto/validation"
+import type { LoginSchema, RegisterSchema } from "@projeto/api"
 
 import { AuthContext } from "~/state/auth-context"
 import { api } from "~/utils/api"
@@ -12,8 +12,8 @@ import { unreachable } from "~/utils/unreachable"
 import { deleteToken, getToken, setToken } from "../utils/session-store"
 
 export type OAuthAccountProvider = "google" | "apple" | "github"
-export type SignInParams = z.infer<typeof signInSchema>
-export type SignUpParams = z.infer<typeof signUpSchema>
+export type LoginSchemaParams = z.infer<typeof LoginSchema>
+export type RegisterSchemaParams = z.infer<typeof RegisterSchema>
 
 export function useAuth() {
   const ctx =
