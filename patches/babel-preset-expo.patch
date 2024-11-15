@@ -1,0 +1,18 @@
+diff --git a/build/expo-inline-manifest-plugin.js b/build/expo-inline-manifest-plugin.js
+index deb491e965204a14a5e7d65fa5de7d06e7429617..44dbd9923b2a51a33d0d976dc2d676fa751aa980 100644
+--- a/build/expo-inline-manifest-plugin.js
++++ b/build/expo-inline-manifest-plugin.js
+@@ -1,7 +1,7 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.expoInlineManifestPlugin = void 0;
+-const config_1 = require("expo/config");
++const config_1 = require("@expo/config");
+ const common_1 = require("./common");
+ const debug = require('debug')('expo:babel:inline-manifest');
+ // Convert expo value to PWA value
+@@ -149,3 +149,4 @@ function expoInlineManifestPlugin(api) {
+     };
+ }
+ exports.expoInlineManifestPlugin = expoInlineManifestPlugin;
++

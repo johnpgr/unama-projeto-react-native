@@ -28,5 +28,10 @@
         "typescript": "catalog:"
     },
     "prettier": "@projeto/prettier-config",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "pnpm": {
+        "patchedDependencies": {
+            "babel-preset-expo": "patches/babel-preset-expo.patch"
+        }
+    }
 }
