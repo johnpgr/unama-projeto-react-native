@@ -1,13 +1,13 @@
 import type { PropsWithChildren } from "react"
 import React from "react"
 
-import type { schema } from "@projeto/api"
+import type { Session, User } from "@projeto/api"
 
 import { api } from "~/utils/api"
 
 export interface IAuthContext {
-  session: schema.Session | null
-  user: schema.User | null
+  session: Session | null
+  user: User | null
   isPending: boolean
 }
 

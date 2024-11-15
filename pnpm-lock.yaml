@@ -157,9 +157,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.9.0
         version: 3.9.1(react-hook-form@7.53.2(react@18.3.1))
-      '@projeto/api':
-        specifier: workspace:^
-        version: link:../api
       '@t3-oss/env-core':
         specifier: ^0.11.1
         version: 0.11.1(typescript@5.6.3)(zod@3.23.8)
@@ -275,6 +272,9 @@ importers:
       '@babel/runtime':
         specifier: ^7.25.0
         version: 7.26.0
+      '@projeto/api':
+        specifier: workspace:^
+        version: link:../api
       '@projeto/eslint-config':
         specifier: workspace:^
         version: link:../tooling/eslint
@@ -329,9 +329,6 @@ importers:
       eslint-plugin-react-hooks:
         specifier: rc
         version: 5.1.0-rc-b01722d5-20241114(eslint@9.14.0(jiti@1.21.6))
-      eslint-plugin-turbo:
-        specifier: ^2.0.13
-        version: 2.2.3(eslint@9.14.0(jiti@1.21.6))
       typescript-eslint:
         specifier: ^8.1.0
         version: 8.14.0(eslint@9.14.0(jiti@1.21.6))(typescript@5.6.3)
@@ -3140,10 +3137,6 @@ packages:
     resolution: {integrity: sha512-zIHwmZPRshsCdpMDyVsqGmgyP0yT8GAgXUnkdAoJisxvf33k7yO6OuoKmcTGuXPWSsm8Oh88nZicRLA9Y0rUeA==}
     engines: {node: '>=12'}
 
-  dotenv@16.0.3:
-    resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
-    engines: {node: '>=12'}
-
   dotenv@16.4.5:
     resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
@@ -3406,11 +3399,6 @@ packages:
     engines: {node: '>=4'}
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9.7
-
-  eslint-plugin-turbo@2.2.3:
-    resolution: {integrity: sha512-LHt35VwxthdGVO6hQRfvmFb6ee8/exAzAYWCy4o87Bnp7urltP8qg7xMd4dPSLAhtfnI2xSo1WgeVaR3MeItxw==}
-    peerDependencies:
-      eslint: '>6.6.0'
 
   eslint-scope@8.2.0:
     resolution: {integrity: sha512-PHlWUfG6lvPc3yvP5A4PNyBL1W8fkDUccmI21JUu/+GKZBoH/W5u6usENXUrWFRsyoW5ACUjFGgAFQp5gUlb/A==}
@@ -9430,8 +9418,6 @@ snapshots:
     dependencies:
       dotenv: 16.4.5
 
-  dotenv@16.0.3: {}
-
   dotenv@16.4.5: {}
 
   drizzle-kit@0.28.1:
@@ -9735,11 +9721,6 @@ snapshots:
       semver: 6.3.1
       string.prototype.matchall: 4.0.11
       string.prototype.repeat: 1.0.0
-
-  eslint-plugin-turbo@2.2.3(eslint@9.14.0(jiti@1.21.6)):
-    dependencies:
-      dotenv: 16.0.3
-      eslint: 9.14.0(jiti@1.21.6)
 
   eslint-scope@8.2.0:
     dependencies:
