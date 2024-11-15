@@ -1,5 +1,7 @@
 {
     "name": "@projeto/api",
+    "author": "johnpgr",
+    "license": "MIT",
     "version": "0.1.0",
     "main": "src/index.ts",
     "type": "module",
@@ -7,18 +9,16 @@
         ".": "./exports/index.ts"
     },
     "scripts": {
-        "clean": "git clean -xdf .cache .turbo dist node_modules",
+        "clean": "git clean -xdf node_modules",
         "dev": "node --env-file=../.env --watch --experimental-strip-types src/index.ts",
         "push": "pnpm with-env drizzle-kit push",
         "dbgen": "pnpm with-env drizzle-kit generate",
         "migrate": "pnpm with-env drizzle-kit migrate",
         "studio": "pnpm with-env drizzle-kit studio",
-        "with-env": "dotenv -e ../../.env --",
+        "with-env": "dotenv -e ../.env --",
         "format": "prettier --check . --ignore-path ../../.gitignore",
         "typecheck": "tsc --noEmit"
     },
-    "author": "johnpgr",
-    "license": "MIT",
     "dependencies": {
         "@langchain/mistralai": "^0.1.1",
         "@lucia-auth/adapter-drizzle": "^1.1.0",

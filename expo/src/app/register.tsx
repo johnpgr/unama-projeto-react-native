@@ -18,22 +18,22 @@ import { Controller, useForm } from "react-hook-form"
 
 import { RegisterSchema } from "@projeto/api"
 
-import type { RegisterParams } from "../hooks/auth"
-import { useRegister } from "../hooks/auth"
+import type { RegisterSchemaParams } from "../hooks/auth"
+import { useSignUp } from "../hooks/auth"
 import { useIsKeyboardOpen } from "../hooks/keyboard"
 import { SigninOAuthButtons } from "./_components/SigninOAuthButtons"
 
 export default function SignUpScreen() {
   const [isAgreed, setIsAgreed] = React.useState(false)
-  const { signUp, error, isPending } = useRegister()
-  const form = useForm<RegisterParams>({
+  const { signUp, error, isPending } = useSignUp()
+  const form = useForm<RegisterSchemaParams>({
     resolver: zodResolver(RegisterSchema),
     mode: "onSubmit",
     criteriaMode: "all",
   })
   const isKeyboardOpen = useIsKeyboardOpen()
 
-  async function onSubmit(data: RegisterParams) {
+  async function onSubmit(data: RegisterSchemaParams) {
     if (!isAgreed) {
       return
     }

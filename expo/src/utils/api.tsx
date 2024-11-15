@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import {
@@ -5,46 +6,38 @@ import {
   httpBatchLink,
   loggerLink,
   splitLink,
-  unstable_httpSubscriptionLink,
   wsLink,
 } from "@trpc/client"
 import { createTRPCReact } from "@trpc/react-query"
 import superjson from "superjson"
-import { ReadableStream, TransformStream } from "web-streams-polyfill"
 
 import type { AppRouter } from "@projeto/api"
 
-import { getBaseUrl } from "./base-url"
+import { getBaseUrl, getWSUrl } from "./base-url"
 import { getToken } from "./session-store"
 
-import "@azure/core-asynciterator-polyfill"
+const wsClient = createWSClient({
+  url: getWSUrl(),
+  retryDelayMs: () => 1_000,
+  lazy: {
+    enabled: true,
+    closeMs: 0,
+  },
 
-import { RNEventSource } from "rn-eventsource-reborn"
-
-globalThis.ReadableStream = globalThis.ReadableStream || ReadableStream
-globalThis.TransformStream = globalThis.TransformStream || TransformStream
-
-//function getWSUrl(): string {
-//  if (process.env.NODE_ENV === "production") {
-//    TODO("Production WS URL")
-//  }
-//  return "ws://localhost:3000/trpc"
-//}
-//
-//const wsClient = createWSClient({
-//  url: getWSUrl(),
-//  lazy: {
-//    enabled: true,
-//    closeMs: 0,
-//  },
-//  connectionParams() {
-//    const token = getToken()
-//    if (token) {
-//      return { token }
-//    }
-//    return {}
-//  },
-//})
+  onError(error) {
+    console.log("Websocket Error", error)
+  },
+  onClose(reason) {
+    console.log("Websocket Closed", reason)
+  },
+  connectionParams() {
+    const token = getToken()
+    if (token) {
+      return { token }
+    }
+    return {}
+  },
+})
 
 /**
  * A set of typesafe hooks for consuming your API.
@@ -69,33 +62,21 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
         }),
         splitLink({
           condition: (op) => op.type === "subscription",
-          true: unstable_httpSubscriptionLink({
+          true: wsLink({
+            client: wsClient,
             transformer: superjson,
-            url: `/${getBaseUrl()}/trpc`,
-
-            eventSourceOptions: () => {
-              const headers = new Map<string, string>()
-              headers.set("x-trpc-source", "expo-react")
-
-              const token = getToken()
-              if (token) headers.set("Authorization", `Bearer ${token}`)
-
-              return {
-                headers: Object.fromEntries(headers),
-              }
-            },
           }),
           false: httpBatchLink({
             transformer: superjson,
-            url: `${getBaseUrl()}/trpc`,
+            url: getBaseUrl(),
             headers() {
-              const headers = new Map<string, string>()
-              headers.set("x-trpc-source", "expo-react")
-
               const token = getToken()
-              if (token) headers.set("Authorization", `Bearer ${token}`)
 
-              return Object.fromEntries(headers)
+              if (token) {
+                return { Authorization: `Bearer ${token}` }
+              }
+
+              return {}
             },
           }),
         }),

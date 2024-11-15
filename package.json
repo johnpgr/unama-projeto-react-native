@@ -1,37 +1,32 @@
 {
-  "name": "create-t3-turbo",
-  "private": true,
-  "engines": {
-    "node": ">=22"
-  },
-  "packageManager": "pnpm@9.7.1",
-  "scripts": {
-    "build": "turbo run build",
-    "clean": "git clean -xdf node_modules",
-    "clean:workspaces": "turbo run clean",
-    "clean:daemon": "turbo daemon clean",
-    "db:generate": "turbo -F @projeto/api dbgen",
-    "db:migrate": "turbo -F @projeto/api migrate",
-    "db:push": "turbo -F @projeto/api push",
-    "db:studio": "turbo -F @projeto/api studio",
-    "dev": "turbo watch dev",
-    "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
-    "format:fix": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",
-    "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
-    "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
-    "lint:ws": "pnpm dlx sherif@latest",
-    "postinstall": "pnpm lint:ws",
-    "typecheck": "turbo run typecheck",
-    "android": "expo run:android",
-    "ios": "expo run:ios"
-  },
-  "devDependencies": {
-    "@projeto/prettier-config": "workspace:*",
-    "@turbo/gen": "^2.0.13",
-    "prettier": "catalog:",
-    "turbo": "^2.0.13",
-    "typescript": "catalog:"
-  },
-  "prettier": "@projeto/prettier-config",
-  "version": "1.0.0"
+    "name": "ecopoints",
+    "private": true,
+    "engines": {
+        "node": ">=22.9.0"
+    },
+    "packageManager": "pnpm@9.7.1",
+    "scripts": {
+        "dev:expo": "pnpm --filter=expo dev",
+        "dev:api": "pnpm --filter=api dev",
+        "dev": "pnpm --parallel dev",
+        "clean": "git clean -xdf node_modules && pnpm --recursive clean",
+        "db:generate": "pnpm --filter=api dbgen",
+        "db:migrate": "pnpm --filter=api migrate",
+        "db:push": "pnpm --filter=api push",
+        "db:studio": "pnpm --filter=api studio",
+        "format": "pnpm --parallel format --continue -- --cache --cache-location .cache/.prettiercache",
+        "format:fix": "pnpm --parallel format --continue -- --write --cache --cache-location .cache/.prettiercache",
+        "lint": "pnpm --parallel lint --continue -- --cache --cache-location .cache/.eslintcache",
+        "lint:fix": "pnpm --parallel lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
+        "lint:ws": "pnpm dlx sherif@latest",
+        "postinstall": "pnpm lint:ws",
+        "typecheck": "pnpm --parallel typecheck"
+    },
+    "devDependencies": {
+        "@projeto/prettier-config": "workspace:*",
+        "prettier": "catalog:",
+        "typescript": "catalog:"
+    },
+    "prettier": "@projeto/prettier-config",
+    "version": "1.0.0"
 }

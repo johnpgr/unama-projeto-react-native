@@ -18,22 +18,22 @@ import { Controller, useForm } from "react-hook-form"
 
 import { LoginSchema } from "@projeto/api"
 
-import type { LoginParams } from "../hooks/auth"
-import { useLogin } from "../hooks/auth"
+import type { LoginSchemaParams } from "../hooks/auth"
+import { useSignIn } from "../hooks/auth"
 import { useIsKeyboardOpen } from "../hooks/keyboard"
 import { SigninOAuthButtons } from "./_components/SigninOAuthButtons"
 
 export default function SignUpScreen() {
   const [remember, setRemember] = React.useState(false)
-  const { signIn, isPending, error } = useLogin()
-  const form = useForm<LoginParams>({
+  const { signIn, isPending, error } = useSignIn()
+  const form = useForm<LoginSchemaParams>({
     resolver: zodResolver(LoginSchema),
     mode: "onSubmit",
     criteriaMode: "all",
   })
   const isKeyboardOpen = useIsKeyboardOpen()
 
-  async function onSubmit(data: LoginParams) {
+  async function onSubmit(data: LoginSchemaParams) {
     await signIn(data)
   }
 

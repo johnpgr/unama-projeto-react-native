@@ -5,25 +5,6 @@ const { withNativeWind } = require("nativewind/metro")
 
 const path = require("path")
 
-const config = withTurborepoManagedCache(
-  withMonorepoPaths(
-    withNativeWind(getDefaultConfig(__dirname), {
-      input: "./src/styles.css",
-      configPath: "./tailwind.config.ts",
-    }),
-  ),
-)
-
-// XXX: Resolve our exports in workspace packages
-// https://github.com/expo/expo/issues/26926
-config.resolver.unstable_enablePackageExports = true
-
-// Config to make jotai work in react native
-// https://github.com/pmndrs/zustand/discussions/1967#discussioncomment-9578159
-config.resolver.unstable_conditionNames = ["browser", "require", "react-native"]
-
-module.exports = config
-
 /**
  * Add the monorepo paths to the Metro config.
  * This allows Metro to resolve modules from the monorepo.
@@ -34,7 +15,7 @@ module.exports = config
  */
 function withMonorepoPaths(config) {
   const projectRoot = __dirname
-  const workspaceRoot = path.resolve(projectRoot, "../..")
+  const workspaceRoot = path.resolve(projectRoot, "..")
 
   // #1 - Watch all files in the monorepo
   config.watchFolders = [workspaceRoot]
@@ -48,17 +29,19 @@ function withMonorepoPaths(config) {
   return config
 }
 
-/**
- * Move the Metro cache to the `.cache/metro` folder.
- * If you have any environment variables, you can configure Turborepo to invalidate it when needed.
- *
- * @see https://turbo.build/repo/docs/reference/configuration#env
- * @param {import('expo/metro-config').MetroConfig} config
- * @returns {import('expo/metro-config').MetroConfig}
- */
-function withTurborepoManagedCache(config) {
-  config.cacheStores = [
-    new FileStore({ root: path.join(__dirname, ".cache/metro") }),
-  ]
-  return config
-}
+const config = withMonorepoPaths(
+  withNativeWind(getDefaultConfig(__dirname), {
+    input: "./src/styles.css",
+    configPath: "./tailwind.config.ts",
+  }),
+)
+
+// XXX: Resolve our exports in workspace packages
+// https://github.com/expo/expo/issues/26926
+config.resolver.unstable_enablePackageExports = true
+
+// Config to make jotai work in react native
+// https://github.com/pmndrs/zustand/discussions/1967#discussioncomment-9578159
+config.resolver.unstable_conditionNames = ["browser", "require", "react-native"]
+
+module.exports = config
