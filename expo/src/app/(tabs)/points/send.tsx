@@ -15,6 +15,7 @@ import { api } from "~/utils/api"
 type SendPointsInput = RouterInputs["transaction"]["sendPointsP2P"]
 
 export default function SendPointsScreen() {
+  const utils = api.useUtils()
   const [isAgreed, setIsAgreed] = React.useState(false)
   const { receiverId } = useLocalSearchParams()
   const form = useForm<SendPointsInput>({
@@ -28,7 +29,9 @@ export default function SendPointsScreen() {
     isPending,
     error,
     isSuccess,
-  } = api.transaction.sendPointsP2P.useMutation()
+  } = api.transaction.sendPointsP2P.useMutation({
+    onSuccess: () => utils.transaction.getUserTransactions.invalidate(),
+  })
 
   async function onSubmit(data: SendPointsInput) {
     if (!isAgreed) {

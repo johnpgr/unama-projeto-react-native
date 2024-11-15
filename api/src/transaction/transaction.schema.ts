@@ -52,10 +52,12 @@ export const P2PTransaction = pgTable("p2p_transaction", {
 
 export const P2PTransactionRelations = relations(P2PTransaction, ({ one }) => ({
   from: one(User, {
+    relationName: "from",
     references: [User.id],
     fields: [P2PTransaction.from],
   }),
   to: one(User, {
+    relationName: "to",
     references: [User.id],
     fields: [P2PTransaction.to],
   }),

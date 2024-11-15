@@ -169,11 +169,10 @@ export const transactionRouter = {
   sendPointsP2P: protectedProcedure
     .input(
       z.object({
-        receiverId: z.string(),
-        amountPoints: z.number(),
+        receiverId: z.string().min(1, "ID do receptor é obrigatório"),
+        amountPoints: z.number().positive("O valor inserido não é válido"),
       }),
     )
-
     .mutation(async ({ ctx, input }) => {
       const sender = ctx.user
       const receiver = await db.query.User.findFirst({
@@ -228,11 +227,12 @@ export const transactionRouter = {
           .update(User)
           .set({
             totalPoints: sql<number>`
-        CASE
-            WHEN ${User.id} = ${sender.id} THEN COALESCE(${User.totalPoints}, 0) - ${input.amountPoints}
-            WHEN ${User.id} = ${input.receiverId} THEN COALESCE(${User.totalPoints}, 0) + ${input.amountPoints}
-        END
-    `,
+            CASE
+                WHEN ${User.id} = ${sender.id} THEN 
+                  COALESCE(${User.totalPoints}, 0) - ${input.amountPoints}
+                WHEN ${User.id} = ${input.receiverId} THEN 
+                  COALESCE(${User.totalPoints}, 0) + ${input.amountPoints}
+            END`,
           })
           .where(inArray(User.id, [sender.id, input.receiverId]))
 
@@ -241,7 +241,7 @@ export const transactionRouter = {
           .values({
             from: sender.id,
             to: input.receiverId,
-            points: -input.amountPoints,
+            points: input.amountPoints,
           })
           .returning()
 
@@ -279,15 +279,73 @@ export const transactionRouter = {
   }),
 
   getAvailableRewards: publicProcedure.query(async () => {
-    return await db.select().from(Reward).orderBy(asc(Reward.points))
+    return await db.query.Reward.findMany({
+      orderBy: (reward) => asc(reward.points),
+    })
   }),
 
   getUserRewards: protectedProcedure.query(async ({ ctx }) => {
-    const userRewards = await db.query.UserRewards.findMany({
+    return await db.query.UserRewards.findMany({
       where: (userRewards) => eq(userRewards.userId, ctx.user.id),
       with: { reward: { columns: { points: true } } },
     })
-    return userRewards
+  }),
+
+  getUserExtract: protectedProcedure.query(async ({ ctx }) => {
+    const extract = await db.query.User.findFirst({
+      where: (user) => eq(user.id, ctx.user.id),
+      columns: {},
+      with: {
+        recyclingTransactions: true,
+        rewards: true,
+        p2pTransactionsFrom: true,
+        p2pTransactionsTo: true,
+      },
+    })
+
+    if (!extract) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Usuário não encontrado",
+      })
+    }
+
+    const asList = [
+      ...extract.p2pTransactionsFrom.map(
+        (transaction) =>
+          ({
+            ...transaction,
+            type: "p2pFrom",
+          }) as const,
+      ),
+      ...extract.p2pTransactionsTo.map(
+        (transaction) =>
+          ({
+            ...transaction,
+            type: "p2pTo",
+          }) as const,
+      ),
+      ...extract.recyclingTransactions.map(
+        (transaction) =>
+          ({
+            ...transaction,
+            type: "recycling",
+          }) as const,
+      ),
+      ...extract.rewards.map(
+        (transaction) =>
+          ({
+            ...transaction,
+            type: "reward",
+          }) as const,
+      ),
+    ]
+
+    const groupped = Object.groupBy(asList, (item) =>
+      item.createdAt.toLocaleDateString(),
+    )
+
+    return groupped
   }),
 
   exchangePointsForReward: protectedProcedure

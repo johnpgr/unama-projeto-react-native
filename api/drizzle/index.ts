@@ -14,4 +14,7 @@ function getOptions() {
 
 const queryClient = postgres(env.DATABASE_URL, getOptions())
 
-export const db = drizzle(queryClient, { schema, casing: "snake_case" })
+export const db = drizzle(queryClient, {
+  schema,
+  casing: "snake_case",
+})

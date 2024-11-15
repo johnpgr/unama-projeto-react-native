@@ -4,7 +4,6 @@ import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
 import { ZodError } from "zod"
 
-import type { Session, User } from "../drizzle/schema.ts"
 import { InvalidSessionError } from "../src/auth/auth.error.ts"
 import { sessionService } from "../src/auth/auth.session.ts"
 
@@ -26,27 +25,19 @@ type NonNullableObj<T> = {
  */
 export async function createContext(
   data: CreateHTTPContextOptions | CreateWSSContextFnOptions,
-): Promise<
-  | {
-      session: Session
-      user: User
-    }
-  | { session: undefined; user: undefined }
-> {
+) {
   const bearerToken =
     data.req.headers.authorization?.split(" ")[1] ??
     data.info.connectionParams?.token
 
   if (!bearerToken) {
-    //@ts-expect-error ok
-    return {}
+    return { session: null, user: null }
   }
 
   const session = await sessionService.validateSessionToken(bearerToken)
 
   if (session instanceof InvalidSessionError) {
-    //@ts-expect-error ok
-    return {}
+    return { session: null, user: null }
   }
 
   return session

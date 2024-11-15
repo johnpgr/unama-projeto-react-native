@@ -1,12 +1,7 @@
 import React from "react"
-import {
-  FlatList,
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native"
-import { Link, useRouter } from "expo-router"
+import { FlatList, Text, TouchableOpacity, View } from "react-native"
+import { Link } from "expo-router"
+import { AntDesign } from "@expo/vector-icons"
 import { useAtom } from "jotai"
 
 import type {
@@ -16,11 +11,11 @@ import type {
 } from "~/state/notifications"
 import type { RouterOutputs } from "~/utils/api"
 import { useAuth } from "~/hooks/auth"
-import { notificationsAtom, TransactionType } from "~/state/notifications"
+import { TransactionType } from "~/state/notifications"
 import { api } from "~/utils/api"
 import { formatDatePTBR } from "~/utils/date"
 
-const mapUserRewardToNotification = (
+const parseUserReward = (
   reward: RouterOutputs["transaction"]["getUserRewards"][number],
 ): UserRewardNotification => ({
   id: reward.id,
@@ -29,7 +24,7 @@ const mapUserRewardToNotification = (
   type: TransactionType.P2REWARD,
 })
 
-const mapP2PTransactionToNotification = (
+const parseP2PRTransaction = (
   transaction: RouterOutputs["transaction"]["getUserTransactions"][number],
 ): P2PNotification => ({
   id: transaction.id,
@@ -40,42 +35,16 @@ const mapP2PTransactionToNotification = (
   to: transaction.to,
 })
 
-const enum PointsPageTab {
-  Rewards,
-  Transactions,
-}
-
 export default function PointsPage() {
-  const [notifications, setNotifications] = useAtom(notificationsAtom)
-  const [activeTab, setActiveTab] = React.useState<PointsPageTab>(
-    PointsPageTab.Rewards,
-  )
   const { user } = useAuth()
 
-  const { data: userRewards } = api.transaction.getUserRewards.useQuery()
-  const { data: p2pTransactions } =
-    api.transaction.getUserTransactions.useQuery()
-
-  React.useEffect(() => {
-    if (userRewards && p2pTransactions) {
-      const combinedNotifications = ([] as Notification[])
-        .concat(userRewards.map(mapUserRewardToNotification))
-        .concat(p2pTransactions.map(mapP2PTransactionToNotification))
-
-      setNotifications(combinedNotifications)
-    }
-  }, [userRewards, p2pTransactions, setNotifications])
-
-  const filteredNotifications: Notification[] =
-    activeTab === PointsPageTab.Rewards
-      ? notifications.filter((item) => item.type === TransactionType.P2REWARD)
-      : notifications.filter((item) => item.type === TransactionType.P2P)
+  const { data: userExtract } = api.transaction.getUserExtract.useQuery()
 
   if (!user) return null
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
-      <View className="items-center rounded-xl bg-emerald-700 p-4">
+    <View className="flex-1 bg-gray-100">
+      <View className="items-center bg-emerald-700 p-4">
         <Text className="text-lg text-white">Pontuação atual</Text>
         <Text className="text-6xl font-bold text-white">
           {user.totalPoints}
@@ -83,75 +52,69 @@ export default function PointsPage() {
       </View>
 
       <View className="my-4 flex-row justify-around">
-        <TouchableOpacity className="rounded-lg bg-gray-200 p-3">
-          <Link href="/scan/my-code">Receber</Link>
-        </TouchableOpacity>
-        <TouchableOpacity className="rounded-lg bg-gray-200 p-3">
-          <Link href="/points/send">Enviar</Link>
-        </TouchableOpacity>
-        <TouchableOpacity className="rounded-lg bg-gray-200 p-3">
-          <Link href="/points/reward">Resgatar</Link>
-        </TouchableOpacity>
+        <Link asChild href="/scan/my-code">
+          <TouchableOpacity className="flex min-w-24 flex-col items-center justify-center rounded-lg bg-gray-200 p-2">
+            <AntDesign name="download" size={16} />
+            <Text>Receber</Text>
+          </TouchableOpacity>
+        </Link>
+        <Link asChild href="/points/send">
+          <TouchableOpacity className="flex min-w-24 flex-col items-center justify-center rounded-lg bg-gray-200 p-2">
+            <AntDesign name="upload" size={16} />
+            <Text>Enviar</Text>
+          </TouchableOpacity>
+        </Link>
+        <Link asChild href="/points/reward">
+          <TouchableOpacity className="flex min-w-24 flex-col items-center justify-center rounded-lg bg-gray-200 p-2">
+            <AntDesign name="gift" size={16} />
+            <Text>Resgatar</Text>
+          </TouchableOpacity>
+        </Link>
+      </View>
+      <View>
+        <Text> Histórico </Text>
+        <Text>{JSON.stringify(userExtract, null, 2)}</Text>
       </View>
 
-      <View className="rounded-t-xl bg-emerald-900 p-4">
-        <Text className="text-xl text-white">Histórico</Text>
-      </View>
+      {/* <View className="mt-4 flex-1 border-t border-border"> */}
+      {/*   {userExtract.length === 0 ? ( */}
+      {/*     <View className="p-4"> */}
+      {/*       <Text className="text-center text-gray-100"> */}
+      {/*         Nehuma notificação encontrada */}
+      {/*       </Text> */}
+      {/*     </View> */}
+      {/*   ) : ( */}
+      {/*     <FlatList */}
+      {/*       data={userExtract} */}
+      {/*       keyExtractor={(item) => item.id} */}
+      {/*       renderItem={({ item }) => ( */}
+      {/*         <NotificationItemView notification={item} /> */}
+      {/*       )} */}
+      {/*       contentContainerStyle={{ paddingBottom: 20 }} */}
+      {/*     /> */}
+      {/*   )} */}
+      {/* </View> */}
+    </View>
+  )
+}
 
-      <View className="flex-row justify-around bg-white p-2">
-        <TouchableOpacity
-          onPress={() => setActiveTab(PointsPageTab.Rewards)}
-          className={`flex-1 p-2 text-center ${
-            activeTab === PointsPageTab.Rewards
-              ? "bg-emerald-700 text-white"
-              : "bg-gray-200"
-          }`}
-        >
-          <Text className="font-bold">Recompensas</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setActiveTab(PointsPageTab.Transactions)}
-          className={`flex-1 p-2 text-center ${
-            activeTab === PointsPageTab.Transactions
-              ? "bg-emerald-700 text-white"
-              : "bg-gray-200"
-          }`}
-        >
-          <Text className="font-bold">Transações</Text>
-        </TouchableOpacity>
+export function NotificationItemView({
+  notification,
+}: {
+  notification: Notification
+}) {
+  return (
+    <View className="flex-row justify-between border-b border-gray-200 p-4">
+      <View>
+        <Text>{notification.points} pontos</Text>
+        <Text className="text-base">{notification.type}</Text>
+        <Text className="text-gray-500">
+          Data: {formatDatePTBR(notification.transactionDate)}
+        </Text>
       </View>
-
-      <View className="flex-1 bg-white shadow-sm">
-        {filteredNotifications.length === 0 ? (
-          <View className="p-4">
-            <Text className="text-center text-gray-500">
-              Nehuma notificação encontrada
-            </Text>
-          </View>
-        ) : (
-          <FlatList
-            data={filteredNotifications}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View className="flex-row justify-between border-b border-gray-200 p-4">
-                <View>
-                  <Text>{item.id}</Text>
-                  <Text className="text-base">
-                    {item.points} pontos . {item.type}
-                  </Text>
-                  <Text className="text-gray-500">
-                    Data: {formatDatePTBR(item.transactionDate)}
-                  </Text>
-                </View>
-                <TouchableOpacity>
-                  <Text className="text-emerald-700">→</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
-        )}
-      </View>
-    </SafeAreaView>
+      <TouchableOpacity>
+        <Text className="text-emerald-700">→</Text>
+      </TouchableOpacity>
+    </View>
   )
 }

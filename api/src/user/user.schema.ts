@@ -11,7 +11,10 @@ import {
 } from "drizzle-orm/pg-core"
 import { nanoid } from "nanoid"
 
-import { RecyclingTransaction } from "../transaction/transaction.schema.ts"
+import {
+  P2PTransaction,
+  RecyclingTransaction,
+} from "../transaction/transaction.schema.ts"
 import { UserRewards } from "./user-rewards.schema.ts"
 
 export const UserTypeEnum = pgEnum("user_type", [
@@ -42,6 +45,8 @@ export const UserRelations = relations(User, ({ many }) => ({
   sessions: many(Session),
   accounts: many(OAuthAccount),
   recyclingTransactions: many(RecyclingTransaction),
+  p2pTransactionsFrom: many(P2PTransaction, { relationName: "from" }),
+  p2pTransactionsTo: many(P2PTransaction, { relationName: "to" }),
   rewards: many(UserRewards),
 }))
 

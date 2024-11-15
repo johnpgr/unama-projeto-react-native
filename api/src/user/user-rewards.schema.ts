@@ -10,9 +10,15 @@ import { User } from "./user.schema.ts"
  */
 export type UserRewards = typeof UserRewards.$inferSelect
 export const UserRewards = pgTable("user_rewards", {
-  id: varchar({ length: 21 }).$default(() => nanoid()),
-  rewardId: varchar({ length: 21 }).references(() => Reward.id),
-  userId: varchar().references(() => User.id),
+  id: varchar({ length: 21 })
+    .notNull()
+    .$default(() => nanoid()),
+  rewardId: varchar({ length: 21 })
+    .notNull()
+    .references(() => Reward.id),
+  userId: varchar()
+    .notNull()
+    .references(() => User.id),
   createdAt: timestamp({ mode: "date", withTimezone: true })
     .notNull()
     .defaultNow(),
