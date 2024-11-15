@@ -1,12 +1,12 @@
 import type { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone"
 import type { CreateWSSContextFnOptions } from "@trpc/server/adapters/ws"
-import type { User } from "lucia"
 import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
 import { ZodError } from "zod"
 
-import type { DatabaseUserAttributes } from "../src/auth/lucia/index.ts"
-import { lucia } from "../src/auth/lucia/index.ts"
+import type { Session, User } from "../drizzle/schema.ts"
+import { InvalidSessionError } from "../src/auth/auth.error.ts"
+import { sessionService } from "../src/auth/auth.session.ts"
 
 type NonNullableObj<T> = {
   [K in keyof T]-?: NonNullable<T[K]>
@@ -26,27 +26,30 @@ type NonNullableObj<T> = {
  */
 export async function createContext(
   data: CreateHTTPContextOptions | CreateWSSContextFnOptions,
-) {
+): Promise<
+  | {
+      session: Session
+      user: User
+    }
+  | { session: undefined; user: undefined }
+> {
   const bearerToken =
     data.req.headers.authorization?.split(" ")[1] ??
     data.info.connectionParams?.token
 
   if (!bearerToken) {
+    //@ts-expect-error ok
     return {}
   }
 
-  const sessionId = lucia.readBearerToken(bearerToken)
-  if (!sessionId) {
+  const session = await sessionService.validateSessionToken(bearerToken)
+
+  if (session instanceof InvalidSessionError) {
+    //@ts-expect-error ok
     return {}
   }
 
-  const { session, user } = await lucia.validateSession(sessionId)
-
-  if (!session) {
-    return {}
-  }
-
-  return { user: user as User & DatabaseUserAttributes, session }
+  return session
 }
 
 type Context = Awaited<ReturnType<typeof createContext>>

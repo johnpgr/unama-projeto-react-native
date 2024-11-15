@@ -6,8 +6,8 @@ import { eq } from "drizzle-orm"
 import { db } from "../../drizzle/index.ts"
 import { protectedProcedure, publicProcedure } from "../../trpc/index.ts"
 import { User } from "../user/user.schema.ts"
+import { sessionService } from "./auth.session.ts"
 import { LoginSchema, RegisterSchema } from "./auth.validation.ts"
-import { lucia } from "./lucia/index.ts"
 
 const ARGON2_OPTS = {
   memoryCost: 19456,
@@ -47,7 +47,7 @@ export const authRouter = {
    */
   signOut: protectedProcedure.mutation(async ({ ctx }) => {
     try {
-      await lucia.invalidateSession(ctx.session.id)
+      await sessionService.invalidateSession(ctx.session.id)
       return "ok" as const
     } catch (error) {
       throw new TRPCError({
@@ -97,7 +97,7 @@ export const authRouter = {
       })
     }
 
-    const session = await lucia.createSession(existingUser.id, {})
+    const session = await sessionService.createSession(existingUser.id)
     return { session }
   }),
 
@@ -143,7 +143,7 @@ export const authRouter = {
       })
     }
 
-    const session = await lucia.createSession(user.id, {})
+    const session = await sessionService.createSession(user.id)
 
     //@ts-expect-error remove hashedPassword from user
     delete user.hashedPassword

@@ -2,12 +2,21 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Image, Pressable, Text, View } from "react-native"
 import { useLocalSearchParams } from "expo-router"
+import { z } from "zod"
+
+export const ReceivedPointsParams = z.object({
+  points: z
+    .string()
+    .transform((it) => parseInt(it))
+    .refine((it) => !isNaN(it)),
+  sender: z.string(),
+})
 
 export default function ReceivedPointsScreen() {
-  const { points, sender } = useLocalSearchParams()
-  if (!points || !sender) return null
-  if (typeof points !== "string") return null
-  if (isNaN(parseInt(points))) return null
+  const params = useLocalSearchParams()
+  const parsedParams = ReceivedPointsParams.safeParse(params)
+  if (!parsedParams.success) return null
+  const { points, sender } = parsedParams.data
 
   return (
     <View className="mt-4 flex flex-1 flex-col px-4">

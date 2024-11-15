@@ -1,24 +1,20 @@
 import type { JsonWebKey } from "crypto"
-import type { Session } from "lucia"
 import jwt from "@tsndr/cloudflare-worker-jwt"
 import { Apple } from "arctic"
 import { eq } from "drizzle-orm"
 
-import type { DatabaseUserAttributes } from "../index.ts"
-import { db } from "../../../../drizzle/index.ts"
-import { User } from "../../../user/user.schema.ts"
-import { CreateSessionError } from "../../auth.error.ts"
-import { OAuthAccount } from "../../oauth.schema.ts"
-import { lucia } from "../index.ts"
+import { env } from "../../../config/env.ts"
+import { db } from "../../../drizzle/index.ts"
+import { OAuthAccount, Session, User } from "../../user/user.schema.ts"
+import { CreateSessionError, InvalidSessionError } from "../auth.error.ts"
+import { sessionService } from "../auth.session.ts"
 
 export const appleAuth = new Apple(
   {
-    clientId:
-      process.env.AUTH_APPLE_WEB_CLIENT_ID ?? "NOOP_NO_APPLE_WEB_CLIENT_ID",
-    teamId: process.env.AUTH_APPLE_TEAM_ID ?? "NOOP_NO_APPLE_TEAM_ID",
-    keyId: process.env.AUTH_APPLE_KEY_ID ?? "NOOP_NO_APPLE_KEY_ID",
-    certificate:
-      process.env.AUTH_APPLE_PRIVATE_KEY ?? "NOOP_NO_APPLE_PRIVATE_KEY",
+    clientId: env.AUTH_APPLE_WEB_CLIENT_ID ?? "NOOP_NO_APPLE_WEB_CLIENT_ID",
+    teamId: env.AUTH_APPLE_TEAM_ID ?? "NOOP_NO_APPLE_TEAM_ID",
+    keyId: env.AUTH_APPLE_KEY_ID ?? "NOOP_NO_APPLE_KEY_ID",
+    certificate: env.AUTH_APPLE_PRIVATE_KEY ?? "NOOP_NO_APPLE_PRIVATE_KEY",
   },
   `${process.env.API_URL}/auth/apple/callback`,
 )
@@ -88,19 +84,21 @@ export async function createAppleSession(params: {
       eq(account.providerUserId, payload.sub.toString()),
   })
 
-  let existingUser: DatabaseUserAttributes | null = null
+  let existingUser: User | null = null
 
   if (params.sessionToken) {
-    const sessionUser = await lucia.validateSession(params.sessionToken)
-    if (sessionUser.user) {
-      existingUser = sessionUser.user as DatabaseUserAttributes
-    }
-  } else {
-    const response = await db.query.User.findFirst({
-      where: (_user) => eq(_user.email, payload.email),
-    })
-    if (response) {
-      existingUser = response
+    const sessionUser = await sessionService.validateSessionToken(
+      params.sessionToken,
+    )
+    if (sessionUser instanceof InvalidSessionError) {
+      const response = await db.query.User.findFirst({
+        where: (_user) => eq(_user.email, payload.email),
+      })
+      if (response) {
+        existingUser = response
+      }
+    } else {
+      existingUser = sessionUser.user
     }
   }
 
@@ -114,12 +112,12 @@ export async function createAppleSession(params: {
       provider: "apple",
       userId: existingUser.id,
     })
-    const session = await lucia.createSession(existingUser.id, {})
+    const session = await sessionService.createSession(existingUser.id)
     return session
   }
 
   if (existingAccount) {
-    return await lucia.createSession(existingAccount.userId, {})
+    return await sessionService.createSession(existingAccount.userId)
   } else {
     const [insertedUser] = await db
       .insert(User)
@@ -140,6 +138,6 @@ export async function createAppleSession(params: {
       userId: insertedUser.id,
     })
 
-    return await lucia.createSession(insertedUser.id, {})
+    return await sessionService.createSession(insertedUser.id)
   }
 }

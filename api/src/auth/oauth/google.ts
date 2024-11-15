@@ -1,17 +1,15 @@
-import type { Session } from "lucia"
 import { Google } from "arctic"
 import { eq } from "drizzle-orm"
 
-import type { DatabaseUserAttributes } from "../index.ts"
-import { db } from "../../../../drizzle/index.ts"
-import { User } from "../../../user/user.schema.ts"
-import { CreateSessionError } from "../../auth.error.ts"
-import { OAuthAccount } from "../../oauth.schema.ts"
-import { lucia } from "../index.ts"
+import { env } from "../../../config/env.ts"
+import { db } from "../../../drizzle/index.ts"
+import { OAuthAccount, Session, User } from "../../user/user.schema.ts"
+import { CreateSessionError, InvalidSessionError } from "../auth.error.ts"
+import { sessionService } from "../auth.session.ts"
 
 export const googleAuth = new Google(
-  process.env.AUTH_GOOGLE_ID ?? "NOOP_NO_GOOGLE_ID",
-  process.env.AUTH_GOOGLE_SECRET ?? "NOOP_NO_GOOGLE_SECRET",
+  env.AUTH_GOOGLE_ID ?? "NOOP_NO_GOOGLE_ID",
+  env.AUTH_GOOGLE_SECRET ?? "NOOP_NO_GOOGLE_SECRET",
   `${process.env.REDIRECT_URL}/auth/google/callback`,
 )
 
@@ -35,7 +33,7 @@ export async function createGoogleSession(
   idToken: string,
   codeVerifier: string,
   sessionToken?: string,
-): Promise<CreateSessionError | Session> {
+): Promise<CreateSessionError | { session: Session; token: string }> {
   const tokens = await googleAuth.validateAuthorizationCode(
     idToken,
     codeVerifier,
@@ -51,12 +49,12 @@ export async function createGoogleSession(
   const existingAccount = await db.query.OAuthAccount.findFirst({
     where: (account) => eq(account.providerUserId, user.sub),
   })
-  let existingUser: DatabaseUserAttributes | null = null
+  let existingUser: User | null = null
 
   if (sessionToken) {
-    const sessionUser = await lucia.validateSession(sessionToken)
-    if (sessionUser.user) {
-      existingUser = sessionUser.user as DatabaseUserAttributes
+    const sessionUser = await sessionService.validateSessionToken(sessionToken)
+    if (!(sessionUser instanceof InvalidSessionError)) {
+      existingUser = sessionUser.user
     }
   } else {
     const response = await db.query.User.findFirst({
@@ -73,10 +71,10 @@ export async function createGoogleSession(
       provider: "google",
       userId: existingUser.id,
     })
-    return await lucia.createSession(existingUser.id, {})
+    return await sessionService.createSession(existingUser.id)
   }
   if (existingAccount) {
-    return await lucia.createSession(existingAccount.userId, {})
+    return await sessionService.createSession(existingAccount.userId)
   } else {
     const [insertedUser] = await db
       .insert(User)
@@ -96,6 +94,6 @@ export async function createGoogleSession(
       provider: "google",
       userId: insertedUser.id,
     })
-    return await lucia.createSession(insertedUser.id, {})
+    return await sessionService.createSession(insertedUser.id)
   }
 }

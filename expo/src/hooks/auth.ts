@@ -29,9 +29,9 @@ export function useSignIn() {
 
   const signInMutation = api.auth.signIn.useMutation({
     onSuccess: async (res) => {
-      setToken(res.session.id)
+      setToken(res.session.token)
       await utils.invalidate()
-      router.replace("/")
+      router.replace("/(tabs)")
     },
   })
 
@@ -48,9 +48,9 @@ export function useSignUp() {
 
   const signUpMutation = api.auth.signUp.useMutation({
     onSuccess: async (res) => {
-      setToken(res.session.id)
+      setToken(res.session.token)
       await utils.invalidate()
-      router.replace("/")
+      router.replace("/(tabs)")
     },
   })
 
@@ -69,7 +69,7 @@ export function useSignOut() {
     onSuccess: async () => {
       await deleteToken()
       await utils.invalidate()
-      router.replace("/")
+      router.replace("/(tabs)")
     },
   })
 
@@ -89,7 +89,7 @@ export function useOAuthSignIn() {
     if (!success) return
     setToken(token)
     await utils.invalidate()
-    router.replace("/")
+    router.replace("/(tabs)")
   }
 }
 

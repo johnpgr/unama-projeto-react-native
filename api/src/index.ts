@@ -8,7 +8,7 @@ import * as ws from "ws"
 
 import { createContext, createTRPCRouter } from "../trpc/index.ts"
 import { authRouter } from "./auth/auth.routes.ts"
-import { handleOAuthRequest } from "./auth/oauth.routes.ts"
+import { handleOAuthRequest } from "./auth/oauth/oauth.routes.ts"
 import { transactionRouter } from "./transaction/transaction.routes.ts"
 
 export type AppRouter = typeof appRouter

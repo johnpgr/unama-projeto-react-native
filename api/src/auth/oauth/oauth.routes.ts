@@ -1,24 +1,15 @@
 import assert from "assert"
 import type http from "http"
-import type { Session } from "lucia"
 import { generateCodeVerifier, generateState } from "arctic"
-import { verifyRequestOrigin } from "lucia"
 import { z } from "zod"
 
-import { CreateSessionError } from "./auth.error.ts"
-import { lucia } from "./lucia/index.ts"
-import {
-  createAppleSession,
-  getAppleAuthorizationUrl,
-} from "./lucia/oauth/apple.ts"
-import {
-  createGithubSession,
-  getGithubAuthorizationUrl,
-} from "./lucia/oauth/github.ts"
-import {
-  createGoogleSession,
-  getGoogleAuthorizationUrl,
-} from "./lucia/oauth/google.ts"
+import type { Session } from "../../user/user.schema.ts"
+import { CreateSessionError, InvalidSessionError } from "../auth.error.ts"
+import { sessionService } from "../auth.session.ts"
+import { createAppleSession, getAppleAuthorizationUrl } from "./apple.ts"
+import { createGithubSession, getGithubAuthorizationUrl } from "./github.ts"
+import { createGoogleSession, getGoogleAuthorizationUrl } from "./google.ts"
+import { verifyRequestOrigin } from "./utils.ts"
 
 const AppleUserObj = z.object({
   name: z.object({
@@ -111,8 +102,8 @@ export const handleOAuthRequest = async (
       ])
 
       if (sessionToken) {
-        const session = await lucia.validateSession(sessionToken)
-        if (session.user) {
+        const session = await sessionService.validateSessionToken(sessionToken)
+        if (!(session instanceof InvalidSessionError)) {
           res.setHeader(
             "Set-Cookie",
             serializeCookie("sessionToken", sessionToken),
@@ -287,15 +278,21 @@ export const handleOAuthRequest = async (
     // Logout - POST /logout
     if (req.method === "POST" && url.pathname === "/auth/logout") {
       const authHeader = req.headers.get("authorization")
-      const sessionId = lucia.readBearerToken(authHeader ?? "")
+      const token = authHeader?.split(" ")[1]
+      if (!token) {
+        res.writeHead(400, { "Content-Type": "application/json" })
+        res.end(JSON.stringify({ error: "Invalid request" }))
+        return
+      }
+      const session = await sessionService.validateSessionToken(token)
 
-      if (!sessionId) {
+      if (session instanceof InvalidSessionError) {
         res.writeHead(400, { "Content-Type": "application/json" })
         res.end(JSON.stringify({ error: "Not logged in" }))
         return
       }
 
-      await lucia.invalidateSession(sessionId)
+      await sessionService.invalidateSession(session.session.id)
 
       // Clear session cookie
       res.setHeader("Set-Cookie", serializeCookie("session", "", { maxAge: 0 }))

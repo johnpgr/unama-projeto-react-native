@@ -163,7 +163,7 @@ export default function SignUpScreen() {
         <SigninOAuthButtons />
         <View className="flex flex-row items-center justify-center gap-2">
           <Text>Já possui conta?</Text>
-          <Link href="/signin" className="font-medium text-green-900">
+          <Link href="/login" className="font-medium text-green-900">
             Entrar
           </Link>
         </View>

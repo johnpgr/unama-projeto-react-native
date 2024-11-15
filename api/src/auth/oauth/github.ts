@@ -1,17 +1,15 @@
-import type { Session } from "lucia"
 import { GitHub } from "arctic"
 import { eq } from "drizzle-orm"
 
-import type { DatabaseUserAttributes } from "../index.ts"
-import { db } from "../../../../drizzle/index.ts"
-import { User } from "../../../user/user.schema.ts"
-import { CreateSessionError } from "../../auth.error.ts"
-import { OAuthAccount } from "../../oauth.schema.ts"
-import { lucia } from "../index.ts"
+import { env } from "../../../config/env.ts"
+import { db } from "../../../drizzle/index.ts"
+import { OAuthAccount, Session, User } from "../../user/user.schema.ts"
+import { CreateSessionError, InvalidSessionError } from "../auth.error.ts"
+import { sessionService } from "../auth.session.ts"
 
 export const githubAuth = new GitHub(
-  process.env.AUTH_GITHUB_ID ?? "NOOP_NO_GITHUB_CLIENT_ID",
-  process.env.AUTH_GITHUB_SECRET ?? "NOOP_NO_GITHUB_SECRET_ID",
+  env.AUTH_GITHUB_ID,
+  env.AUTH_GITHUB_SECRET,
   {
     redirectURI: `${process.env.REDIRECT_URL}/auth/github/callback`,
   },
@@ -37,7 +35,7 @@ interface GithubEmailResponse {
 export async function createGithubSession(
   idToken: string,
   sessionToken?: string,
-): Promise<CreateSessionError | Session> {
+): Promise<CreateSessionError | { session: Session; token: string }> {
   const tokens = await githubAuth.validateAuthorizationCode(idToken)
 
   const githubUserResponse = (await (
@@ -48,6 +46,7 @@ export async function createGithubSession(
       },
     })
   ).json()) as GithubUserResponse
+
   const githubEmailResponse = (await (
     await fetch("https://api.github.com/user/emails", {
       headers: {
@@ -65,20 +64,23 @@ export async function createGithubSession(
     where: (account) =>
       eq(account.providerUserId, githubUserResponse.id.toString()),
   })
-  let existingUser: DatabaseUserAttributes | null = null
+
+  let existingUser: User | null = null
   if (sessionToken) {
-    const sessionUser = await lucia.validateSession(sessionToken)
-    if (sessionUser.user) {
-      existingUser = sessionUser.user as DatabaseUserAttributes
+    const sessionUser = await sessionService.validateSessionToken(sessionToken)
+    if (!(sessionUser instanceof InvalidSessionError)) {
+      existingUser = sessionUser.user
     }
   } else {
     const response = await db.query.User.findFirst({
       where: (user) => eq(user.email, primaryEmail.email),
     })
+
     if (response) {
       existingUser = response
     }
   }
+
   if (
     existingUser?.emailVerified &&
     primaryEmail.verified &&
@@ -89,11 +91,12 @@ export async function createGithubSession(
       provider: "github",
       userId: existingUser.id,
     })
-    return await lucia.createSession(existingUser.id, {})
+
+    return await sessionService.createSession(existingUser.id)
   }
 
   if (existingAccount) {
-    return await lucia.createSession(existingAccount.userId, {})
+    return await sessionService.createSession(existingAccount.userId)
   } else {
     const [insertedUser] = await db
       .insert(User)
@@ -104,13 +107,16 @@ export async function createGithubSession(
         emailVerified: primaryEmail.verified ? new Date() : null,
       })
       .returning()
-    if (!insertedUser)
+    if (!insertedUser) {
       return new CreateSessionError("Failed to insert new User to database")
+    }
+
     await db.insert(OAuthAccount).values({
       providerUserId: githubUserResponse.id.toString(),
       provider: "github",
       userId: insertedUser.id,
     })
-    return await lucia.createSession(insertedUser.id, {})
+
+    return await sessionService.createSession(insertedUser.id)
   }
 }
