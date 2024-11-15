@@ -1,4 +1,3 @@
-import EventEmitter, { on } from "node:events"
 import { ChatMistralAI } from "@langchain/mistralai"
 import { TRPCError } from "@trpc/server"
 import { observable } from "@trpc/server/observable"
@@ -250,7 +249,7 @@ export const transactionRouter = {
 
         await redis.publish("sendPointsP2P", {
           id: transaction.id,
-          pointsTransferred: transaction.points,
+          pointsTransferred: input.amountPoints,
           senderId: transaction.from,
           receiverId: transaction.to,
         })

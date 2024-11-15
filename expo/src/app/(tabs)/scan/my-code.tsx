@@ -5,19 +5,11 @@ import { EvilIcons } from "@expo/vector-icons"
 import QRCode from "react-qr-code"
 
 import { useAuth } from "~/hooks/auth"
-import { api } from "~/utils/api"
 import { TODO } from "~/utils/todo"
 
 export default function MyCodeScreen() {
   const router = useRouter()
   const { user } = useAuth()
-  api.transaction.onP2PTransaction.useSubscription(undefined, {
-    onData(data) {
-      router.push(
-        `/scan/received-points?points=${data.pointsTransferred}&sender=${data.senderId}`,
-      )
-    },
-  })
 
   function onPressShareHandler() {
     TODO("Implement share handler")

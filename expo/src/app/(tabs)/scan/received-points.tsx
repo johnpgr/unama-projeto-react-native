@@ -29,8 +29,12 @@ export default function ReceivedPointsScreen() {
         <Text>Detalhes da ação:</Text>
         <Text className="font-bold">DETALHES</Text>
         <View>
-          <Pressable>Ver detalhes</Pressable>
-          <Pressable>Ver meus pontos</Pressable>
+          <Pressable>
+            <Text>Ver detalhes</Text>
+          </Pressable>
+          <Pressable>
+            <Text>Ver meus pontos</Text>
+          </Pressable>
         </View>
       </View>
     </View>

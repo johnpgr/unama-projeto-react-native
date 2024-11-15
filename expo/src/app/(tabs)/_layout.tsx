@@ -1,12 +1,22 @@
 import React from "react"
 import { View } from "react-native"
-import { Redirect, Tabs } from "expo-router"
-import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons"
+import { Redirect, Tabs, useRouter } from "expo-router"
+import { Entypo, MaterialIcons } from "@expo/vector-icons"
 
 import { useAuth } from "~/hooks/auth"
+import { api } from "~/utils/api"
 
 export default function TabLayout() {
   const { session, isPending } = useAuth()
+  const router = useRouter()
+
+  api.transaction.onP2PTransaction.useSubscription(undefined, {
+    onData(data) {
+      router.push(
+        `/scan/received-points?points=${data.pointsTransferred}&sender=${data.senderId}`,
+      )
+    },
+  })
 
   if (isPending) return null
   if (!session) return <Redirect href={"/onboarding"} />

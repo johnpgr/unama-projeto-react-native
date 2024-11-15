@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native"
-import { Link } from "expo-router"
+import { Link, useRouter } from "expo-router"
 import { useAtom } from "jotai"
 
 import type {
