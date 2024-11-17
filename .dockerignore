@@ -1,0 +1,13 @@
+fly.toml
+node_modules/
+.git/
+.env
+*.log
+dist/
+coverage/
+.next/
+.cache/
+README.md
+.gitignore
+.dockerignore
+Dockerfile

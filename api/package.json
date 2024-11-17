@@ -6,9 +6,10 @@
     "main": "src/index.ts",
     "type": "module",
     "exports": {
-        ".": "./exports/index.ts"
+        ".": "./exports.ts"
     },
     "scripts": {
+        "build": "tsc",
         "clean": "git clean -xdf node_modules",
         "dev": "node --env-file=../.env --watch --experimental-strip-types src/index.ts",
         "push": "pnpm with-env drizzle-kit push",
@@ -24,6 +25,7 @@
         "@node-rs/argon2": "^1.8.3",
         "@oslojs/crypto": "^1.0.1",
         "@oslojs/encoding": "^1.1.0",
+        "@t3-oss/env-core": "^0.11.1",
         "@trpc/server": "catalog:",
         "@tsndr/cloudflare-worker-jwt": "^2.5.3",
         "arctic": "^1.9.2",
@@ -35,6 +37,7 @@
         "postgres": "^3.4.5",
         "redis": "^4.7.0",
         "superjson": "2.2.1",
+        "trpc-ui": "^1.0.3",
         "ws": "^8.18.0",
         "zod": "catalog:"
     },

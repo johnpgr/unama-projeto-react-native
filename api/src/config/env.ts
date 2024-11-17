@@ -1,5 +1,5 @@
-import { createEnv } from "@t3-oss/env-core"
-import { z } from "zod"
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
 
 export const env = createEnv({
   server: {
@@ -7,7 +7,7 @@ export const env = createEnv({
     REDIS_URL: z.string(),
     REDIS_PASSWORD: z.string().optional(),
     MISTRAL_API_KEY: z.string(),
-    REDIRECT_URL: z.string().url(),
+    APP_URL: z.string().url().default("http://localhost:3000"),
     AUTH_GOOGLE_ID: z.string(),
     AUTH_GOOGLE_SECRET: z.string(),
     AUTH_GITHUB_ID: z.string(),
@@ -19,4 +19,4 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "production"]).default("development"),
   },
   runtimeEnv: process.env,
-})
+});

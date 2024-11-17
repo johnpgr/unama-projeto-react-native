@@ -1,15 +1,15 @@
-import type { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone"
-import type { CreateWSSContextFnOptions } from "@trpc/server/adapters/ws"
-import { initTRPC, TRPCError } from "@trpc/server"
-import superjson from "superjson"
-import { ZodError } from "zod"
+import type { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone";
+import type { CreateWSSContextFnOptions } from "@trpc/server/adapters/ws";
+import { initTRPC, TRPCError } from "@trpc/server";
+import superjson from "superjson";
+import { ZodError } from "zod";
 
-import { InvalidSessionError } from "../src/auth/auth.error.ts"
-import { sessionService } from "../src/auth/auth.session.ts"
+import { InvalidSessionError } from "../features/auth/auth.error.ts";
+import { sessionService } from "../features/auth/auth.session.ts";
 
 type NonNullableObj<T> = {
-  [K in keyof T]-?: NonNullable<T[K]>
-}
+  [K in keyof T]-?: NonNullable<T[K]>;
+};
 
 /**
  * 1. CONTEXT
@@ -28,22 +28,22 @@ export async function createContext(
 ) {
   const bearerToken =
     data.req.headers.authorization?.split(" ")[1] ??
-    data.info.connectionParams?.token
+    data.info.connectionParams?.token;
 
   if (!bearerToken) {
-    return { session: null, user: null }
+    return { session: null, user: null };
   }
 
-  const session = await sessionService.validateSessionToken(bearerToken)
+  const session = await sessionService.validateSessionToken(bearerToken);
 
   if (session instanceof InvalidSessionError) {
-    return { session: null, user: null }
+    return { session: null, user: null };
   }
 
-  return session
+  return session;
 }
 
-type Context = Awaited<ReturnType<typeof createContext>>
+type Context = Awaited<ReturnType<typeof createContext>>;
 
 /**
  * 2. INITIALIZATION
@@ -60,7 +60,7 @@ const t = initTRPC.context<typeof createContext>().create({
       zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
     },
   }),
-})
+});
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
@@ -73,7 +73,7 @@ const t = initTRPC.context<typeof createContext>().create({
  * This is how you create new routers and subrouters in your tRPC API
  * @see https://trpc.io/docs/router
  */
-export const createTRPCRouter = t.router
+export const createTRPCRouter = t.router;
 
 /**
  * Middleware for timing procedure execution and adding an articifial delay in development.
@@ -82,15 +82,15 @@ export const createTRPCRouter = t.router
  * network latency that would occur in production but not in local development.
  */
 const timingMiddleware = t.middleware(async ({ next, path }) => {
-  const start = Date.now()
+  const start = Date.now();
 
-  const result = await next()
+  const result = await next();
 
-  const end = Date.now()
-  console.log(`[TRPC] ${path} took ${end - start}ms to execute`)
+  const end = Date.now();
+  console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
 
-  return result
-})
+  return result;
+});
 
 /**
  * Public (unauthed) procedure
@@ -99,7 +99,7 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * tRPC API. It does not guarantee that a user querying is authorized, but you
  * can still access user session data if they are logged in
  */
-export const publicProcedure = t.procedure.use(timingMiddleware)
+export const publicProcedure = t.procedure.use(timingMiddleware);
 
 /**
  * Protected (authenticated) procedure
@@ -113,12 +113,12 @@ export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
     if (!ctx.session) {
-      throw new TRPCError({ code: "UNAUTHORIZED" })
+      throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next({
       ctx: ctx as NonNullableObj<Context>,
-    })
-  })
+    });
+  });
 
 /**
  * Protected procedure that ensures the user is authenticated and has admin privileges.
@@ -130,9 +130,9 @@ export const adminProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
     if (!ctx.session || ctx.user.userType !== "admin") {
-      throw new TRPCError({ code: "UNAUTHORIZED" })
+      throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next({
       ctx: ctx as NonNullableObj<Context>,
-    })
-  })
+    });
+  });

@@ -15,27 +15,27 @@ services:
       POSTGRES_USER: ecopoints
       POSTGRES_PASSWORD: ecopoints
       TZ: America/Sao_Paulo
-  s3:
-    image: minio/minio
-    ports:
-      - "9000:9000"
-    environment:
-      MINIO_ACCESS_KEY: ecopoints
-      MINIO_SECRET_KEY: ecopointsecopointsecopoints
-      MINIO_ROOT_USER: ecopoints
-      MINIO_ROOT_PASSWORD: ecopointsecopointsecopoints
-    command: server ./data
-  bucket:
-    image: minio/mc
-    depends_on:
-      - s3
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc alias set ecopoints http://s3:9000 ecopoints ecopointsecopointsecopoints;
-      /usr/bin/mc mb ecopoints/ecopoints;
-      /usr/bin/mc anonymous set public ecopoints/ecopoints;
-      exit 0;
-      "
+  # s3:
+  #   image: minio/minio
+  #   ports:
+  #     - "9000:9000"
+  #   environment:
+  #     MINIO_ACCESS_KEY: ecopoints
+  #     MINIO_SECRET_KEY: ecopointsecopointsecopoints
+  #     MINIO_ROOT_USER: ecopoints
+  #     MINIO_ROOT_PASSWORD: ecopointsecopointsecopoints
+  #   command: server ./data
+  # bucket:
+  #   image: minio/mc
+  #   depends_on:
+  #     - s3
+  #   entrypoint: >
+  #     /bin/sh -c "
+  #     /usr/bin/mc alias set ecopoints http://s3:9000 ecopoints ecopointsecopointsecopoints;
+  #     /usr/bin/mc mb ecopoints/ecopoints;
+  #     /usr/bin/mc anonymous set public ecopoints/ecopoints;
+  #     exit 0;
+  #     "
 
 volumes:
   data:

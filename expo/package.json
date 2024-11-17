@@ -18,7 +18,6 @@
         "@bacons/text-decoder": "^0.0.0",
         "@expo/metro-config": "^0.19.3",
         "@hookform/resolvers": "^3.9.0",
-        "@t3-oss/env-core": "^0.11.1",
         "@tanstack/react-query": "catalog:",
         "@trpc/client": "catalog:",
         "@trpc/react-query": "catalog:",

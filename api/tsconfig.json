@@ -4,15 +4,18 @@
         "@projeto/tsconfig/base.json"
     ],
     "include": [
-        "."
+        "./src"
     ],
     "compilerOptions": {
         "verbatimModuleSyntax": true,
         "allowImportingTsExtensions": true,
+        "rewriteRelativeImportExtensions": true,
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "types": [
             "@types/node"
-        ]
-    },
+        ],
+        "noEmit": false,
+        "outDir": "./dist"
+    }
 }
