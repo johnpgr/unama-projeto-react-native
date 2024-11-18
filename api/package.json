@@ -14,6 +14,7 @@
     "dev": "node --env-file=../.env --watch --experimental-strip-types src/index.ts",
     "push": "pnpm with-env drizzle-kit push",
     "generate": "pnpm with-env drizzle-kit generate",
+    "migrate": "pnpm with-env drizzle-kit migrate",
     "studio": "pnpm with-env drizzle-kit studio",
     "with-env": "dotenv -e ../.env --",
     "format": "prettier --check . --ignore-path ../../.gitignore",

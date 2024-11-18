@@ -1,12 +1,14 @@
 import Constants from "expo-constants"
 
-import { TODO } from "./todo"
-
 /**
  * Extend this function when going to production by
  * setting the baseUrl to your production API URL.
  */
 export const getBaseUrl = () => {
+  console.log("API_URL:", process.env.EXPO_PUBLIC_API_URL)
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL
+  }
   /**
    * Gets the IP address of your host-machine. If it cannot automatically find it,
    * you'll have to manually set it. NOTE: Port 3000 should work for most but confirm
@@ -17,16 +19,15 @@ export const getBaseUrl = () => {
    */
   const debuggerHost = Constants.expoConfig?.hostUri
   const localhost = debuggerHost?.split(":")[0]
-
-  if (!localhost) {
-    // return "https://turbo.t3.gg";
-    TODO("Production URL")
-  }
 
   return `http://${localhost}:3000`
 }
 
 export const getWSUrl = () => {
+  console.log("API_URL:", process.env.EXPO_PUBLIC_API_URL)
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL
+  }
   /**
    * Gets the IP address of your host-machine. If it cannot automatically find it,
    * you'll have to manually set it. NOTE: Port 3000 should work for most but confirm
@@ -37,10 +38,6 @@ export const getWSUrl = () => {
    */
   const debuggerHost = Constants.expoConfig?.hostUri
   const localhost = debuggerHost?.split(":")[0]
-
-  if (!localhost) {
-    TODO("Production WS URL")
-  }
 
   return `ws://${localhost}:3000/`
 }

@@ -13,6 +13,7 @@
     "clean": "git clean -xdf node_modules && pnpm --recursive clean",
     "db:generate": "pnpm --filter=api generate",
     "db:push": "pnpm --filter=api push",
+    "db:migrate": "pnpm --filter=api migrate",
     "db:studio": "pnpm --filter=api studio",
     "format": "pnpm --parallel format --cache --cache-location .cache/.prettiercache",
     "format:fix": "pnpm --parallel format --write --cache --cache-location .cache/.prettiercache",

@@ -16,6 +16,7 @@ export default function TabLayout() {
         `/scan/received-points?points=${data.pointsTransferred}&sender=${data.senderId}`,
       )
     },
+    enabled: !!session,
   })
 
   if (isPending) return null
