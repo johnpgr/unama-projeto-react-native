@@ -3,23 +3,24 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'unama-projeto-react-native'
-primary_region = 'gru'
+app = "unama-projeto-react-native"
+primary_region = "gru"
 
 [build]
 
 [env]
-  PORT = '3000'
+  PORT = "3000"
+  FLY_SCALE_TO_ZERO = "1h"
 
 [http_service]
   internal_port = 3000
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = "stop"
   auto_start_machines = true
   min_machines_running = 0
-  processes = ['app']
+  processes = ["app"]
 
 [[vm]]
-  memory = '256mb'
-  cpu_kind = 'shared'
+  memory = "256mb"
+  cpu_kind = "shared"
   cpus = 1

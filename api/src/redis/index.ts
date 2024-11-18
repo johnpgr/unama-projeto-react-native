@@ -26,7 +26,7 @@ export class RedisService {
     this.subscriberClient = this.mainClient.duplicate()
 
     this.subscriberClient.on("error", (error) => {
-      console.error(error)
+      console.error("Redis subscriber error:", error)
     })
   }
 

@@ -24,12 +24,6 @@ const wsClient = createWSClient({
     closeMs: 0,
   },
 
-  onError(error) {
-    console.log("Websocket Error", error)
-  },
-  onClose(reason) {
-    console.log("Websocket Closed", reason)
-  },
   connectionParams() {
     const token = getToken()
     if (token) {
