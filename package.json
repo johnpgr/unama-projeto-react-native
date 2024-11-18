@@ -1,37 +1,36 @@
 {
-    "name": "ecopoints",
-    "version": "1.0.0",
-    "private": true,
-    "engines": {
-        "node": ">=22.9.0"
-    },
-    "packageManager": "pnpm@9.7.1",
-    "scripts": {
-        "dev:expo": "pnpm --filter=expo dev",
-        "dev:api": "pnpm --filter=api dev",
-        "dev": "pnpm --parallel dev",
-        "clean": "git clean -xdf node_modules && pnpm --recursive clean",
-        "db:generate": "pnpm --filter=api dbgen",
-        "db:migrate": "pnpm --filter=api migrate",
-        "db:push": "pnpm --filter=api push",
-        "db:studio": "pnpm --filter=api studio",
-        "format": "pnpm --parallel format --cache --cache-location .cache/.prettiercache",
-        "format:fix": "pnpm --parallel format --write --cache --cache-location .cache/.prettiercache",
-        "lint": "pnpm --parallel lint --cache --cache-location .cache/.eslintcache",
-        "lint:fix": "pnpm --parallel lint --fix --cache --cache-location .cache/.eslintcache",
-        "lint:ws": "pnpm dlx sherif@latest",
-        "postinstall": "pnpm lint:ws",
-        "typecheck": "pnpm --parallel typecheck"
-    },
-    "devDependencies": {
-        "@projeto/prettier-config": "workspace:*",
-        "prettier": "catalog:",
-        "typescript": "catalog:"
-    },
-    "prettier": "@projeto/prettier-config",
-    "pnpm": {
-        "patchedDependencies": {
-            "babel-preset-expo": "patches/babel-preset-expo.patch"
-        }
+  "name": "ecopoints",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "packageManager": "pnpm@9.7.1",
+  "scripts": {
+    "dev:expo": "pnpm --filter=expo dev",
+    "dev:api": "pnpm --filter=api dev",
+    "dev": "pnpm --parallel dev",
+    "clean": "git clean -xdf node_modules && pnpm --recursive clean",
+    "db:generate": "pnpm --filter=api generate",
+    "db:push": "pnpm --filter=api push",
+    "db:studio": "pnpm --filter=api studio",
+    "format": "pnpm --parallel format --cache --cache-location .cache/.prettiercache",
+    "format:fix": "pnpm --parallel format --write --cache --cache-location .cache/.prettiercache",
+    "lint": "pnpm --parallel lint --cache --cache-location .cache/.eslintcache",
+    "lint:fix": "pnpm --parallel lint --fix --cache --cache-location .cache/.eslintcache",
+    "lint:ws": "pnpm dlx sherif@latest",
+    "postinstall": "pnpm lint:ws",
+    "typecheck": "pnpm --parallel typecheck"
+  },
+  "devDependencies": {
+    "@projeto/prettier-config": "workspace:*",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  },
+  "prettier": "@projeto/prettier-config",
+  "pnpm": {
+    "patchedDependencies": {
+      "babel-preset-expo": "patches/babel-preset-expo.patch"
     }
+  }
 }
