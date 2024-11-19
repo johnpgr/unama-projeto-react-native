@@ -1,7 +1,7 @@
 import { ChatMistralAI } from "@langchain/mistralai"
 import { TRPCError } from "@trpc/server"
 import { observable } from "@trpc/server/observable"
-import { asc, eq, inArray, or, sql } from "drizzle-orm"
+import { asc, desc, eq, inArray, or, sql } from "drizzle-orm"
 import { z } from "zod"
 
 import type { PubSubEvents } from "../../redis/index.ts"
@@ -296,10 +296,11 @@ export const transactionRouter = {
       where: (user) => eq(user.id, ctx.user.id),
       columns: {},
       with: {
-        recyclingTransactions: true,
-        rewards: true,
-        p2pTransactionsFrom: true,
-        p2pTransactionsTo: true,
+        //prettier-ignore
+        recyclingTransactions: { orderBy: (recycling) => desc(recycling.createdAt) },
+        rewards: { orderBy: (reward) => desc(reward.createdAt) },
+        p2pTransactionsFrom: { orderBy: (p2p) => desc(p2p.createdAt) },
+        p2pTransactionsTo: { orderBy: (p2p) => desc(p2p.createdAt) },
       },
     })
 

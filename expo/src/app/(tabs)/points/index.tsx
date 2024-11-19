@@ -2,10 +2,9 @@ import React from "react"
 import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import { Link } from "expo-router"
 import { AntDesign } from "@expo/vector-icons"
-import { useAtom } from "jotai"
+import { FlashList } from "@shopify/flash-list"
 
 import type {
-  Notification,
   P2PNotification,
   UserRewardNotification,
 } from "~/state/notifications"
@@ -15,25 +14,36 @@ import { TransactionType } from "~/state/notifications"
 import { api } from "~/utils/api"
 import { formatDatePTBR } from "~/utils/date"
 
-const parseUserReward = (
-  reward: RouterOutputs["transaction"]["getUserRewards"][number],
-): UserRewardNotification => ({
-  id: reward.id,
-  points: reward.reward.points,
-  transactionDate: reward.createdAt,
-  type: TransactionType.P2REWARD,
-})
+// const parseUserReward = (
+//   reward: RouterOutputs["transaction"]["getUserRewards"][number],
+// ): UserRewardNotification => ({
+//   id: reward.id,
+//   points: reward.reward.points,
+//   transactionDate: reward.createdAt,
+//   type: TransactionType.P2REWARD,
+// })
+//
+// const parseP2PRTransaction = (
+//   transaction: RouterOutputs["transaction"]["getUserTransactions"][number],
+// ): P2PNotification => ({
+//   id: transaction.id,
+//   points: transaction.points,
+//   transactionDate: transaction.createdAt,
+//   type: TransactionType.P2P,
+//   from: transaction.from,
+//   to: transaction.to,
+// })
 
-const parseP2PRTransaction = (
-  transaction: RouterOutputs["transaction"]["getUserTransactions"][number],
-): P2PNotification => ({
-  id: transaction.id,
-  points: transaction.points,
-  transactionDate: transaction.createdAt,
-  type: TransactionType.P2P,
-  from: transaction.from,
-  to: transaction.to,
-})
+type UserExtract = NonNullable<
+  RouterOutputs["transaction"]["getUserExtract"][string]
+>[number]
+
+const EXTRACT_TYPE: Record<UserExtract["type"], string> = {
+  p2pFrom: "Transferência de pontos",
+  p2pTo: "Recebimento de pontos",
+  reward: "Recompensa",
+  recycling: "Reciclagem",
+}
 
 export default function PointsPage() {
   const { user } = useAuth()
@@ -72,10 +82,10 @@ export default function PointsPage() {
           </TouchableOpacity>
         </Link>
       </View>
-      <View className="flex flex-col gap-4">
+      <View className="flex flex-1 flex-col gap-4">
         <Text className="px-4 text-lg font-medium">Histórico</Text>
         {userExtract ? (
-          <FlatList
+          <FlashList
             data={keys}
             keyExtractor={(date) => date}
             renderItem={({ item }) => {
@@ -83,16 +93,16 @@ export default function PointsPage() {
               if (!value) return null
               return (
                 <View>
-                  <Text className="px-2 py-1 text-lg font-medium text-gray-700">
+                  <Text className="p-2 pb-0 text-lg font-medium text-gray-700">
                     {item}
                   </Text>
-                  <FlatList
+                  <FlashList
+                    estimatedItemSize={95}
                     data={value}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
-                      <NotificationItemView notification={item} />
+                      <ExtractItemView extract={item} />
                     )}
-                    contentContainerStyle={{ paddingBottom: 20 }}
                   />
                 </View>
               )
@@ -110,23 +120,17 @@ export default function PointsPage() {
   )
 }
 
-export function NotificationItemView({
-  notification,
-}: {
-  notification: NonNullable<
-    RouterOutputs["transaction"]["getUserExtract"][string]
-  >[number]
-}) {
-  switch (notification.type) {
+export function ExtractItemView({ extract }: { extract: UserExtract }) {
+  switch (extract.type) {
     case "p2pFrom":
     case "p2pTo":
       return (
         <View className="flex-row justify-between border-b border-gray-200 p-4">
           <View>
-            <Text>{notification.points} pontos</Text>
-            <Text className="text-base">{notification.type}</Text>
+            <Text>{extract.points} pontos</Text>
+            <Text className="text-base">{EXTRACT_TYPE[extract.type]}</Text>
             <Text className="text-gray-500">
-              Data: {formatDatePTBR(notification.createdAt)}
+              Data: {formatDatePTBR(extract.createdAt)}
             </Text>
           </View>
           <TouchableOpacity>
@@ -138,10 +142,10 @@ export function NotificationItemView({
       return (
         <View className="flex-row justify-between border-b border-gray-200 p-4">
           <View>
-            <Text>Recompensa: {notification.rewardId}</Text>
-            <Text className="text-base">{notification.type}</Text>
+            <Text>Recompensa: {extract.rewardId}</Text>
+            <Text className="text-base">{extract.type}</Text>
             <Text className="text-gray-500">
-              Data: {formatDatePTBR(notification.createdAt)}
+              Data: {formatDatePTBR(extract.createdAt)}
             </Text>
           </View>
           <TouchableOpacity>
@@ -153,10 +157,10 @@ export function NotificationItemView({
       return (
         <View className="flex-row justify-between border-b border-gray-200 p-4">
           <View>
-            <Text>Reciclagem: {notification.weight}kg</Text>
-            <Text className="text-base">{notification.type}</Text>
+            <Text>Reciclagem: {extract.weight}kg</Text>
+            <Text className="text-base">{extract.type}</Text>
             <Text className="text-gray-500">
-              Data: {formatDatePTBR(notification.createdAt)}
+              Data: {formatDatePTBR(extract.createdAt)}
             </Text>
           </View>
           <TouchableOpacity>

@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "git clean -xdf node_modules",
-    "dev": "node --env-file=../.env --watch --experimental-strip-types src/index.ts",
+    "dev": "node --env-file=../.env --watch-path=./src --experimental-strip-types src/index.ts",
     "push": "pnpm with-env drizzle-kit push",
     "generate": "pnpm with-env drizzle-kit generate",
     "migrate": "pnpm with-env drizzle-kit migrate",
