@@ -8,7 +8,6 @@ import { User } from "./user.schema.ts"
 /**
  * Many-to-Many table to track rewards that users have redeemed
  */
-export type UserRewards = typeof UserRewards.$inferSelect
 export const UserRewards = pgTable("user_rewards", {
   id: varchar({ length: 21 })
     .notNull()
@@ -23,6 +22,8 @@ export const UserRewards = pgTable("user_rewards", {
     .notNull()
     .defaultNow(),
 })
+
+export type UserRewards = typeof UserRewards.$inferSelect
 
 export const UserRewardsRelations = relations(UserRewards, ({ one }) => ({
   user: one(User, {

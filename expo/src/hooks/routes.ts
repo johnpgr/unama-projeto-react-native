@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import React from "react"
 import { usePathname } from "expo-router"
 
 /**
@@ -17,9 +17,9 @@ export function useRouteObserver(
   callback: (currentPath: string, previousPath: string | null) => void,
 ) {
   const pathname = usePathname()
-  const previousPathname = useRef<string | null>(null)
+  const previousPathname = React.useRef<string | null>(null)
 
-  useEffect(() => {
+  React.useEffect(() => {
     callback(pathname, previousPathname.current)
     previousPathname.current = pathname
   }, [pathname, callback])
