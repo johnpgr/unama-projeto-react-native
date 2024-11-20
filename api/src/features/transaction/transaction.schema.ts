@@ -1,10 +1,25 @@
 import { relations } from "drizzle-orm"
-import { integer, pgTable, timestamp, varchar } from "drizzle-orm/pg-core"
+import {
+  integer,
+  pgEnum,
+  pgTable,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core"
 import { nanoid } from "nanoid"
 
 import { User } from "../user/user.schema.ts"
 
-export type RecyclingTransaction = typeof RecyclingTransaction.$inferSelect
+export const recyclingMaterial = pgEnum("recycling_material", [
+  "plastic",
+  "glass",
+  "metal",
+  "paper",
+  "electronic",
+])
+
+export type RecyclingMaterial = (typeof recyclingMaterial.enumValues)[number]
+
 export const RecyclingTransaction = pgTable("recycling_transaction", {
   id: varchar({ length: 21 })
     .primaryKey()
@@ -13,6 +28,7 @@ export const RecyclingTransaction = pgTable("recycling_transaction", {
     .references(() => User.id)
     .notNull(),
   weight: integer().notNull(),
+  material: recyclingMaterial().notNull(),
   points: integer().notNull(),
   createdAt: timestamp({
     withTimezone: true,
@@ -22,6 +38,8 @@ export const RecyclingTransaction = pgTable("recycling_transaction", {
     .notNull()
     .defaultNow(),
 })
+
+export type RecyclingTransaction = typeof RecyclingTransaction.$inferSelect
 
 export const RecyclingTransactionRelations = relations(
   RecyclingTransaction,
@@ -33,7 +51,6 @@ export const RecyclingTransactionRelations = relations(
   }),
 )
 
-export type P2PTransaction = typeof P2PTransaction.$inferSelect
 export const P2PTransaction = pgTable("p2p_transaction", {
   id: varchar({ length: 21 })
     .primaryKey()
@@ -49,6 +66,8 @@ export const P2PTransaction = pgTable("p2p_transaction", {
     .notNull()
     .defaultNow(),
 })
+
+export type P2PTransaction = typeof P2PTransaction.$inferSelect
 
 export const P2PTransactionRelations = relations(P2PTransaction, ({ one }) => ({
   from: one(User, {
