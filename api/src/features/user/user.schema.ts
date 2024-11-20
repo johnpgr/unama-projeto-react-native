@@ -60,10 +60,10 @@ export const OAuthAccount = pgTable(
     provider: text().$type<OAuthAccountProvider>().notNull(),
     providerUserId: text().notNull(),
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.provider, table.providerUserId] }),
-    idxUserId: index().on(table.userId),
-  }),
+  (table) => [
+    primaryKey({ columns: [table.provider, table.providerUserId] }),
+    index().on(table.userId),
+  ],
 )
 
 export type OAuthAccount = typeof OAuthAccount.$inferSelect
@@ -85,9 +85,7 @@ export const Session = pgTable(
       precision: 3,
     }).notNull(),
   },
-  (table) => ({
-    idxUserId: index().on(table.userId),
-  }),
+  (table) => [index().on(table.userId)],
 )
 
 export type Session = typeof Session.$inferSelect

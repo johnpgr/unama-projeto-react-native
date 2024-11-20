@@ -31,9 +31,7 @@ export const Notification = pgTable(
       .notNull(),
     readAt: timestamp({ mode: "date", precision: 3, withTimezone: true }),
   },
-  (table) => ({
-    userIdIdx: index().on(table.userId),
-  }),
+  (table) => [index().on(table.userId)],
 )
 
 export type Notification = typeof Notification.$inferSelect

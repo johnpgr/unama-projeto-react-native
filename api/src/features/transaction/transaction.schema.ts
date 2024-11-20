@@ -35,9 +35,7 @@ export const RecyclingTransaction = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => ({
-    idxUserId: index().on(table.userId),
-  }),
+  (table) => [index().on(table.userId)],
 )
 
 export type RecyclingTransaction = typeof RecyclingTransaction.$inferSelect
@@ -69,15 +67,12 @@ export const P2PTransaction = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => ({
-    idxFrom: index().on(table.from),
-    idxTo: index().on(table.to),
-    checkSenderNotReceiver: check(
-      "sender_not_receiver",
-      not(eq(table.from, table.to)),
-    ),
-    checkAmountPositive: check("amount_positive", gt(table.points, sql`0`)),
-  }),
+  (table) => [
+    index().on(table.from),
+    index().on(table.to),
+    check("sender_not_receiver", not(eq(table.from, table.to))),
+    check("amount_positive", gt(table.points, sql`0`)),
+  ],
 )
 
 export type P2PTransaction = typeof P2PTransaction.$inferSelect

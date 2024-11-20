@@ -24,10 +24,7 @@ export const UserRewards = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => ({
-    idxUserId: index().on(table.userId),
-    idxRewardId: index().on(table.rewardId),
-  }),
+  (table) => [index().on(table.userId), index().on(table.rewardId)],
 )
 
 export type UserRewards = typeof UserRewards.$inferSelect
