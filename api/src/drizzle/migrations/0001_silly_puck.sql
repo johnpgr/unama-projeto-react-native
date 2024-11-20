@@ -1,0 +1,2 @@
+CREATE TYPE "public"."recycling_material" AS ENUM('plastic', 'glass', 'metal', 'paper', 'electronic');--> statement-breakpoint
+ALTER TABLE "recycling_transaction" ADD COLUMN "material" "recycling_material" NOT NULL;
