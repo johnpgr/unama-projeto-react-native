@@ -1,10 +1,18 @@
+import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs"
 import React from "react"
-import { View } from "react-native"
+import { Pressable, Text } from "react-native"
 import { Redirect, Tabs, useRouter } from "expo-router"
-import { Entypo, MaterialIcons } from "@expo/vector-icons"
+import {
+  AntDesign,
+  Entypo,
+  Ionicons,
+  MaterialIcons,
+  SimpleLineIcons,
+} from "@expo/vector-icons"
 
 import { useAuth } from "~/hooks/auth"
 import { api } from "~/utils/api"
+import { DrawerToggleButton } from "../../_components/DrawerToggleButton"
 
 export default function TabLayout() {
   const { session, isPending } = useAuth()
@@ -24,26 +32,23 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: "#003822",
-        tabBarStyle: { paddingTop: 8, paddingBottom: 8, height: 64 },
-      }}
+      screenOptions={
+        {
+          tabBarActiveTintColor: "#003822",
+          tabBarStyle: { paddingTop: 8, paddingBottom: 8, height: 64 },
+          headerLeft: () => <DrawerToggleButton />,
+        } satisfies BottomTabNavigationOptions
+      }
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "ECOPoints",
-          headerTitleStyle: {
-            fontWeight: "bold",
-          },
-          headerRight: () => (
-            <View className="mr-4 flex flex-row items-center gap-2">
-              <MaterialIcons name="notifications" size={26} />
-              <MaterialIcons name="more-vert" size={26} />
-            </View>
+          title: "Início",
+          headerTitle: () => (
+            <Text className="text-2xl font-medium">ECOPoints</Text>
           ),
           tabBarIcon: ({ color }) => (
-            <Entypo name="home" size={32} color={color} />
+            <Entypo name="home" size={30} color={color} />
           ),
         }}
       />
@@ -53,7 +58,7 @@ export default function TabLayout() {
         options={{
           title: "Pontos",
           tabBarIcon: ({ color }) => (
-            <Entypo name="wallet" size={32} color={color} />
+            <Entypo name="wallet" size={30} color={color} />
           ),
         }}
       />
@@ -79,7 +84,7 @@ export default function TabLayout() {
         options={{
           title: "Escanear",
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="qr-code-scanner" size={32} color={color} />
+            <MaterialIcons name="qr-code-scanner" size={30} color={color} />
           ),
         }}
       />
@@ -105,17 +110,38 @@ export default function TabLayout() {
         options={{
           title: "Chat",
           tabBarIcon: ({ color }) => (
-            <Entypo name="chat" size={32} color={color} />
+            <Entypo name="chat" size={30} color={color} />
           ),
         }}
       />
 
       <Tabs.Screen
-        name="menu/index"
+        name="notifications/index"
         options={{
-          title: "Menu",
+          title: "Notificações",
           tabBarIcon: ({ color }) => (
-            <Entypo name="menu" size={32} color={color} />
+            <Ionicons name="notifications" size={30} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="my-account/index"
+        options={{
+          title: "Minha conta",
+          href: null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="settings/index"
+        options={{
+          href: null,
+          title: "Configurações",
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
           ),
         }}
       />

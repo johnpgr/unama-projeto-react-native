@@ -1,54 +1,28 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react"
 import { Image, Pressable, ScrollView, Text, View } from "react-native"
 import { Link } from "expo-router"
-import { MaterialIcons } from "@expo/vector-icons"
 
-import { useAuth, useSignOut } from "~/hooks/auth"
+import CampaignCardImage from "../../../../assets/card_1.png"
+import CampaignCardImage2 from "../../../../assets/card_2.png"
 
 export default function Index() {
-  const { user } = useAuth()
-  const { signOut } = useSignOut()
-
-  if (!user) return null
-  const avatarUrl = user.imageUrl
-
   return (
     <View className="flex-1 gap-8 bg-white px-4 pt-4">
-      <View className="flex flex-row items-center gap-4">
-        <Image
-          source={
-            avatarUrl
-              ? { uri: avatarUrl }
-              : require("../../../assets/avatar_default.png")
-          }
-          className="h-12 w-12 rounded-full"
-          resizeMode="contain"
-        />
-        <Text className="text-xl font-bold">Bem vindo, {user.fullName}</Text>
-        <Pressable
-          onPress={() => signOut()}
-          className="flex flex-row items-center gap-2"
-        >
-          <MaterialIcons name="logout" size={20} />
-        </Pressable>
-      </View>
       <ScrollView className="flex-col gap-2">
         <Text className="text-lg">Campanhas perto de você</Text>
         <View className="flex flex-row p-4">
           <Link href={"/campaigns/1"} asChild>
             <Pressable>
               <Image
-                source={require("../../../assets/card_1.png")}
+                source={CampaignCardImage}
                 className="h-80 w-80"
                 resizeMode="contain"
               />
             </Pressable>
           </Link>
           <Image
-            source={require("../../../assets/card_2.png")}
+            source={CampaignCardImage2}
             className="-ml-20 h-80 w-80"
             resizeMode="contain"
           />

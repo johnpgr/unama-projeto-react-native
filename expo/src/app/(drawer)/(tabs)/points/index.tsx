@@ -85,7 +85,7 @@ export default function PointsPage() {
       <View className="flex flex-1 flex-col gap-4">
         <Text className="px-4 text-lg font-medium">Histórico</Text>
         {userExtract ? (
-          <FlashList
+          <FlatList
             data={keys}
             keyExtractor={(date) => date}
             renderItem={({ item }) => {

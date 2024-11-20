@@ -21,7 +21,7 @@ export default function ReceivedPointsScreen() {
   return (
     <View className="flex flex-1 flex-col items-center gap-4 bg-background px-4 pt-4">
       <View className="flex flex-col items-center">
-        <Image source={require("../../../../assets/checkmark.png")} />
+        <Image source={require("../../../../../assets/checkmark.png")} />
         <Text className="text-lg font-medium">
           Parabéns! Você recebeu {points} pontos
         </Text>
@@ -31,7 +31,7 @@ export default function ReceivedPointsScreen() {
         <Pressable className="flex min-w-40 flex-row justify-center rounded-md bg-gray-300 p-4 active:bg-gray-300/90">
           <Text>Ver detalhes</Text>
         </Pressable>
-        <Link asChild href="/(tabs)/points">
+        <Link asChild href="/points">
           <Pressable className="flex min-w-40 flex-row justify-center rounded-md bg-gray-300 p-4 active:bg-gray-300/90">
             <Text>Ver meus pontos</Text>
           </Pressable>

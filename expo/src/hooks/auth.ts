@@ -31,7 +31,7 @@ export function useSignIn() {
     onSuccess: async (res) => {
       setToken(res.session.token)
       await utils.invalidate()
-      router.replace("/(tabs)")
+      router.replace("/")
     },
   })
 
@@ -50,7 +50,7 @@ export function useSignUp() {
     onSuccess: async (res) => {
       setToken(res.session.token)
       await utils.invalidate()
-      router.replace("/(tabs)")
+      router.replace("/")
     },
   })
 
@@ -69,7 +69,7 @@ export function useSignOut() {
     onSuccess: async () => {
       await deleteToken()
       await utils.invalidate()
-      router.replace("/(tabs)")
+      router.replace("/")
     },
   })
 
@@ -89,7 +89,7 @@ export function useOAuthSignIn() {
     if (!success) return
     setToken(token)
     await utils.invalidate()
-    router.replace("/(tabs)")
+    router.replace("/")
   }
 }
 
