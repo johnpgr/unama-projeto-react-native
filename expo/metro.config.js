@@ -40,8 +40,4 @@ const config = withMonorepoPaths(
 // https://github.com/expo/expo/issues/26926
 config.resolver.unstable_enablePackageExports = true
 
-// Config to make jotai work in react native
-// https://github.com/pmndrs/zustand/discussions/1967#discussioncomment-9578159
-config.resolver.unstable_conditionNames = ["browser", "require", "react-native"]
-
 module.exports = config

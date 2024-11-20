@@ -36,7 +36,6 @@
     "expo-splash-screen": "~0.29.12",
     "expo-status-bar": "~2.0.0",
     "expo-web-browser": "~14.0.1",
-    "jotai": "^2.10.0",
     "nativewind": "~4.0.36",
     "react": "catalog:react18",
     "react-dom": "catalog:react18",
