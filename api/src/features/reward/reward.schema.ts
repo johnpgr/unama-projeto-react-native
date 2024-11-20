@@ -5,7 +5,7 @@ import { nanoid } from "nanoid"
 import { UserRewards } from "../user/user-rewards.schema.ts"
 
 export type Reward = typeof Reward.$inferSelect
-export const Reward = pgTable("rewards", {
+export const Reward = pgTable("reward", {
   id: varchar({ length: 21 })
     .primaryKey()
     .$default(() => nanoid()),

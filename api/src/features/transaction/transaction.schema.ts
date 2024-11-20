@@ -1,8 +1,11 @@
-import { relations } from "drizzle-orm"
+import { relations, sql } from "drizzle-orm"
+import { eq, gt, not } from "drizzle-orm/expressions"
 import {
+  check,
+  index,
   integer,
-  pgEnum,
   pgTable,
+  text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core"
@@ -10,34 +13,32 @@ import { nanoid } from "nanoid"
 
 import { User } from "../user/user.schema.ts"
 
-export const recyclingMaterial = pgEnum("recycling_material", [
-  "plastic",
-  "glass",
-  "metal",
-  "paper",
-  "electronic",
-])
-
-export type RecyclingMaterial = (typeof recyclingMaterial.enumValues)[number]
-
-export const RecyclingTransaction = pgTable("recycling_transaction", {
-  id: varchar({ length: 21 })
-    .primaryKey()
-    .$default(() => nanoid()),
-  userId: varchar()
-    .references(() => User.id)
-    .notNull(),
-  weight: integer().notNull(),
-  material: recyclingMaterial().notNull(),
-  points: integer().notNull(),
-  createdAt: timestamp({
-    withTimezone: true,
-    precision: 3,
-    mode: "date",
-  })
-    .notNull()
-    .defaultNow(),
-})
+export const RecyclingTransaction = pgTable(
+  "recycling_transaction",
+  {
+    id: varchar({ length: 21 })
+      .primaryKey()
+      .$default(() => nanoid()),
+    userId: varchar()
+      .references(() => User.id)
+      .notNull(),
+    weight: integer().notNull(),
+    material: text({
+      enum: ["plastic", "glass", "metal", "paper", "electronic"],
+    }).notNull(),
+    points: integer().notNull(),
+    createdAt: timestamp({
+      withTimezone: true,
+      precision: 3,
+      mode: "date",
+    })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    idxUserId: index().on(table.userId),
+  }),
+)
 
 export type RecyclingTransaction = typeof RecyclingTransaction.$inferSelect
 
@@ -51,21 +52,33 @@ export const RecyclingTransactionRelations = relations(
   }),
 )
 
-export const P2PTransaction = pgTable("p2p_transaction", {
-  id: varchar({ length: 21 })
-    .primaryKey()
-    .$default(() => nanoid()),
-  from: varchar()
-    .references(() => User.id)
-    .notNull(),
-  to: varchar()
-    .references(() => User.id)
-    .notNull(),
-  points: integer().notNull(),
-  createdAt: timestamp({ withTimezone: true, precision: 3, mode: "date" })
-    .notNull()
-    .defaultNow(),
-})
+export const P2PTransaction = pgTable(
+  "p2p_transaction",
+  {
+    id: varchar({ length: 21 })
+      .primaryKey()
+      .$default(() => nanoid()),
+    from: varchar()
+      .references(() => User.id)
+      .notNull(),
+    to: varchar()
+      .references(() => User.id)
+      .notNull(),
+    points: integer().notNull(),
+    createdAt: timestamp({ withTimezone: true, precision: 3, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    idxFrom: index().on(table.from),
+    idxTo: index().on(table.to),
+    checkSenderNotReceiver: check(
+      "sender_not_receiver",
+      not(eq(table.from, table.to)),
+    ),
+    checkAmountPositive: check("amount_positive", gt(table.points, sql`0`)),
+  }),
+)
 
 export type P2PTransaction = typeof P2PTransaction.$inferSelect
 

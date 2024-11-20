@@ -1,8 +1,8 @@
 import { relations } from "drizzle-orm"
 import {
   boolean,
+  index,
   integer,
-  pgEnum,
   pgTable,
   primaryKey,
   text,
@@ -11,19 +11,13 @@ import {
 } from "drizzle-orm/pg-core"
 import { nanoid } from "nanoid"
 
+import { Notification } from "../notification/notification.schema.ts"
 import {
   P2PTransaction,
   RecyclingTransaction,
 } from "../transaction/transaction.schema.ts"
 import { UserRewards } from "./user-rewards.schema.ts"
 
-export const UserTypeEnum = pgEnum("user_type", [
-  "normal",
-  "cooperative",
-  "admin",
-])
-
-export type User = typeof User.$inferSelect
 export const User = pgTable("user", {
   id: varchar({ length: 21 })
     .primaryKey()
@@ -36,14 +30,19 @@ export const User = pgTable("user", {
     withTimezone: true,
   }),
   imageUrl: text(),
-  userType: UserTypeEnum().notNull().default("normal"),
+  userType: text({ enum: ["normal", "cooperative", "admin"] })
+    .notNull()
+    .default("normal"),
   totalPoints: integer().notNull().default(1000),
   canRedeemRewards: boolean().notNull().default(true),
 })
 
+export type User = typeof User.$inferSelect
+
 export const UserRelations = relations(User, ({ many }) => ({
   sessions: many(Session),
   accounts: many(OAuthAccount),
+  notifications: many(Notification),
   recyclingTransactions: many(RecyclingTransaction),
   p2pTransactionsFrom: many(P2PTransaction, { relationName: "from" }),
   p2pTransactionsTo: many(P2PTransaction, { relationName: "to" }),
@@ -52,7 +51,6 @@ export const UserRelations = relations(User, ({ many }) => ({
 
 export type OAuthAccountProvider = "google" | "apple" | "github"
 
-export type OAuthAccount = typeof OAuthAccount.$inferSelect
 export const OAuthAccount = pgTable(
   "oauth_account",
   {
@@ -64,24 +62,35 @@ export const OAuthAccount = pgTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.provider, table.providerUserId] }),
+    idxUserId: index().on(table.userId),
   }),
 )
+
+export type OAuthAccount = typeof OAuthAccount.$inferSelect
+
 export const OAuthAccountRelations = relations(OAuthAccount, ({ one }) => ({
   user: one(User, { references: [User.id], fields: [OAuthAccount.userId] }),
 }))
 
+export const Session = pgTable(
+  "session",
+  {
+    id: text().primaryKey(),
+    userId: varchar({ length: 21 })
+      .notNull()
+      .references(() => User.id),
+    expiresAt: timestamp({
+      withTimezone: true,
+      mode: "date",
+      precision: 3,
+    }).notNull(),
+  },
+  (table) => ({
+    idxUserId: index().on(table.userId),
+  }),
+)
+
 export type Session = typeof Session.$inferSelect
-export const Session = pgTable("session", {
-  id: text().primaryKey(),
-  userId: varchar({ length: 21 })
-    .notNull()
-    .references(() => User.id),
-  expiresAt: timestamp({
-    withTimezone: true,
-    mode: "date",
-    precision: 3,
-  }).notNull(),
-})
 
 export const SessionRelations = relations(Session, ({ one }) => ({
   user: one(User, { references: [User.id], fields: [Session.userId] }),

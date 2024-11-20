@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm"
-import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core"
+import { index, pgTable, timestamp, varchar } from "drizzle-orm/pg-core"
 import { nanoid } from "nanoid"
 
 import { Reward } from "../reward/reward.schema.ts"
@@ -8,20 +8,27 @@ import { User } from "./user.schema.ts"
 /**
  * Many-to-Many table to track rewards that users have redeemed
  */
-export const UserRewards = pgTable("user_rewards", {
-  id: varchar({ length: 21 })
-    .notNull()
-    .$default(() => nanoid()),
-  rewardId: varchar({ length: 21 })
-    .notNull()
-    .references(() => Reward.id),
-  userId: varchar()
-    .notNull()
-    .references(() => User.id),
-  createdAt: timestamp({ mode: "date", withTimezone: true })
-    .notNull()
-    .defaultNow(),
-})
+export const UserRewards = pgTable(
+  "user_reward",
+  {
+    id: varchar({ length: 21 })
+      .notNull()
+      .$default(() => nanoid()),
+    rewardId: varchar({ length: 21 })
+      .notNull()
+      .references(() => Reward.id),
+    userId: varchar()
+      .notNull()
+      .references(() => User.id),
+    createdAt: timestamp({ mode: "date", withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    idxUserId: index().on(table.userId),
+    idxRewardId: index().on(table.rewardId),
+  }),
+)
 
 export type UserRewards = typeof UserRewards.$inferSelect
 
