@@ -5,9 +5,7 @@ export const LoginSchema = z.object({
     .string({ required_error: "Email é obrigatório" })
     .min(1, "Email é obrigatório")
     .email("Formato de email inválido"),
-  password: z
-    .string({ required_error: "Senha é obrigatória" })
-    .min(1, "Senha é obrigatória"),
+  password: z.string({ required_error: "Senha é obrigatória" }).min(1, "Senha é obrigatória"),
 })
 
 export const RegisterSchema = z.object({

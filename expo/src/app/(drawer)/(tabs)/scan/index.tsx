@@ -51,11 +51,7 @@ export default function ScanScreen() {
         onPress={() => setTorchEnabled(!torchEnabled)}
         className="absolute bottom-8 left-8 rounded-full bg-black/30 p-4"
       >
-        <MaterialIcons
-          name={torchEnabled ? "flash-on" : "flash-off"}
-          size={32}
-          color={"white"}
-        />
+        <MaterialIcons name={torchEnabled ? "flash-on" : "flash-off"} size={32} color={"white"} />
       </Pressable>
     </View>
   )

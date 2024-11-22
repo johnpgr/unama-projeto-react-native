@@ -12,10 +12,7 @@ import {
 import { nanoid } from "nanoid"
 
 import { Notification } from "../notification/notification.schema.ts"
-import {
-  P2PTransaction,
-  RecyclingTransaction,
-} from "../transaction/transaction.schema.ts"
+import { P2PTransaction, RecyclingTransaction } from "../transaction/transaction.schema.ts"
 import { UserRewards } from "./user-rewards.schema.ts"
 
 export const User = pgTable("user", {

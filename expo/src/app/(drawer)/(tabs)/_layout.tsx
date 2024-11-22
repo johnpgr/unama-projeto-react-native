@@ -2,13 +2,7 @@ import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs"
 import React from "react"
 import { Pressable, Text } from "react-native"
 import { Redirect, Tabs, useRouter } from "expo-router"
-import {
-  AntDesign,
-  Entypo,
-  Ionicons,
-  MaterialIcons,
-  SimpleLineIcons,
-} from "@expo/vector-icons"
+import { AntDesign, Entypo, Ionicons, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons"
 
 import { useAuth } from "~/hooks/auth"
 import { api } from "~/utils/api"
@@ -20,9 +14,7 @@ export default function TabLayout() {
 
   api.transaction.onP2PTransaction.useSubscription(undefined, {
     onData(data) {
-      router.push(
-        `/scan/received-points?points=${data.pointsTransferred}&sender=${data.senderId}`,
-      )
+      router.push(`/scan/received-points?points=${data.pointsTransferred}&sender=${data.senderId}`)
     },
     enabled: !!session,
   })
@@ -44,12 +36,8 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Início",
-          headerTitle: () => (
-            <Text className="text-2xl font-medium">ECOPoints</Text>
-          ),
-          tabBarIcon: ({ color }) => (
-            <Entypo name="home" size={30} color={color} />
-          ),
+          headerTitle: () => <Text className="text-2xl font-medium">ECOPoints</Text>,
+          tabBarIcon: ({ color }) => <Entypo name="home" size={30} color={color} />,
         }}
       />
 
@@ -57,9 +45,7 @@ export default function TabLayout() {
         name="points/index"
         options={{
           title: "Pontos",
-          tabBarIcon: ({ color }) => (
-            <Entypo name="wallet" size={30} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <Entypo name="wallet" size={30} color={color} />,
         }}
       />
 
@@ -109,9 +95,7 @@ export default function TabLayout() {
         name="chat/index"
         options={{
           title: "Chat",
-          tabBarIcon: ({ color }) => (
-            <Entypo name="chat" size={30} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <Entypo name="chat" size={30} color={color} />,
         }}
       />
 
@@ -119,9 +103,7 @@ export default function TabLayout() {
         name="notifications/index"
         options={{
           title: "Notificações",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="notifications" size={30} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <Ionicons name="notifications" size={30} color={color} />,
         }}
       />
 

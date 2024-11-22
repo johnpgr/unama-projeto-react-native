@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import {
-  createWSClient,
-  httpBatchLink,
-  loggerLink,
-  splitLink,
-  wsLink,
-} from "@trpc/client"
+import { createWSClient, httpBatchLink, loggerLink, splitLink, wsLink } from "@trpc/client"
 import { createTRPCReact } from "@trpc/react-query"
 import superjson from "superjson"
 
@@ -80,9 +74,7 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
 
   return (
     <api.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        {props.children}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{props.children}</QueryClientProvider>
     </api.Provider>
   )
 }

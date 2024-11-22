@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type {
-  DrawerContentComponentProps,
-  DrawerNavigationOptions,
-} from "@react-navigation/drawer"
+import type { DrawerContentComponentProps, DrawerNavigationOptions } from "@react-navigation/drawer"
 import type { Href } from "expo-router"
 import React from "react"
 import { Image, Pressable, Text, View } from "react-native"
@@ -37,57 +34,43 @@ export function CustomDrawerContent(props: CustomDrawerContentProps) {
         <LogoutButton />
         <Image
           resizeMode="contain"
-          source={
-            props.user.imageUrl ? { uri: props.user.imageUrl } : DefaultAvatar
-          }
+          source={props.user.imageUrl ? { uri: props.user.imageUrl } : DefaultAvatar}
           className="h-16 w-16 rounded-full"
           fadeDuration={0}
         />
         <Text className="mt-4 text-xl font-medium">{props.user.fullName}</Text>
         <Text className="text-foreground/50">{props.user.email}</Text>
-        <Text className="mt-2 font-medium text-primary">
-          {props.user.totalPoints} pontos
-        </Text>
+        <Text className="mt-2 font-medium text-primary">{props.user.totalPoints} pontos</Text>
         <View className="mt-6 h-[1px] w-full bg-gray-300"></View>
       </View>
 
       <DrawerItem
         label="Resgatar recompensas"
-        icon={({ color, size }) => (
-          <SimpleLineIcons name="present" size={size} color={color} />
-        )}
+        icon={({ color, size }) => <SimpleLineIcons name="present" size={size} color={color} />}
         onPress={() => navigate("/points/reward")}
       />
 
       <DrawerItem
         label={"Configurações e privacidade"}
-        icon={({ color, size }) => (
-          <SimpleLineIcons name="settings" size={size} color={color} />
-        )}
+        icon={({ color, size }) => <SimpleLineIcons name="settings" size={size} color={color} />}
         onPress={() => navigate("/settings")}
       />
 
       <DrawerItem
         label="Ajuda e suporte"
-        icon={({ color, size }) => (
-          <SimpleLineIcons name="question" size={size} color={color} />
-        )}
+        icon={({ color, size }) => <SimpleLineIcons name="question" size={size} color={color} />}
         onPress={() => void 0}
       />
 
       <DrawerItem
         label="Permissões"
-        icon={({ color, size }) => (
-          <SimpleLineIcons name="info" size={size} color={color} />
-        )}
+        icon={({ color, size }) => <SimpleLineIcons name="info" size={size} color={color} />}
         onPress={() => void 0}
       />
 
       <DrawerItem
         label="Modo escuro"
-        icon={({ color, size }) => (
-          <Ionicons name="moon-outline" size={size} color={color} />
-        )}
+        icon={({ color, size }) => <Ionicons name="moon-outline" size={size} color={color} />}
         onPress={() => void 0}
       />
     </DrawerContentScrollView>
@@ -109,19 +92,14 @@ export function LogoutButton() {
 
   return (
     <>
-      <Pressable
-        className="absolute right-8 top-8"
-        onPress={() => setIsVisible(!isVisible)}
-      >
+      <Pressable className="absolute right-8 top-8" onPress={() => setIsVisible(!isVisible)}>
         <Text className="text-destructive">
           <SimpleLineIcons name="logout" size={20} />
         </Text>
       </Pressable>
       <Dialog.Container visible={isVisible}>
         <Dialog.Title>Sair</Dialog.Title>
-        <Dialog.Description>
-          Você tem certeza que deseja sair da sua conta?
-        </Dialog.Description>
+        <Dialog.Description>Você tem certeza que deseja sair da sua conta?</Dialog.Description>
         <Dialog.Button label="Cancelar" onPress={handleCancel} />
         <Dialog.Button label="Sair" onPress={handleLogout} />
       </Dialog.Container>

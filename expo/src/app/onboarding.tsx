@@ -20,8 +20,8 @@ export default function OnboardingScreen() {
           resizeMode="contain"
         />
         <Text className="text-center text-xl font-medium">
-          A cada ação, você ganha pontos que podem ser trocados por recompensas.
-          Mas o maior prêmio é contribuir para um planeta mais verde e saudável.
+          A cada ação, você ganha pontos que podem ser trocados por recompensas. Mas o maior prêmio
+          é contribuir para um planeta mais verde e saudável.
         </Text>
         <View className="flex flex-row gap-4">
           <Image
@@ -47,14 +47,8 @@ export default function OnboardingScreen() {
         />
         <Link href="/login">
           <View className="flex flex-row items-center justify-center rounded-[2rem] bg-primary p-4">
-            <Text className="text-lg font-medium text-white">
-              Vamos Começar
-            </Text>
-            <Ionicons
-              name="chevron-forward-outline"
-              size={24}
-              color={"white"}
-            />
+            <Text className="text-lg font-medium text-white">Vamos Começar</Text>
+            <Ionicons name="chevron-forward-outline" size={24} color={"white"} />
           </View>
         </Link>
       </View>

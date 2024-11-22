@@ -4,10 +4,7 @@ import { Link } from "expo-router"
 import { AntDesign } from "@expo/vector-icons"
 import { FlashList } from "@shopify/flash-list"
 
-import type {
-  P2PNotification,
-  UserRewardNotification,
-} from "~/state/notifications"
+import type { P2PNotification, UserRewardNotification } from "~/state/notifications"
 import type { RouterOutputs } from "~/utils/api"
 import { useAuth } from "~/hooks/auth"
 import { TransactionType } from "~/state/notifications"
@@ -34,9 +31,7 @@ import { formatDatePTBR } from "~/utils/date"
 //   to: transaction.to,
 // })
 
-type UserExtract = NonNullable<
-  RouterOutputs["transaction"]["getUserExtract"][string]
->[number]
+type UserExtract = NonNullable<RouterOutputs["transaction"]["getUserExtract"][string]>[number]
 
 const EXTRACT_TYPE: Record<UserExtract["type"], string> = {
   p2pFrom: "Transferência de pontos",
@@ -57,9 +52,7 @@ export default function PointsPage() {
     <View className="flex-1 bg-white">
       <View className="items-center bg-emerald-700 p-4">
         <Text className="text-lg text-white">Pontuação atual</Text>
-        <Text className="text-6xl font-bold text-white">
-          {user.totalPoints}
-        </Text>
+        <Text className="text-6xl font-bold text-white">{user.totalPoints}</Text>
       </View>
 
       <View className="my-4 flex-row justify-around">
@@ -93,16 +86,12 @@ export default function PointsPage() {
               if (!value) return null
               return (
                 <View>
-                  <Text className="p-2 pb-0 text-lg font-medium text-gray-700">
-                    {item}
-                  </Text>
+                  <Text className="p-2 pb-0 text-lg font-medium text-gray-700">{item}</Text>
                   <FlashList
                     estimatedItemSize={95}
                     data={value}
                     keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                      <ExtractItemView extract={item} />
-                    )}
+                    renderItem={({ item }) => <ExtractItemView extract={item} />}
                   />
                 </View>
               )
@@ -110,9 +99,7 @@ export default function PointsPage() {
           />
         ) : (
           <View className="p-4">
-            <Text className="text-center text-gray-100">
-              Nehuma notificação encontrada
-            </Text>
+            <Text className="text-center text-gray-100">Nehuma notificação encontrada</Text>
           </View>
         )}
       </View>
@@ -129,9 +116,7 @@ export function ExtractItemView({ extract }: { extract: UserExtract }) {
           <View>
             <Text>{extract.points} pontos</Text>
             <Text className="text-base">{EXTRACT_TYPE[extract.type]}</Text>
-            <Text className="text-gray-500">
-              Data: {formatDatePTBR(extract.createdAt)}
-            </Text>
+            <Text className="text-gray-500">Data: {formatDatePTBR(extract.createdAt)}</Text>
           </View>
           <TouchableOpacity>
             <Text className="text-emerald-700">→</Text>
@@ -144,9 +129,7 @@ export function ExtractItemView({ extract }: { extract: UserExtract }) {
           <View>
             <Text>Recompensa: {extract.rewardId}</Text>
             <Text className="text-base">{extract.type}</Text>
-            <Text className="text-gray-500">
-              Data: {formatDatePTBR(extract.createdAt)}
-            </Text>
+            <Text className="text-gray-500">Data: {formatDatePTBR(extract.createdAt)}</Text>
           </View>
           <TouchableOpacity>
             <Text className="text-emerald-700">→</Text>
@@ -159,9 +142,7 @@ export function ExtractItemView({ extract }: { extract: UserExtract }) {
           <View>
             <Text>Reciclagem: {extract.weight}kg</Text>
             <Text className="text-base">{extract.type}</Text>
-            <Text className="text-gray-500">
-              Data: {formatDatePTBR(extract.createdAt)}
-            </Text>
+            <Text className="text-gray-500">Data: {formatDatePTBR(extract.createdAt)}</Text>
           </View>
           <TouchableOpacity>
             <Text className="text-emerald-700">→</Text>

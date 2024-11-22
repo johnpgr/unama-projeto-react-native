@@ -97,9 +97,7 @@ export const transactionRouter = {
     )
     .mutation(async ({ ctx, input }) => {
       if (ctx.user.userType !== "cooperative") {
-        throw new Error(
-          "Apenas cooperativas podem enviar dinheiro para ganhar pontos.",
-        )
+        throw new Error("Apenas cooperativas podem enviar dinheiro para ganhar pontos.")
       }
       const pointsEarned = input.amount * 20
       await db
@@ -132,10 +130,7 @@ export const transactionRouter = {
 
     const formattedTransactions = transactions.map((transaction) => ({
       ...transaction,
-      points:
-        transaction.from === ctx.user.id
-          ? -transaction.points
-          : transaction.points,
+      points: transaction.from === ctx.user.id ? -transaction.points : transaction.points,
     }))
 
     return formattedTransactions
@@ -342,9 +337,7 @@ export const transactionRouter = {
       ),
     ]
 
-    const groupped = Object.groupBy(asList, (item) =>
-      item.createdAt.toLocaleDateString(),
-    )
+    const groupped = Object.groupBy(asList, (item) => item.createdAt.toLocaleDateString())
 
     return groupped
   }),

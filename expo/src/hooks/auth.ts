@@ -8,6 +8,7 @@ import type { LoginSchema, RegisterSchema } from "@projeto/api"
 
 import { AuthContext } from "~/state/auth-context"
 import { api } from "~/utils/api"
+import { getBaseUrl } from "~/utils/base-url"
 import { unreachable } from "~/utils/unreachable"
 import { deleteToken, getToken, setToken } from "../utils/session-store"
 
@@ -17,8 +18,7 @@ export type RegisterSchemaParams = z.infer<typeof RegisterSchema>
 
 export function useAuth() {
   const ctx =
-    React.useContext(AuthContext) ??
-    unreachable("useAuth must be used inside an AuthProvider")
+    React.useContext(AuthContext) ?? unreachable("useAuth must be used inside an AuthProvider")
 
   return ctx
 }
@@ -93,34 +93,23 @@ export function useOAuthSignIn() {
   }
 }
 
-async function handleOAuthSignin(
-  provider: OAuthAccountProvider,
-  redirect = Linking.createURL(""),
-) {
+async function handleOAuthSignin(provider: OAuthAccountProvider, redirect = Linking.createURL("")) {
   Browser.maybeCompleteAuthSession()
-  const signInUrl = new URL(
-    `${process.env.EXPO_PUBLIC_API_URL}/auth/${provider}?redirect=${redirect}`,
-  )
+  const signInUrl = new URL(`${getBaseUrl()}/oauth/${provider}?redirect=${redirect}`)
+  console.log("Signin url", signInUrl.toString())
   const storedSessionToken = getToken()
   if (storedSessionToken) {
     signInUrl.searchParams.append("sessionToken", storedSessionToken)
   }
-  const result = await Browser.openAuthSessionAsync(
-    signInUrl.toString(),
-    redirect,
-  )
+  const result = await Browser.openAuthSessionAsync(signInUrl.toString(), redirect)
   if (result.type !== "success") {
-    console.error(
-      "Oauth signin failed (Browser auth session returned result was not successfull)",
-    )
+    console.error("Oauth signin failed (Browser auth session returned result was not successfull)")
     return { success: false, token: null } as const
   }
   const url = Linking.parse(result.url)
   const sessionToken = url.queryParams?.token?.toString()
   if (!sessionToken) {
-    console.error(
-      "Oauth signin failed (Session token not found in callback url)",
-    )
+    console.error("Oauth signin failed (Session token not found in callback url)")
     return { success: false, token: null } as const
   }
 

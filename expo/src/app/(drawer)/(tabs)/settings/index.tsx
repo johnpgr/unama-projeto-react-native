@@ -163,17 +163,13 @@ export function LogoutItem() {
         <SimpleLineIcons name="logout" size={24} />,
         <View className="flex flex-1 flex-col">
           <Text className="text-lg font-medium">Sair</Text>
-          <Text className="text-foreground/70">
-            Desconecte-se do aplicativo.
-          </Text>
+          <Text className="text-foreground/70">Desconecte-se do aplicativo.</Text>
         </View>
       </Pressable>
 
       <Dialog.Container visible={isVisible}>
         <Dialog.Title>Sair</Dialog.Title>
-        <Dialog.Description>
-          Você tem certeza que deseja sair da sua conta?
-        </Dialog.Description>
+        <Dialog.Description>Você tem certeza que deseja sair da sua conta?</Dialog.Description>
         <Dialog.Button label="Cancelar" onPress={handleCancel} />
         <Dialog.Button label="Sair" onPress={handleLogout} />
       </Dialog.Container>

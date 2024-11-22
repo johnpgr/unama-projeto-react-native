@@ -1,6 +1,7 @@
 import type { RedisClientType } from "redis"
 import { createClient } from "redis"
 
+import type { Notification } from "../drizzle/schema.ts"
 import { env } from "../config/env.ts"
 
 export interface PubSubEvents {
@@ -10,6 +11,8 @@ export interface PubSubEvents {
     receiverId: string
     pointsTransferred: number
   }) => void
+
+  userNotificationCreated: (args: Notification) => void
 }
 
 export class RedisService {
@@ -71,6 +74,7 @@ export class RedisService {
     await this.ensureConnection()
     await this.subscriberClient.subscribe(channel, (message) => {
       const data = JSON.parse(message) as Parameters<PubSubEvents[K]>[0]
+      //@ts-expect-error this is fucked up, typescript
       callback(data)
     })
   }
@@ -78,6 +82,36 @@ export class RedisService {
   public async unsubscribe(channel: keyof PubSubEvents): Promise<void> {
     await this.ensureConnection()
     await this.subscriberClient.unsubscribe(channel)
+  }
+
+  async cache<T>(
+    key: string | string[],
+    callback: () => Promise<T>,
+    expirationInSeconds?: number,
+  ): Promise<T> {
+    await this.ensureConnection()
+    const cacheKey = Array.isArray(key) ? key.join(":") : key
+
+    const cached = await this.mainClient.get(cacheKey)
+    if (cached) {
+      return JSON.parse(cached) as T
+    }
+
+    const result = await callback()
+    if (expirationInSeconds) {
+      await this.mainClient.setEx(cacheKey, expirationInSeconds, JSON.stringify(result))
+    } else {
+      await this.mainClient.set(cacheKey, JSON.stringify(result))
+    }
+
+    return result
+  }
+
+  async cacheDel(key: string | string[]): Promise<void> {
+    await this.ensureConnection()
+
+    const cacheKey = Array.isArray(key) ? key.join(":") : key
+    await this.mainClient.del(cacheKey)
   }
 }
 

@@ -84,11 +84,7 @@ export const authRouter = {
       })
     }
 
-    const validPassword = await verify(
-      existingUser.hashedPassword,
-      input.password,
-      ARGON2_OPTS,
-    )
+    const validPassword = await verify(existingUser.hashedPassword, input.password, ARGON2_OPTS)
 
     if (!validPassword) {
       throw new TRPCError({

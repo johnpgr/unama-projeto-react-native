@@ -23,12 +23,9 @@ type NonNullableObj<T> = {
  *
  * @see https://trpc.io/docs/server/context
  */
-export async function createContext(
-  data: CreateHTTPContextOptions | CreateWSSContextFnOptions,
-) {
+export async function createContext(data: CreateHTTPContextOptions | CreateWSSContextFnOptions) {
   const bearerToken =
-    data.req.headers.authorization?.split(" ")[1] ??
-    data.info.connectionParams?.token
+    data.req.headers.authorization?.split(" ")[1] ?? data.info.connectionParams?.token
 
   if (!bearerToken) {
     return { session: null, user: null }
@@ -109,16 +106,14 @@ export const publicProcedure = t.procedure.use(timingMiddleware)
  *
  * @see https://trpc.io/docs/procedures
  */
-export const protectedProcedure = t.procedure
-  .use(timingMiddleware)
-  .use(({ ctx, next }) => {
-    if (!ctx.session) {
-      throw new TRPCError({ code: "UNAUTHORIZED" })
-    }
-    return next({
-      ctx: ctx as NonNullableObj<Context>,
-    })
+export const protectedProcedure = t.procedure.use(timingMiddleware).use(({ ctx, next }) => {
+  if (!ctx.session) {
+    throw new TRPCError({ code: "UNAUTHORIZED" })
+  }
+  return next({
+    ctx: ctx as NonNullableObj<Context>,
   })
+})
 
 /**
  * Protected procedure that ensures the user is authenticated and has admin privileges.
@@ -126,13 +121,11 @@ export const protectedProcedure = t.procedure
  *
  * @throws {TRPCError} With code "UNAUTHORIZED" if the user is not logged in or is not an admin
  */
-export const adminProcedure = t.procedure
-  .use(timingMiddleware)
-  .use(({ ctx, next }) => {
-    if (!ctx.session || ctx.user.userType !== "admin") {
-      throw new TRPCError({ code: "UNAUTHORIZED" })
-    }
-    return next({
-      ctx: ctx as NonNullableObj<Context>,
-    })
+export const adminProcedure = t.procedure.use(timingMiddleware).use(({ ctx, next }) => {
+  if (!ctx.session || ctx.user.userType !== "admin") {
+    throw new TRPCError({ code: "UNAUTHORIZED" })
+  }
+  return next({
+    ctx: ctx as NonNullableObj<Context>,
   })
+})

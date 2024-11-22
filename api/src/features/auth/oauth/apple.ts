@@ -3,12 +3,12 @@ import jwt from "@tsndr/cloudflare-worker-jwt"
 import { Apple } from "arctic"
 import { eq } from "drizzle-orm"
 
+import type { CreatedSession } from "./types.ts"
 import { env } from "../../../config/env.ts"
 import { db } from "../../../drizzle/index.ts"
 import { OAuthAccount, User } from "../../user/user.schema.ts"
 import { CreateSessionError, InvalidSessionError } from "../auth.error.ts"
 import { sessionService } from "../auth.session.ts"
-import type { CreatedSession } from "./types.ts"
 
 export const appleAuth = new Apple(
   {
@@ -17,7 +17,7 @@ export const appleAuth = new Apple(
     keyId: env.AUTH_APPLE_KEY_ID ?? "NOOP_NO_APPLE_KEY_ID",
     certificate: env.AUTH_APPLE_PRIVATE_KEY ?? "NOOP_NO_APPLE_PRIVATE_KEY",
   },
-  `${process.env.API_URL}/auth/apple/callback`,
+  `${env.APP_URL}/auth/apple/callback`,
 )
 
 export async function getAppleAuthorizationUrl(state: string): Promise<URL> {
@@ -71,8 +71,7 @@ export async function createAppleSession(params: {
     !payload ||
     payload.iss !== "https://appleid.apple.com" ||
     !(
-      payload.aud === process.env.APPLE_CLIENT_ID ||
-      payload.aud === process.env.APPLE_WEB_CLIENT_ID
+      payload.aud === process.env.APPLE_CLIENT_ID || payload.aud === process.env.APPLE_WEB_CLIENT_ID
     ) ||
     !payload.exp ||
     payload.exp < Date.now() / 1000
@@ -81,16 +80,13 @@ export async function createAppleSession(params: {
   }
 
   const existingAccount = await db.query.OAuthAccount.findFirst({
-    where: (account, { eq }) =>
-      eq(account.providerUserId, payload.sub.toString()),
+    where: (account, { eq }) => eq(account.providerUserId, payload.sub.toString()),
   })
 
   let existingUser: User | null = null
 
   if (params.sessionToken) {
-    const sessionUser = await sessionService.validateSessionToken(
-      params.sessionToken,
-    )
+    const sessionUser = await sessionService.validateSessionToken(params.sessionToken)
     if (sessionUser instanceof InvalidSessionError) {
       const response = await db.query.User.findFirst({
         where: (_user) => eq(_user.email, payload.email),
@@ -103,11 +99,7 @@ export async function createAppleSession(params: {
     }
   }
 
-  if (
-    existingUser?.emailVerified &&
-    payload.email_verified &&
-    !existingAccount
-  ) {
+  if (existingUser?.emailVerified && payload.email_verified && !existingAccount) {
     await db.insert(OAuthAccount).values({
       providerUserId: payload.sub.toString(),
       provider: "apple",
@@ -130,8 +122,7 @@ export async function createAppleSession(params: {
       })
       .returning()
 
-    if (!insertedUser)
-      return new CreateSessionError("Failed to insert new user to database")
+    if (!insertedUser) return new CreateSessionError("Failed to insert new user to database")
 
     await db.insert(OAuthAccount).values({
       providerUserId: payload.sub,

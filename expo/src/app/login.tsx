@@ -73,9 +73,7 @@ export default function SignUpScreen() {
                 onBlur={field.onBlur}
               />
               {form.formState.errors.email ? (
-                <Text className="text-destructive">
-                  {form.formState.errors.email.message}
-                </Text>
+                <Text className="text-destructive">{form.formState.errors.email.message}</Text>
               ) : null}
             </View>
           )}
@@ -96,9 +94,7 @@ export default function SignUpScreen() {
                 onBlur={field.onBlur}
               />
               {form.formState.errors.password ? (
-                <Text className="text-destructive">
-                  {form.formState.errors.password.message}
-                </Text>
+                <Text className="text-destructive">{form.formState.errors.password.message}</Text>
               ) : null}
             </View>
           )}
@@ -113,9 +109,7 @@ export default function SignUpScreen() {
             />
             <Text>Lembrar de mim?</Text>
           </View>
-          <Text className="font-medium text-green-900">
-            Esqueceu sua senha?
-          </Text>
+          <Text className="font-medium text-green-900">Esqueceu sua senha?</Text>
         </View>
 
         <Pressable
@@ -124,20 +118,12 @@ export default function SignUpScreen() {
           disabled={isPending}
         >
           {isPending ? (
-            <ActivityIndicator
-              className="absolute left-[35%]"
-              size="small"
-              color="#FFFFFF"
-            />
+            <ActivityIndicator className="absolute left-[35%]" size="small" color="#FFFFFF" />
           ) : null}
           <Text className="text-xl font-bold text-white">Entrar</Text>
         </Pressable>
 
-        {error ? (
-          <Text className="mt-4 text-center text-destructive">
-            {error.message}
-          </Text>
-        ) : null}
+        {error ? <Text className="mt-4 text-center text-destructive">{error.message}</Text> : null}
 
         <SigninOAuthButtons />
         <View className="flex flex-row items-center justify-center gap-2">

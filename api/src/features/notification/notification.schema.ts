@@ -1,12 +1,5 @@
 import { relations } from "drizzle-orm"
-import {
-  index,
-  jsonb,
-  pgTable,
-  text,
-  timestamp,
-  varchar,
-} from "drizzle-orm/pg-core"
+import { index, jsonb, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core"
 import { nanoid } from "nanoid"
 
 import { User } from "../user/user.schema.ts"
@@ -25,10 +18,8 @@ export const Notification = pgTable(
     type: text({ enum: ["info", "warning", "error"] })
       .notNull()
       .default("info"),
-    metadata: jsonb(),
-    createdAt: timestamp({ mode: "date", precision: 3, withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    metadata: jsonb().$type<object>(),
+    createdAt: timestamp({ mode: "date", precision: 3, withTimezone: true }).defaultNow().notNull(),
     readAt: timestamp({ mode: "date", precision: 3, withTimezone: true }),
   },
   (table) => [index().on(table.userId)],

@@ -58,9 +58,7 @@ export default function SignUpScreen() {
         />
       )}
       <View className="mt-auto max-h-[630px] rounded-t-[3rem] bg-white p-8">
-        <Text className="mt-4 text-center text-4xl font-bold text-green-900">
-          Vamos começar
-        </Text>
+        <Text className="mt-4 text-center text-4xl font-bold text-green-900">Vamos começar</Text>
 
         <Controller
           name="fullName"
@@ -76,9 +74,7 @@ export default function SignUpScreen() {
                 onBlur={field.onBlur}
               />
               {form.formState.errors.fullName ? (
-                <Text className="text-destructive">
-                  {form.formState.errors.fullName.message}
-                </Text>
+                <Text className="text-destructive">{form.formState.errors.fullName.message}</Text>
               ) : null}
             </View>
           )}
@@ -98,9 +94,7 @@ export default function SignUpScreen() {
                 onBlur={field.onBlur}
               />
               {form.formState.errors.email ? (
-                <Text className="text-destructive">
-                  {form.formState.errors.email.message}
-                </Text>
+                <Text className="text-destructive">{form.formState.errors.email.message}</Text>
               ) : null}
             </View>
           )}
@@ -121,17 +115,13 @@ export default function SignUpScreen() {
                 onBlur={field.onBlur}
               />
               {form.formState.errors.password ? (
-                <Text className="text-destructive">
-                  {form.formState.errors.password.message}
-                </Text>
+                <Text className="text-destructive">{form.formState.errors.password.message}</Text>
               ) : null}
             </View>
           )}
         />
 
-        {error ? (
-          <Text className="mt-4 text-center text-red-500">{error.message}</Text>
-        ) : null}
+        {error ? <Text className="mt-4 text-center text-red-500">{error.message}</Text> : null}
 
         <View className="mt-2 flex flex-row items-center gap-2 py-4">
           <Checkbox
@@ -151,11 +141,7 @@ export default function SignUpScreen() {
           disabled={isPending}
         >
           {isPending ? (
-            <ActivityIndicator
-              className="absolute left-[35%]"
-              size="small"
-              color="#FFFFFF"
-            />
+            <ActivityIndicator className="absolute left-[35%]" size="small" color="#FFFFFF" />
           ) : null}
           <Text className="text-xl font-bold text-white">Criar conta</Text>
         </Pressable>

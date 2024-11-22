@@ -1,11 +1,5 @@
 import React from "react"
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native"
+import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native"
 import { useLocalSearchParams } from "expo-router"
 import { Controller, useForm } from "react-hook-form"
 
@@ -89,11 +83,7 @@ export default function SendPointsScreen() {
         disabled={isPending || !isAgreed}
       >
         {isPending ? (
-          <ActivityIndicator
-            className="absolute left-[35%]"
-            size="small"
-            color="#FFFFFF"
-          />
+          <ActivityIndicator className="absolute left-[35%]" size="small" color="#FFFFFF" />
         ) : (
           <Text className="text-xl font-bold text-white">Enviar</Text>
         )}

@@ -28,15 +28,8 @@ export default function CampaignScreen() {
     )
 
   return (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
-      className="h-full border p-4"
-    >
-      <Image
-        source={campaign.cover}
-        className="h-96 w-96"
-        resizeMode="contain"
-      />
+    <ScrollView contentInsetAdjustmentBehavior="automatic" className="h-full border p-4">
+      <Image source={campaign.cover} className="h-96 w-96" resizeMode="contain" />
       <Markdown
         style={{
           heading2: { marginBottom: 24 },

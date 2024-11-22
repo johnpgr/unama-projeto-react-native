@@ -32,21 +32,14 @@ const ICON_CONFIG = {
   color: "#4B5563",
 } as const
 
-function PopupHeader(props: {
-  type: PopupProps["type"]
-  onClose: PopupProps["onClose"]
-}) {
+function PopupHeader(props: { type: PopupProps["type"]; onClose: PopupProps["onClose"] }) {
   return (
     <View className="mb-3 flex-row items-center justify-between">
       <Text className="text-lg font-semibold">
         {props.type === POPUP_TYPES.SUCCESS ? "Sucesso!" : "Erro"}
       </Text>
       <TouchableOpacity onPress={props.onClose}>
-        <Ionicons
-          name="close"
-          size={ICON_CONFIG.size}
-          color={ICON_CONFIG.color}
-        />
+        <Ionicons name="close" size={ICON_CONFIG.size} color={ICON_CONFIG.color} />
       </TouchableOpacity>
     </View>
   )
@@ -54,16 +47,8 @@ function PopupHeader(props: {
 
 function Popup(props: PopupProps) {
   return (
-    <Modal
-      transparent
-      visible={props.visible}
-      animationType="fade"
-      onRequestClose={props.onClose}
-    >
-      <Pressable
-        className="flex-1 items-center justify-center bg-black/50"
-        onPress={props.onClose}
-      >
+    <Modal transparent visible={props.visible} animationType="fade" onRequestClose={props.onClose}>
+      <Pressable className="flex-1 items-center justify-center bg-black/50" onPress={props.onClose}>
         <Pressable
           className="w-4/5 rounded-lg bg-white p-4 shadow-lg"
           onPress={(e) => e.stopPropagation()}
@@ -76,20 +61,13 @@ function Popup(props: PopupProps) {
   )
 }
 
-function RewardCard(props: {
-  reward: schema.Reward
-  onRedeem: (id: string) => void
-}) {
+function RewardCard(props: { reward: schema.Reward; onRedeem: (id: string) => void }) {
   return (
     <View className="w-1/2 p-2">
       <View className="items-center rounded-lg bg-gray-100 p-4">
         <Ionicons name="car-outline" size={50} color={ICON_CONFIG.color} />
-        <Text className="mt-2 text-lg font-semibold">
-          {props.reward.reward}
-        </Text>
-        <Text className="mb-2 text-sm text-gray-600">
-          Pontos: {props.reward.points}
-        </Text>
+        <Text className="mt-2 text-lg font-semibold">{props.reward.reward}</Text>
+        <Text className="mb-2 text-sm text-gray-600">Pontos: {props.reward.points}</Text>
         <TouchableOpacity
           className="rounded-md bg-blue-500 px-4 py-2"
           onPress={() => props.onRedeem(props.reward.id)}
@@ -124,33 +102,32 @@ export default function RewardsScreen() {
   const { data: rewards, isLoading: isLoadingRewards } =
     api.transaction.getAvailableRewards.useQuery()
 
-  const { mutate: exchangePoints } =
-    api.transaction.exchangePointsForReward.useMutation({
-      onMutate: () => {
-        setIsExchanging(true)
-        setPopupState({
-          isVisible: false,
-          message: "",
-          type: POPUP_TYPES.SUCCESS,
-        })
-      },
-      onSuccess: (data) => {
-        setIsExchanging(false)
-        setPopupState({
-          isVisible: true,
-          message: `Sucesso! Você resgatou ${data.rewardName}! Pontos restantes: ${data.remainingPoints}`,
-          type: POPUP_TYPES.SUCCESS,
-        })
-      },
-      onError: (error) => {
-        setIsExchanging(false)
-        setPopupState({
-          isVisible: true,
-          message: error.message,
-          type: POPUP_TYPES.ERROR,
-        })
-      },
-    })
+  const { mutate: exchangePoints } = api.transaction.exchangePointsForReward.useMutation({
+    onMutate: () => {
+      setIsExchanging(true)
+      setPopupState({
+        isVisible: false,
+        message: "",
+        type: POPUP_TYPES.SUCCESS,
+      })
+    },
+    onSuccess: (data) => {
+      setIsExchanging(false)
+      setPopupState({
+        isVisible: true,
+        message: `Sucesso! Você resgatou ${data.rewardName}! Pontos restantes: ${data.remainingPoints}`,
+        type: POPUP_TYPES.SUCCESS,
+      })
+    },
+    onError: (error) => {
+      setIsExchanging(false)
+      setPopupState({
+        isVisible: true,
+        message: error.message,
+        type: POPUP_TYPES.ERROR,
+      })
+    },
+  })
 
   function handleRedeemReward(rewardId: string) {
     Alert.alert("Confirmar Resgate", "Deseja resgatar esta recompensa?", [

@@ -22,9 +22,7 @@ export default function ReceivedPointsScreen() {
     <View className="flex flex-1 flex-col items-center gap-4 bg-background px-4 pt-4">
       <View className="flex flex-col items-center">
         <Image source={require("../../../../../assets/checkmark.png")} />
-        <Text className="text-lg font-medium">
-          Parabéns! Você recebeu {points} pontos
-        </Text>
+        <Text className="text-lg font-medium">Parabéns! Você recebeu {points} pontos</Text>
       </View>
       <View className="h-[1px] w-full bg-border"></View>
       <View className="flex flex-row items-center gap-4">

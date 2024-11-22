@@ -25,9 +25,7 @@ export class SessionService {
     return crypto.randomUUID()
   }
 
-  async createSession(
-    userId: string,
-  ): Promise<{ session: Session; token: string }> {
+  async createSession(userId: string): Promise<{ session: Session; token: string }> {
     const token = this.generateSessionToken()
     const sessionId = encodeHexLowerCase(sha256(this.textEncoder.encode(token)))
     const session: Session = {

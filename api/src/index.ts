@@ -13,11 +13,12 @@ import { handleOAuthRequest } from "./features/auth/oauth/oauth.routes.ts"
 import { transactionRouter } from "./features/transaction/transaction.routes.ts"
 import { createContext, createTRPCRouter } from "./trpc/index.ts"
 
-export type AppRouter = typeof appRouter
 export const appRouter = createTRPCRouter({
   auth: authRouter,
   transaction: transactionRouter,
 })
+
+export type AppRouter = typeof appRouter
 
 const handleTRPCRequest = createHTTPHandler({
   middleware: cors(),
@@ -42,13 +43,13 @@ const httpServer = http.createServer((req, res) => {
     handleOAuthRequest(url, request, res).catch((e) => {
       res.writeHead(500, { "Content-Type": "application/json" })
       res.end(JSON.stringify({ error: "Internal Server Error" }))
-      console.error("OAuth Request Error:", e)
+      console.error("OAuth Request Error:", (e as Error).message)
     })
   } else {
     handleTRPCRequest(req, res).catch((e) => {
       res.writeHead(500, { "Content-Type": "application/json" })
       res.end(JSON.stringify({ error: "Internal Server Error" }))
-      console.error("TRPC Request Error:", e)
+      console.error("TRPC Request Error:", (e as Error).message)
     })
   }
 })
@@ -56,7 +57,7 @@ const httpServer = http.createServer((req, res) => {
 const wss = new ws.WebSocketServer({ server: httpServer })
 
 applyWSSHandler<AppRouter>({
-  onError: (e) => console.error("WebSocket error", e),
+  onError: (e) => console.error("WebSocket error", e.error.message),
   wss,
   router: appRouter,
   createContext,

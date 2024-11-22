@@ -1,14 +1,6 @@
 import { relations, sql } from "drizzle-orm"
 import { eq, gt, not } from "drizzle-orm/expressions"
-import {
-  check,
-  index,
-  integer,
-  pgTable,
-  text,
-  timestamp,
-  varchar,
-} from "drizzle-orm/pg-core"
+import { check, index, integer, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core"
 import { nanoid } from "nanoid"
 
 import { User } from "../user/user.schema.ts"
@@ -40,15 +32,12 @@ export const RecyclingTransaction = pgTable(
 
 export type RecyclingTransaction = typeof RecyclingTransaction.$inferSelect
 
-export const RecyclingTransactionRelations = relations(
-  RecyclingTransaction,
-  ({ one }) => ({
-    user: one(User, {
-      references: [User.id],
-      fields: [RecyclingTransaction.userId],
-    }),
+export const RecyclingTransactionRelations = relations(RecyclingTransaction, ({ one }) => ({
+  user: one(User, {
+    references: [User.id],
+    fields: [RecyclingTransaction.userId],
   }),
-)
+}))
 
 export const P2PTransaction = pgTable(
   "p2p_transaction",
@@ -63,9 +52,7 @@ export const P2PTransaction = pgTable(
       .references(() => User.id)
       .notNull(),
     points: integer().notNull(),
-    createdAt: timestamp({ withTimezone: true, precision: 3, mode: "date" })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp({ withTimezone: true, precision: 3, mode: "date" }).notNull().defaultNow(),
   },
   (table) => [
     index().on(table.from),

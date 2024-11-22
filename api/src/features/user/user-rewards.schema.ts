@@ -20,9 +20,7 @@ export const UserRewards = pgTable(
     userId: varchar()
       .notNull()
       .references(() => User.id),
-    createdAt: timestamp({ mode: "date", withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp({ mode: "date", withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index().on(table.userId), index().on(table.rewardId)],
 )

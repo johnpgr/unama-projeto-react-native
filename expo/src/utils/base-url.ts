@@ -5,7 +5,6 @@ import Constants from "expo-constants"
  * setting the baseUrl to your production API URL.
  */
 export const getBaseUrl = () => {
-  console.log("API_URL:", process.env.EXPO_PUBLIC_API_URL)
   if (process.env.EXPO_PUBLIC_API_URL) {
     return process.env.EXPO_PUBLIC_API_URL
   }

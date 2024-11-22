@@ -14,31 +14,22 @@ export default function Index() {
         <View className="flex flex-row p-4">
           <Link href={"/campaigns/1"} asChild>
             <Pressable>
-              <Image
-                source={CampaignCardImage}
-                className="h-80 w-80"
-                resizeMode="contain"
-              />
+              <Image source={CampaignCardImage} className="h-80 w-80" resizeMode="contain" />
             </Pressable>
           </Link>
-          <Image
-            source={CampaignCardImage2}
-            className="-ml-20 h-80 w-80"
-            resizeMode="contain"
-          />
+          <Image source={CampaignCardImage2} className="-ml-20 h-80 w-80" resizeMode="contain" />
         </View>
         <Text className="text-medium text-lg text-primary">Sobre a COP30:</Text>
         <Text className="text-center text-lg">
-          A COP 30 é a Conferência das Nações Unidas sobre Mudanças Climáticas,
-          que será realizada em Belém do Pará, em novembro de 2025.
+          A COP 30 é a Conferência das Nações Unidas sobre Mudanças Climáticas, que será realizada
+          em Belém do Pará, em novembro de 2025.
         </Text>
         <View className="h-[1px] w-full bg-border"></View>
         <View className="flex flex-row gap-2 p-2">
           <Text className="max-w-64 text-lg">
-            A COP, que significa "Conferência das Partes", reúne representantes
-            de 198 países, ativistas, defensores do meio ambiente, empresas e a
-            sociedade civil para discutir e acelerar ações em prol de um planeta
-            mais sustentável
+            A COP, que significa "Conferência das Partes", reúne representantes de 198 países,
+            ativistas, defensores do meio ambiente, empresas e a sociedade civil para discutir e
+            acelerar ações em prol de um planeta mais sustentável
           </Text>
           <View className="h-48 w-40 rounded-2xl bg-zinc-200"></View>
         </View>

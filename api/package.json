@@ -30,6 +30,7 @@
     "@tsndr/cloudflare-worker-jwt": "^2.5.3",
     "arctic": "^1.9.2",
     "bufferutil": "^4.0.8",
+    "cookie": "^1.0.2",
     "cors": "^2.8.5",
     "drizzle-orm": "^0.36.2",
     "nanoid": "^5.0.8",

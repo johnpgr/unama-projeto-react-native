@@ -1,20 +1,16 @@
 import { GitHub } from "arctic"
 import { eq } from "drizzle-orm"
 
+import type { CreatedSession } from "./types.ts"
 import { env } from "../../../config/env.ts"
 import { db } from "../../../drizzle/index.ts"
 import { OAuthAccount, User } from "../../user/user.schema.ts"
 import { CreateSessionError, InvalidSessionError } from "../auth.error.ts"
 import { sessionService } from "../auth.session.ts"
-import type { CreatedSession } from "./types.ts"
 
-export const githubAuth = new GitHub(
-  env.AUTH_GITHUB_ID,
-  env.AUTH_GITHUB_SECRET,
-  {
-    redirectURI: `${env.APP_URL}/auth/github/callback`,
-  },
-)
+export const githubAuth = new GitHub(env.AUTH_GITHUB_ID, env.AUTH_GITHUB_SECRET, {
+  redirectURI: `${env.APP_URL}/oauth/github/callback`,
+})
 
 export async function getGithubAuthorizationUrl(state: string): Promise<URL> {
   return await githubAuth.createAuthorizationURL(state, {
@@ -28,11 +24,13 @@ interface GithubUserResponse {
   name: string
   avatar_url: string
 }
+
 interface GithubEmailResponse {
   email: string
   primary: boolean
   verified: boolean
 }
+
 export async function createGithubSession(
   idToken: string,
   sessionToken?: string,
@@ -58,12 +56,10 @@ export async function createGithubSession(
   ).json()) as GithubEmailResponse[]
 
   const primaryEmail = githubEmailResponse.find((email) => email.primary)
-  if (!primaryEmail)
-    return new CreateSessionError("Github account with no primary email")
+  if (!primaryEmail) return new CreateSessionError("Github account with no primary email")
 
   const existingAccount = await db.query.OAuthAccount.findFirst({
-    where: (account) =>
-      eq(account.providerUserId, githubUserResponse.id.toString()),
+    where: (account) => eq(account.providerUserId, githubUserResponse.id.toString()),
   })
 
   let existingUser: User | null = null
@@ -82,11 +78,7 @@ export async function createGithubSession(
     }
   }
 
-  if (
-    existingUser?.emailVerified &&
-    primaryEmail.verified &&
-    !existingAccount
-  ) {
+  if (existingUser?.emailVerified && primaryEmail.verified && !existingAccount) {
     await db.insert(OAuthAccount).values({
       providerUserId: githubUserResponse.id.toString(),
       provider: "github",

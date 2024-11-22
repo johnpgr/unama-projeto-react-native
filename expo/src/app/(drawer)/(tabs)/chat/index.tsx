@@ -53,11 +53,7 @@ export default function ChatbotScreen() {
   const [notifications, setNotifications] = useAtom(notificationsAtom)
   const [messages, setMessages] = React.useState<Message[]>(initialMessages)
   const [inputText, setInputText] = React.useState("")
-  const {
-    mutateAsync: getResponse,
-    data,
-    isPending,
-  } = api.transaction.getLLMResponse.useMutation()
+  const { mutateAsync: getResponse, data, isPending } = api.transaction.getLLMResponse.useMutation()
   const router = useRouter()
 
   if (!user) return null
@@ -96,17 +92,13 @@ export default function ChatbotScreen() {
 
     switch (option) {
       case UserMessageChoice.REQUEST_BALANCE: {
-        const botMessage = new BotMessage(
-          `Seu saldo é de ${user!.totalPoints} pontos.`,
-        )
+        const botMessage = new BotMessage(`Seu saldo é de ${user!.totalPoints} pontos.`)
         setMessages((prevMessages) => [botMessage, ...prevMessages])
         break
       }
       case UserMessageChoice.LIST_TRANSACTIONS: {
         if (notifications.length <= 0) {
-          const botMessage = new BotMessage(
-            "Você não possui nenhuma transação salva em sua conta",
-          )
+          const botMessage = new BotMessage("Você não possui nenhuma transação salva em sua conta")
           setMessages((prevMessages) => [botMessage, ...prevMessages])
           break
         }
@@ -149,9 +141,7 @@ export default function ChatbotScreen() {
           "self-start bg-emerald-700": item instanceof BotMessage,
         })}
       >
-        <Text
-          className={item instanceof UserMessage ? "text-black" : "text-white"}
-        >
+        <Text className={item instanceof UserMessage ? "text-black" : "text-white"}>
           {item.text}
         </Text>
         {item instanceof UserMessage && item.options ? (

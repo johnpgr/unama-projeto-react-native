@@ -1,23 +1,20 @@
 import { Google } from "arctic"
 import { eq } from "drizzle-orm"
 
+import type { CreatedSession } from "./types.ts"
 import { env } from "../../../config/env.ts"
 import { db } from "../../../drizzle/index.ts"
 import { OAuthAccount, User } from "../../user/user.schema.ts"
 import { CreateSessionError, InvalidSessionError } from "../auth.error.ts"
 import { sessionService } from "../auth.session.ts"
-import type { CreatedSession } from "./types.ts"
 
 export const googleAuth = new Google(
-  env.AUTH_GOOGLE_ID ?? "NOOP_NO_GOOGLE_ID",
-  env.AUTH_GOOGLE_SECRET ?? "NOOP_NO_GOOGLE_SECRET",
+  env.AUTH_GOOGLE_ID,
+  env.AUTH_GOOGLE_SECRET,
   `${env.APP_URL}/auth/google/callback`,
 )
 
-export async function getGoogleAuthorizationUrl(
-  state: string,
-  codeVerifier: string,
-): Promise<URL> {
+export async function getGoogleAuthorizationUrl(state: string, codeVerifier: string): Promise<URL> {
   return await googleAuth.createAuthorizationURL(state, codeVerifier, {
     scopes: ["profile", "email"],
   })
@@ -36,10 +33,7 @@ export async function createGoogleSession(
   codeVerifier: string,
   sessionToken?: string,
 ): Promise<CreateSessionError | CreatedSession> {
-  const tokens = await googleAuth.validateAuthorizationCode(
-    idToken,
-    codeVerifier,
-  )
+  const tokens = await googleAuth.validateAuthorizationCode(idToken, codeVerifier)
   const user = (await (
     await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
       headers: {
@@ -88,8 +82,7 @@ export async function createGoogleSession(
       })
       .returning()
 
-    if (!insertedUser)
-      return new CreateSessionError("Failed to insert new user into database")
+    if (!insertedUser) return new CreateSessionError("Failed to insert new user into database")
 
     await db.insert(OAuthAccount).values({
       providerUserId: user.sub,
