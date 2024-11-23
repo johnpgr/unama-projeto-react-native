@@ -4,6 +4,7 @@ import cookie from "cookie"
 import { z } from "zod"
 
 import type { CreatedSession } from "./types.ts"
+import { env } from "../../../config/env.ts"
 import { CreateSessionError, InvalidSessionError } from "../auth.error.ts"
 import { sessionService } from "../auth.session.ts"
 import { createAppleSession, getAppleAuthorizationUrl } from "./apple.ts"
@@ -20,22 +21,21 @@ const AppleUserObj = z.object({
 
 const OAuthLoginBody = z.object({
   idToken: z.string(),
-  sessionToken: z.string(),
   user: z
     .object({
       fullName: z.string(),
     })
     .optional(),
+  sessionToken: z.string().optional(),
 })
 
 type OAuthProvider = "github" | "google" | "apple"
 
 const COOKIE_OPTS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
+  maxAge: 60 * 30,
   path: "/",
-  maxAge: 60 * 60 * 24 * 7,
+  secure: process.env.NODE_ENV === "production",
 } satisfies cookie.SerializeOptions
 
 function setCookie(
@@ -44,141 +44,172 @@ function setCookie(
   value: string,
   opts?: cookie.SerializeOptions,
 ) {
-  res.setHeader("Set-Cookie", cookie.serialize(name, value, { ...COOKIE_OPTS, ...opts }))
+  res.appendHeader("Set-Cookie", cookie.serialize(name, value, { ...COOKIE_OPTS, ...opts }))
 }
 
-export const handleOAuthRequest = async (url: URL, req: Request, res: http.ServerResponse) => {
-  const cookies = cookie.parse(req.headers.get("cookie") ?? "")
+function redirect(res: http.ServerResponse, path: string | URL) {
+  res.writeHead(302, { Location: path instanceof URL ? path.toString() : path }).end()
+}
 
+function json<T>(
+  res: http.ServerResponse,
+  data: T,
+  opts?: { status?: number; headers?: http.OutgoingHttpHeaders },
+) {
+  res.writeHead(opts?.status ?? 200, {
+    ...(opts?.headers ?? {}),
+    "Content-Type": "application/json",
+  })
+  res.end(JSON.stringify(data, null, 2))
+}
+
+export async function handleOAuthRequest(url: URL, req: Request, res: http.ServerResponse) {
   // OAuth Login Routes - GET /:provider
   if (req.method === "GET" && /^\/oauth\/(github|google|apple)$/.test(url.pathname)) {
     const provider = url.pathname.split("/")[2] as OAuthProvider
-    const redirect = url.searchParams.get("redirect") ?? "http://localhost:8081"
+    const redirectUrl = url.searchParams.get("redirect") ?? "http://localhost:8081"
     const sessionToken = url.searchParams.get("sessionToken")
-    const state = generateState()
 
-    setCookie(res, "redirect", redirect)
-    setCookie(res, `${provider}_oauth_state`, state)
+    setCookie(res, "redirect", redirectUrl)
 
     if (sessionToken) {
       const session = await sessionService.validateSessionToken(sessionToken)
+
       if (!(session instanceof InvalidSessionError)) {
         setCookie(res, "sessionToken", sessionToken)
       }
     }
 
-    let authUrl: URL
+    const state = generateState()
+
     switch (provider) {
       case "github": {
-        authUrl = await getGithubAuthorizationUrl(state)
+        const url = await getGithubAuthorizationUrl(state)
 
-        break
+        setCookie(res, "github_oauth_state", state)
+
+        return redirect(res, url)
       }
 
       case "google": {
         const codeVerifier = generateCodeVerifier()
-        authUrl = await getGoogleAuthorizationUrl(state, codeVerifier)
+        const url = await getGoogleAuthorizationUrl(state, codeVerifier)
+
+        setCookie(res, "google_oauth_state", state)
         setCookie(res, "google_oauth_code_verifier", codeVerifier)
 
-        break
+        return redirect(res, url)
       }
 
       case "apple": {
-        authUrl = await getAppleAuthorizationUrl(state)
+        const url = await getAppleAuthorizationUrl(state)
 
-        break
+        setCookie(res, "apple_oauth_state", state)
+
+        return redirect(res, url)
       }
     }
-    console.log("response cookies:", res.getHeaders()["set-cookie"])
-
-    res.writeHead(302, { Location: authUrl.toString() })
-    res.end()
-
-    return
   }
 
   // OAuth Callback Routes - POST|GET /:provider/callback
   if (/^\/oauth\/(github|google|apple)\/callback$/.test(url.pathname)) {
-    const provider = url.pathname.split("/")[1] as OAuthProvider
-    const stateCookie = cookies[`${provider}_oauth_state`]
-    const codeVerifier = cookies[`${provider}_oauth_code_verifier`]
-    const sessionToken = cookies.sessionToken
-    const redirect = cookies.redirect
+    const cookies = cookie.parse(req.headers.get("cookie") ?? "")
+    const provider = url.pathname.split("/")[2] as OAuthProvider
+    let stateCookie = cookies[`${provider}_oauth_state`]
+    const codeVerifierCookie = cookies[`${provider}_oauth_code_verifier`]
+    const sessionTokenCookie = cookies.sessionToken
+    let redirectCookie = cookies.redirect
 
-    console.log({ provider, stateCookie, codeVerifier, sessionToken, redirect })
+    let state = url.searchParams.get("state")
+    let code = url.searchParams.get("code")
 
-    // Clear OAuth-related cookies after use
-    setCookie(res, `${provider}_oauth_state`, "", { maxAge: 0 })
-    setCookie(res, `${provider}_oauth_code_verifier`, "", { maxAge: 0 })
-    setCookie(res, "redirect", "", { maxAge: 0 })
-
-    const urlParams = new URLSearchParams(url.search)
-    let state: string | null = urlParams.get("state")
-    let code: string | null = urlParams.get("code")
+    const codeVerifierRequired = provider === "google"
 
     if (req.method === "POST") {
       const formData = await req.formData()
-      state = formData.get("state")?.toString() ?? state
+      state = formData.get("state")?.toString() ?? null
+      stateCookie = state ?? stateCookie
       code = formData.get("code")?.toString() ?? code
+      redirectCookie = env.APP_URL
     }
 
-    if (!state || !stateCookie || !code || stateCookie !== state || !redirect) {
-      res.writeHead(400, { "Content-Type": "application/json" })
-      res.end(
-        JSON.stringify(
-          {
-            error: "Invalid request (Incorrect OAuth state)",
-            variables: { state, stateCookie, code, redirect },
-          },
-          null,
-          2,
-        ),
-      )
-
-      return
+    if (
+      !state ||
+      !stateCookie ||
+      !code ||
+      stateCookie !== state ||
+      !redirectCookie ||
+      (codeVerifierRequired && !codeVerifierCookie)
+    ) {
+      return json(res, {
+        error: "Invalid request (Incorrect OAuth state)",
+        cookies,
+        variables: {
+          provider,
+          state: state ?? "",
+          code: code ?? "",
+          stateCookie: stateCookie ?? "",
+          redirectCookie: redirectCookie ?? "",
+          codeVerifierCookie: codeVerifierCookie ?? "",
+        },
+      })
     }
-
-    let result: CreateSessionError | CreatedSession
 
     switch (provider) {
       case "github": {
-        result = await createGithubSession(code, sessionToken)
+        const sessionRes = await createGithubSession(code, sessionTokenCookie)
 
-        break
+        if (sessionRes instanceof CreateSessionError) {
+          return json(res, { error: sessionRes.message }, { status: 400 })
+        }
+
+        const url = new URL(redirectCookie)
+
+        url.searchParams.append("token", sessionRes.token)
+
+        return redirect(res, url)
       }
 
       case "google": {
-        if (!codeVerifier) {
-          res.writeHead(400, { "Content-Type": "application/json" })
-          res.end(JSON.stringify({ error: "Invalid request (Missing google code verifier)" }))
-
-          return
+        if (!codeVerifierCookie) {
+          return json(res, { error: "Invalid request (Missing google code verifier)" })
         }
 
-        result = await createGoogleSession(code, codeVerifier, sessionToken)
+        const sessionRes = await createGoogleSession(code, codeVerifierCookie, sessionTokenCookie)
 
-        break
+        if (sessionRes instanceof CreateSessionError) {
+          return json(res, { error: sessionRes.message }, { status: 400 })
+        }
+
+        const url = new URL(redirectCookie)
+
+        url.searchParams.append("token", sessionRes.token)
+
+        return redirect(res, url)
       }
 
       case "apple": {
-        const origin = req.headers.get("origin") ?? ""
-        if (!verifyRequestOrigin(origin, [url.host, "appleid.apple.com"])) {
-          res.writeHead(403).end("Unauthorized")
+        const originHeader = req.headers.get("origin") ?? ""
+        const hostHeader = req.headers.get("host") ?? ""
 
-          return
+        if (
+          !originHeader ||
+          !hostHeader ||
+          !verifyRequestOrigin(originHeader, [hostHeader, "appleid.apple.com"])
+        ) {
+          return json(res, { error: "Unauthorized" }, { status: 403 })
         }
 
         const formData = await req.formData()
+        const userJSON = formData.get("user")
+
         let user: { fullName: string } | undefined
 
-        if (formData.has("user")) {
-          const userData = AppleUserObj.safeParse(JSON.parse(formData.get("user") as string))
+        if (userJSON) {
+          const userData = AppleUserObj.safeParse(JSON.parse(userJSON as string))
 
           if (!userData.success) {
-            res.writeHead(400, { "Content-Type": "application/json" })
-            res.end(JSON.stringify({ error: "Invalid request (Invalid user data)" }))
-
-            return
+            return json(res, { error: "Invalid request (Invalid user data)" }, { status: 400 })
           }
 
           user = {
@@ -186,31 +217,25 @@ export const handleOAuthRequest = async (url: URL, req: Request, res: http.Serve
           }
         }
 
-        result = await createAppleSession({ code, user, sessionToken })
+        const sessionRes = await createAppleSession({
+          code,
+          user,
+          sessionToken: sessionTokenCookie,
+        })
 
-        break
+        if (sessionRes instanceof CreateSessionError) {
+          return json(res, { error: sessionRes.message }, { status: 400 })
+        }
+
+        const url = new URL(redirectCookie)
+        url.searchParams.append("token", sessionRes.token)
+        return redirect(res, url)
       }
     }
-
-    if (result instanceof CreateSessionError) {
-      res.writeHead(400, { "Content-Type": "application/json" })
-      res.end(JSON.stringify({ error: result.message }))
-
-      return
-    }
-
-    const redirectUrl = new URL(redirect)
-
-    redirectUrl.searchParams.append("token", result.token)
-    res.writeHead(302, { Location: redirectUrl.toString() })
-    res.end()
-
-    return
   }
 
   // Direct Login - POST /login/:provider
   if (req.method === "POST" && /^\/oauth\/login\/(github|google|apple)$/.test(url.pathname)) {
-    const provider = url.pathname.split("/")[3] as OAuthProvider
     const body = OAuthLoginBody.safeParse(await req.json())
 
     if (!body.success) {
@@ -219,41 +244,35 @@ export const handleOAuthRequest = async (url: URL, req: Request, res: http.Serve
       return
     }
 
-    const idToken = body.data.idToken
-    const sessionToken = body.data.sessionToken
+    const provider = url.pathname.split("/")[3] as OAuthProvider
 
-    let result: CreateSessionError | CreatedSession
+    let session: CreateSessionError | CreatedSession
 
     switch (provider) {
       case "github": {
-        result = await createGithubSession(idToken, sessionToken)
+        session = await createGithubSession(body.data.idToken, body.data.sessionToken)
+
         break
       }
 
       case "google": {
-        result = await createGoogleSession(idToken, "", sessionToken)
+        session = await createGoogleSession(body.data.idToken, "", body.data.sessionToken)
+
         break
       }
 
       case "apple": {
-        result = await createAppleSession({
-          idToken,
-          user: body.data.user,
-          sessionToken,
-        })
+        session = await createAppleSession(body.data)
+
         break
       }
     }
 
-    if (result instanceof CreateSessionError) {
-      res.writeHead(400, { "Content-Type": "application/json" })
-      res.end(JSON.stringify({ error: result.message }))
-      return
+    if (session instanceof CreateSessionError) {
+      return json(res, { error: session.message }, { status: 400 })
     }
 
-    res.writeHead(200, { "Content-Type": "application/json" })
-    res.end(JSON.stringify({ token: result.token }))
-    return
+    return json(res, { token: session.token })
   }
 
   // Logout - POST /logout
@@ -262,24 +281,22 @@ export const handleOAuthRequest = async (url: URL, req: Request, res: http.Serve
     const token = authHeader?.split(" ")[1]
 
     if (!token) {
-      res.writeHead(400, { "Content-Type": "application/json" })
-      res.end(JSON.stringify({ error: "Invalid request (Missing token)" }))
-      return
+      return json(
+        res,
+        { error: "Invalid request (Authorization header not found)" },
+        { status: 400 },
+      )
     }
 
     const session = await sessionService.validateSessionToken(token)
 
     if (session instanceof InvalidSessionError) {
-      res.writeHead(400, { "Content-Type": "application/json" })
-      res.end(JSON.stringify({ error: "Not logged in" }))
-      return
+      return json(res, { error: "Invalid request (Not signed in)" }, { status: 400 })
     }
 
     await sessionService.invalidateSession(session.session.id)
 
-    res.writeHead(200).end()
-
-    return
+    return res.writeHead(200).end()
   }
 
   // 404 for unmatched routes
