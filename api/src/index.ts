@@ -10,12 +10,24 @@ import * as ws from "ws"
 import { env } from "./config/env.ts"
 import { authRouter } from "./features/auth/auth.routes.ts"
 import { handleOAuthRequest } from "./features/auth/oauth/oauth.routes.ts"
+import { chatRouter } from "./features/chat/chat.routes.ts"
+import { healthRouter } from "./features/health/health.routes.ts"
+import { notificationRouter } from "./features/notification/notification.routes.ts"
+import { pointsRouter } from "./features/points/points.routes.ts"
+import { rewardRouter } from "./features/reward/reward.routes.ts"
 import { transactionRouter } from "./features/transaction/transaction.routes.ts"
+import { userRouter } from "./features/user/user.routes.ts"
 import { createContext, createTRPCRouter } from "./trpc/index.ts"
 
 export const appRouter = createTRPCRouter({
+  health: healthRouter,
   auth: authRouter,
+  user: userRouter,
   transaction: transactionRouter,
+  chat: chatRouter,
+  points: pointsRouter,
+  notification: notificationRouter,
+  reward: rewardRouter,
 })
 
 export type AppRouter = typeof appRouter
@@ -27,11 +39,13 @@ const handleTRPCRequest = createHTTPHandler({
 })
 
 const httpServer = http.createServer((req, res) => {
-  const request = incomingMessageToRequest(req, { maxBodySize: 20_000 })
-  const url = new URL(request.url)
-  console.log(`󱓞 ${request.method} ${url.pathname}`)
+  if (!req.url) {
+    throw new Error("Request URL is undefined")
+  }
 
-  if (env.NODE_ENV === "development" && url.pathname === "/panel") {
+  console.log(`󱓞 ${req.method} ${req.url}`)
+
+  if (env.NODE_ENV === "development" && req.url === "/trpc.panel") {
     res.writeHead(200, { "content-type": "text/html" })
     res.end(
       renderTrpcPanel(appRouter, {
@@ -39,8 +53,8 @@ const httpServer = http.createServer((req, res) => {
         transformer: "superjson",
       }),
     )
-  } else if (url.pathname.startsWith("/oauth")) {
-    handleOAuthRequest(url, request, res).catch((e) => {
+  } else if (req.url.startsWith("/oauth")) {
+    handleOAuthRequest(req, res).catch((e) => {
       res.writeHead(500, { "Content-Type": "application/json" })
       res.end(JSON.stringify({ error: "Internal Server Error" }))
       console.error("OAuth Request Error:", (e as Error).message)

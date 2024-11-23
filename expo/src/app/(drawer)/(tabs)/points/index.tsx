@@ -4,10 +4,8 @@ import { Link } from "expo-router"
 import { AntDesign } from "@expo/vector-icons"
 import { FlashList } from "@shopify/flash-list"
 
-import type { P2PNotification, UserRewardNotification } from "~/state/notifications"
 import type { RouterOutputs } from "~/utils/api"
 import { useAuth } from "~/hooks/auth"
-import { TransactionType } from "~/state/notifications"
 import { api } from "~/utils/api"
 import { formatDatePTBR } from "~/utils/date"
 
@@ -31,7 +29,7 @@ import { formatDatePTBR } from "~/utils/date"
 //   to: transaction.to,
 // })
 
-type UserExtract = NonNullable<RouterOutputs["transaction"]["getUserExtract"][string]>[number]
+type UserExtract = NonNullable<RouterOutputs["user"]["getUserExtract"][string]>[number]
 
 const EXTRACT_TYPE: Record<UserExtract["type"], string> = {
   p2pFrom: "Transferência de pontos",
@@ -43,7 +41,7 @@ const EXTRACT_TYPE: Record<UserExtract["type"], string> = {
 export default function PointsPage() {
   const { user } = useAuth()
 
-  const { data: userExtract } = api.transaction.getUserExtract.useQuery()
+  const { data: userExtract } = api.user.getUserExtract.useQuery(undefined, { enabled: !!user })
   const keys = Object.keys(userExtract ?? {})
 
   if (!user) return null

@@ -6,7 +6,7 @@ import { Controller, useForm } from "react-hook-form"
 import type { RouterInputs } from "~/utils/api"
 import { api } from "~/utils/api"
 
-type SendPointsInput = RouterInputs["transaction"]["sendPointsP2P"]
+type SendPointsInput = RouterInputs["transaction"]["createP2PTransaction"]
 
 export default function SendPointsScreen() {
   const utils = api.useUtils()
@@ -23,8 +23,8 @@ export default function SendPointsScreen() {
     isPending,
     error,
     isSuccess,
-  } = api.transaction.sendPointsP2P.useMutation({
-    onSuccess: () => utils.transaction.getUserTransactions.invalidate(),
+  } = api.transaction.createP2PTransaction.useMutation({
+    onSuccess: () => utils.user.getUserExtract.invalidate(),
   })
 
   async function onSubmit(data: SendPointsInput) {

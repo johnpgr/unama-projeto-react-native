@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { createWSClient, httpBatchLink, loggerLink, splitLink, wsLink } from "@trpc/client"
+import {
+  createWSClient,
+  loggerLink,
+  splitLink,
+  unstable_httpBatchStreamLink,
+  wsLink,
+} from "@trpc/client"
 import { createTRPCReact } from "@trpc/react-query"
 import superjson from "superjson"
 
@@ -54,7 +60,7 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
             client: wsClient,
             transformer: superjson,
           }),
-          false: httpBatchLink({
+          false: unstable_httpBatchStreamLink({
             transformer: superjson,
             url: getBaseUrl(),
             headers() {

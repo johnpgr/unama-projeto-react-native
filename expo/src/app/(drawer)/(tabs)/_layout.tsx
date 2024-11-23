@@ -2,7 +2,7 @@ import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs"
 import React from "react"
 import { Pressable, Text } from "react-native"
 import { Redirect, Tabs, useRouter } from "expo-router"
-import { AntDesign, Entypo, Ionicons, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons"
+import { AntDesign, Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons"
 
 import { useAuth } from "~/hooks/auth"
 import { api } from "~/utils/api"

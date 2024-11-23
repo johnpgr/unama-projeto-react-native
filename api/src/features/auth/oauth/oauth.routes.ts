@@ -1,4 +1,5 @@
 import type http from "http"
+import { incomingMessageToRequest } from "@trpc/server/adapters/node-http"
 import { generateCodeVerifier, generateState } from "arctic"
 import cookie from "cookie"
 import { z } from "zod"
@@ -63,7 +64,10 @@ function json<T>(
   res.end(JSON.stringify(data, null, 2))
 }
 
-export async function handleOAuthRequest(url: URL, req: Request, res: http.ServerResponse) {
+export async function handleOAuthRequest(inc: http.IncomingMessage, res: http.ServerResponse) {
+  const req = incomingMessageToRequest(inc, { maxBodySize: 20_000 })
+  const url = new URL(req.url, req.headers.get("host") ?? "http://127.0.0.1")
+
   // OAuth Login Routes - GET /:provider
   if (req.method === "GET" && /^\/oauth\/(github|google|apple)$/.test(url.pathname)) {
     const provider = url.pathname.split("/")[2] as OAuthProvider

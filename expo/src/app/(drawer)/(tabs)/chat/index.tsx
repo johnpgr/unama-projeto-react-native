@@ -9,6 +9,7 @@ import { useAuth } from "~/hooks/auth"
 import { api } from "~/utils/api"
 import { formatDatePTBR } from "~/utils/date"
 import { randomString } from "~/utils/random"
+import { TODO } from "~/utils/todo"
 import { PROMPT } from "./prompt"
 
 const enum UserMessageChoice {
@@ -50,24 +51,18 @@ const initialMessages: Message[] = [
 
 export default function ChatbotScreen() {
   const { user } = useAuth()
-  const [notifications, setNotifications] = useAtom(notificationsAtom)
+  const { data: userExtract } = api.user.getUserExtract.useQuery(undefined, {
+    enabled: !!user,
+  })
   const [messages, setMessages] = React.useState<Message[]>(initialMessages)
-  const [inputText, setInputText] = React.useState("")
-  const { mutateAsync: getResponse, data, isPending } = api.transaction.getLLMResponse.useMutation()
+  const { mutateAsync: getLLMResponse } = api.chat.getLLMResponse.useMutation()
   const router = useRouter()
-
-  if (!user) return null
 
   async function sendMessage(input: string) {
     try {
-      const botResponse = await getResponse({ prompt: input })
-      const responseMessage =
-        typeof botResponse.response === "string"
-          ? botResponse.response
-          : botResponse.response.join(", ")
-
-      const botMessage = new BotMessage(responseMessage)
-      setMessages((prevMessages) => [...prevMessages, botMessage])
+      for await (const chunk of await getLLMResponse({ prompt: input })) {
+        TODO("Handle chunked responses")
+      }
     } catch (err) {
       if (err instanceof Error) {
         const errorMessage = new BotMessage(`Erro: ${err.message}`)
@@ -82,11 +77,15 @@ export default function ChatbotScreen() {
 
     setMessages((prevMessages) => [userMessage, ...prevMessages])
 
+    const notifications = Object.values(userExtract ?? {})
+      .flat()
+      .filter(Boolean)
+
     const transactionDetails = notifications
-      .filter((notification) => notification.type === TransactionType.P2P)
+      .filter((notification) => notification.type === "p2pFrom" || notification.type === "p2pTo")
       .map(
         (notification) =>
-          `Transação de ${notification.points} pontos em ${formatDatePTBR(notification.transactionDate)} de ${notification.from} para ${notification.to}.`,
+          `Transação de ${notification.points} pontos em ${formatDatePTBR(notification.createdAt)} de ${notification.from} para ${notification.to}.`,
       )
       .join("\n")
 

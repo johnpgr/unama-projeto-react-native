@@ -11,7 +11,7 @@ import {
 } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 
-import type { schema } from "@projeto/api"
+import type { Reward } from "@projeto/api"
 
 import { api } from "~/utils/api"
 
@@ -61,7 +61,7 @@ function Popup(props: PopupProps) {
   )
 }
 
-function RewardCard(props: { reward: schema.Reward; onRedeem: (id: string) => void }) {
+function RewardCard(props: { reward: Reward; onRedeem: (id: string) => void }) {
   return (
     <View className="w-1/2 p-2">
       <View className="items-center rounded-lg bg-gray-100 p-4">
@@ -99,10 +99,9 @@ export default function RewardsScreen() {
   })
   const [isExchanging, setIsExchanging] = React.useState(false)
 
-  const { data: rewards, isLoading: isLoadingRewards } =
-    api.transaction.getAvailableRewards.useQuery()
+  const { data: rewards, isLoading: isLoadingRewards } = api.reward.getAvailableRewards.useQuery()
 
-  const { mutate: exchangePoints } = api.transaction.exchangePointsForReward.useMutation({
+  const { mutateAsync: exchangePoints } = api.reward.requestReward.useMutation({
     onMutate: () => {
       setIsExchanging(true)
       setPopupState({
@@ -137,7 +136,7 @@ export default function RewardsScreen() {
       },
       {
         text: "Confirmar",
-        onPress: () => exchangePoints({ rewardId }),
+        onPress: () => void exchangePoints({ rewardId }),
       },
     ])
   }
