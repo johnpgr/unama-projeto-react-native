@@ -5,7 +5,7 @@
         "skipLibCheck": true,
         "target": "ESNext",
         "lib": [
-            "ESNext"
+            "ESNext",
         ],
         "allowJs": true,
         "resolveJsonModule": true,
@@ -22,7 +22,8 @@
         "moduleResolution": "Bundler",
         "noEmit": true,
         "types": [
-            "@total-typescript/ts-reset"
+            "@total-typescript/ts-reset",
+            "@types/node",
         ]
     },
     "exclude": [

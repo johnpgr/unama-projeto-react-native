@@ -48,7 +48,6 @@
     "@projeto/prettier-config": "workspace:^",
     "@projeto/tsconfig": "workspace:^",
     "@types/cors": "^2.8.17",
-    "@types/node": "^22.9.0",
     "@types/ws": "^8.5.13",
     "dotenv-cli": "^7.4.2",
     "drizzle-kit": "^0.28.1",
