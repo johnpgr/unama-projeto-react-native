@@ -65,6 +65,9 @@ importers:
 
   api:
     dependencies:
+      '@langchain/core':
+        specifier: ^0.3.18
+        version: 0.3.18
       '@langchain/mistralai':
         specifier: ^0.1.1
         version: 0.1.1(@langchain/core@0.3.18)
