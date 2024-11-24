@@ -49,9 +49,6 @@ type Context = Awaited<ReturnType<typeof createContext>>
  * transformer
  */
 const t = initTRPC.context<typeof createContext>().create({
-  experimental: {
-    iterablesAndDeferreds: true,
-  },
   transformer: superjson,
   errorFormatter: ({ shape, error }) => ({
     ...shape,

@@ -65,7 +65,7 @@ function json<T>(
 }
 
 export async function handleOAuthRequest(inc: http.IncomingMessage, res: http.ServerResponse) {
-  const req = incomingMessageToRequest(inc, { maxBodySize: 20_000 })
+  const req = incomingMessageToRequest(inc, res, { maxBodySize: 20_000 })
   const url = new URL(req.url, req.headers.get("host") ?? "http://127.0.0.1")
 
   // OAuth Login Routes - GET /:provider

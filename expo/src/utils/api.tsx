@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import {
   createWSClient,
+  httpBatchLink,
   loggerLink,
   splitLink,
   unstable_httpBatchStreamLink,
@@ -60,7 +60,7 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
             client: wsClient,
             transformer: superjson,
           }),
-          false: unstable_httpBatchStreamLink({
+          false: httpBatchLink({
             transformer: superjson,
             url: getBaseUrl(),
             headers() {

@@ -11,10 +11,12 @@ import { DrawerToggleButton } from "../../_components/DrawerToggleButton"
 export default function TabLayout() {
   const { session, isPending } = useAuth()
   const router = useRouter()
+  const utils = api.useUtils()
 
   api.transaction.onP2PTransaction.useSubscription(undefined, {
     onData(data) {
       router.push(`/scan/received-points?points=${data.pointsTransferred}&sender=${data.senderId}`)
+      void utils.user.getUserExtract.invalidate()
     },
     enabled: !!session,
   })

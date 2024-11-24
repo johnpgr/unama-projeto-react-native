@@ -10,7 +10,6 @@ import { api } from "~/utils/api"
 import { formatDatePTBR } from "~/utils/date"
 import { randomString } from "~/utils/random"
 import { TODO } from "~/utils/todo"
-import { PROMPT } from "./prompt"
 
 const enum UserMessageChoice {
   REQUEST_BALANCE = "Consultar saldo",
@@ -54,20 +53,21 @@ export default function ChatbotScreen() {
   const { data: userExtract } = api.user.getUserExtract.useQuery(undefined, {
     enabled: !!user,
   })
-  const [messages, setMessages] = React.useState<Message[]>(initialMessages)
-  const { mutateAsync: getLLMResponse } = api.chat.getLLMResponse.useMutation()
   const router = useRouter()
+  const [messages, setMessages] = React.useState<Message[]>(initialMessages)
+  const { mutateAsync: getLLMResponse } = api.chat.lookupTransactionsRegression.useMutation()
 
-  async function sendMessage(input: string) {
+  async function requestPointsPrediction() {
     try {
-      for await (const chunk of await getLLMResponse({ prompt: input })) {
-        TODO("Handle chunked responses")
-      }
+      const msgResponse = await getLLMResponse()
+      const msg = new BotMessage(msgResponse.content as string)
+
+      setMessages((prevMessages) => [...prevMessages, msg])
     } catch (err) {
       if (err instanceof Error) {
-        const errorMessage = new BotMessage(`Erro: ${err.message}`)
+        const msg = new BotMessage(err.message)
 
-        setMessages((prevMessages) => [...prevMessages, errorMessage])
+        setMessages((prevMessages) => [...prevMessages, msg])
       }
     }
   }
@@ -98,14 +98,18 @@ export default function ChatbotScreen() {
       case UserMessageChoice.LIST_TRANSACTIONS: {
         if (notifications.length <= 0) {
           const botMessage = new BotMessage("Você não possui nenhuma transação salva em sua conta")
+
           setMessages((prevMessages) => [botMessage, ...prevMessages])
+
           break
         }
 
         const botMessage = new BotMessage(
           `Essas são todas as transações da sua conta:\n${transactionDetails}`,
         )
+
         setMessages((prevMessages) => [botMessage, ...prevMessages])
+
         break
       }
       case UserMessageChoice.DOUBT_ABOUT_POINTS: {
@@ -123,9 +127,9 @@ export default function ChatbotScreen() {
           setMessages((prevMessages) => [botMessage, ...prevMessages])
           break
         }
-        const prompt = PROMPT(transactionDetails, user!.fullName)
 
-        await sendMessage(prompt)
+        await requestPointsPrediction()
+
         break
       }
     }

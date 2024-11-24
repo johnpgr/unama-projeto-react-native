@@ -3,6 +3,7 @@ import { desc, eq, or } from "drizzle-orm"
 
 import { db } from "../../drizzle/index.ts"
 import { protectedProcedure } from "../../trpc/index.ts"
+import { getUserExtract } from "./user.queries.ts"
 
 export const userRouter = {
   /**
@@ -40,57 +41,8 @@ export const userRouter = {
   }),
 
   getUserExtract: protectedProcedure.query(async ({ ctx }) => {
-    const extract = await db.query.User.findFirst({
-      where: (user) => eq(user.id, ctx.user.id),
-      columns: {},
-      with: {
-        //prettier-ignore
-        recyclingTransactions: { orderBy: (recycling) => desc(recycling.createdAt) },
-        rewards: { orderBy: (reward) => desc(reward.createdAt) },
-        p2pTransactionsFrom: { orderBy: (p2p) => desc(p2p.createdAt) },
-        p2pTransactionsTo: { orderBy: (p2p) => desc(p2p.createdAt) },
-      },
-    })
-
-    if (!extract) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: "Usuário não encontrado",
-      })
-    }
-
-    const asList = [
-      ...extract.p2pTransactionsFrom.map(
-        (transaction) =>
-          ({
-            ...transaction,
-            type: "p2pFrom",
-          }) as const,
-      ),
-      ...extract.p2pTransactionsTo.map(
-        (transaction) =>
-          ({
-            ...transaction,
-            type: "p2pTo",
-          }) as const,
-      ),
-      ...extract.recyclingTransactions.map(
-        (transaction) =>
-          ({
-            ...transaction,
-            type: "recycling",
-          }) as const,
-      ),
-      ...extract.rewards.map(
-        (transaction) =>
-          ({
-            ...transaction,
-            type: "reward",
-          }) as const,
-      ),
-    ]
-
-    const groupped = Object.groupBy(asList, (item) => item.createdAt.toLocaleDateString())
+    const extract = await getUserExtract(ctx.user.id)
+    const groupped = Object.groupBy(extract, (item) => item.createdAt.toLocaleDateString())
 
     return groupped
   }),

@@ -23,7 +23,6 @@ export const getBaseUrl = () => {
 }
 
 export const getWSUrl = () => {
-  console.log("API_URL:", process.env.EXPO_PUBLIC_API_URL)
   if (process.env.EXPO_PUBLIC_API_URL) {
     return process.env.EXPO_PUBLIC_API_URL
   }

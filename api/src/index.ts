@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import http from "node:http"
-import { incomingMessageToRequest } from "@trpc/server/adapters/node-http"
 import { createHTTPHandler } from "@trpc/server/adapters/standalone"
 import { applyWSSHandler } from "@trpc/server/adapters/ws"
 import cors from "cors"
@@ -60,11 +58,7 @@ const httpServer = http.createServer((req, res) => {
       console.error("OAuth Request Error:", (e as Error).message)
     })
   } else {
-    handleTRPCRequest(req, res).catch((e) => {
-      res.writeHead(500, { "Content-Type": "application/json" })
-      res.end(JSON.stringify({ error: "Internal Server Error" }))
-      console.error("TRPC Request Error:", (e as Error).message)
-    })
+    handleTRPCRequest(req, res)
   }
 })
 
