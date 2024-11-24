@@ -22,17 +22,17 @@ export const notificationRouter = {
     return res?.notifications ?? []
   }),
 
-  onNotificationCreated: protectedProcedure.subscription(({ ctx }) => {
-    return observable<Parameters<PubSubEvents["userNotificationCreated"]>[0]>((emit) => {
-      void redis.subscribe("userNotificationCreated", (notification) => {
-        if (ctx.user.id === notification.userId) {
-          emit.next(notification)
-        }
-      })
+  // onNotificationCreated: protectedProcedure.subscription(({ ctx }) => {
+  //   return observable<Parameters<PubSubEvents["userNotificationCreated"]>[0]>((emit) => {
+  //     void redis.subscribe("userNotificationCreated", (notification) => {
+  //       if (ctx.user.id === notification.userId) {
+  //         emit.next(notification)
+  //       }
+  //     })
 
-      return () => {
-        void redis.unsubscribe("userNotificationCreated")
-      }
-    })
-  }),
+  //     return () => {
+  //       void redis.unsubscribe("userNotificationCreated")
+  //     }
+  //   })
+  // }),
 }

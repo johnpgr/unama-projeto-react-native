@@ -11,8 +11,7 @@
     "ios": "expo run:ios",
     "android": "expo run:android",
     "format": "prettier --check . --ignore-path ../../.gitignore",
-    "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "lint": "eslint"
   },
   "dependencies": {
     "@bacons/text-decoder": "^0.0.0",

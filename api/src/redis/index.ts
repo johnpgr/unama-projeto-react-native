@@ -86,7 +86,6 @@ export class RedisService {
     await this.ensureConnection()
     await this.subscriberClient.subscribe(channel, (message) => {
       const data = JSON.parse(message) as Parameters<PubSubEvents[K]>[0]
-      //@ts-expect-error this is fucked up, typescript
       callback(data)
     })
   }
