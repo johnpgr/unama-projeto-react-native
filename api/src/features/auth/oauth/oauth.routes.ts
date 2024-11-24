@@ -66,8 +66,10 @@ function json<T>(
 
 export async function handleOAuthRequest(inc: http.IncomingMessage, res: http.ServerResponse) {
   const req = incomingMessageToRequest(inc, res, { maxBodySize: 20_000 })
-  console.log({ url: req.url, host: req.headers.get("host") })
-  const url = new URL(req.url, req.headers.get("host") ?? "http://127.0.0.1")
+  const host = req.headers.get("host")
+  const isHTTPS = req.headers.get("x-forwarded-proto") === "https"
+  const base = `${isHTTPS ? "https" : "http"}://${host}`
+  const url = new URL(req.url, host ? base : "http://127.0.0.1")
 
   // OAuth Login Routes - GET /:provider
   if (req.method === "GET" && /^\/oauth\/(github|google|apple)$/.test(url.pathname)) {
