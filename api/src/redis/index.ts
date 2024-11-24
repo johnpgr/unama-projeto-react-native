@@ -1,18 +1,30 @@
 import type { RedisClientType } from "redis"
 import { createClient } from "redis"
 
-import type { Notification } from "../drizzle/schema.ts"
+import type { Notification, RecyclingTransaction } from "../drizzle/schema.ts"
 import { env } from "../config/env.ts"
 
 export interface PubSubEvents {
-  sendPointsP2P: (args: {
-    id: string
-    senderId: string
-    receiverId: string
-    pointsTransferred: number
-  }) => void
-
-  userNotificationCreated: (args: Notification) => void
+  notifyTransaction: (
+    args:
+      | {
+          id: string
+          type: "p2p"
+          senderId: string
+          receiverId: string
+          description: string | null
+          points: number
+        }
+      | {
+          id: string
+          type: "recycling"
+          receiverId: string
+          material: RecyclingTransaction["material"]
+          weight: number
+          description: string | null
+          points: number
+        },
+  ) => void
 }
 
 export class RedisService {

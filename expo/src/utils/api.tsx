@@ -1,13 +1,6 @@
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import {
-  createWSClient,
-  httpBatchLink,
-  loggerLink,
-  splitLink,
-  unstable_httpBatchStreamLink,
-  wsLink,
-} from "@trpc/client"
+import { createWSClient, httpBatchLink, loggerLink, splitLink, wsLink } from "@trpc/client"
 import { createTRPCReact } from "@trpc/react-query"
 import superjson from "superjson"
 

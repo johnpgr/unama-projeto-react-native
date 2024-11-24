@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import type { Href } from "expo-router"
 import React from "react"
-import { Pressable, Text, View } from "react-native"
-import Dialog from "react-native-dialog"
+import { Alert, Pressable, Text, View } from "react-native"
 import { Link } from "expo-router"
 import { SimpleLineIcons } from "@expo/vector-icons"
 import { FlashList } from "@shopify/flash-list"
@@ -142,38 +141,41 @@ export namespace MenuItem {
 }
 
 export function LogoutItem() {
-  const [isVisible, setIsVisible] = React.useState(false)
   const { signOut } = useSignOut()
 
   function handleLogout() {
     void signOut()
-    setIsVisible(false)
   }
 
-  function handleCancel() {
-    setIsVisible(false)
+  function showAlert() {
+    Alert.alert(
+      "Sair",
+      "Você tem certeza que deseja sair da sua conta?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Sair",
+          onPress: handleLogout,
+        },
+      ],
+      { cancelable: true },
+    )
   }
 
   return (
-    <>
-      <Pressable
-        onPress={() => setIsVisible(!isVisible)}
-        className="flex flex-row items-center justify-between gap-6 p-4 px-6"
-      >
-        <SimpleLineIcons name="logout" size={24} />,
-        <View className="flex flex-1 flex-col">
-          <Text className="text-lg font-medium">Sair</Text>
-          <Text className="text-foreground/70">Desconecte-se do aplicativo.</Text>
-        </View>
-      </Pressable>
-
-      <Dialog.Container visible={isVisible}>
-        <Dialog.Title>Sair</Dialog.Title>
-        <Dialog.Description>Você tem certeza que deseja sair da sua conta?</Dialog.Description>
-        <Dialog.Button label="Cancelar" onPress={handleCancel} />
-        <Dialog.Button label="Sair" onPress={handleLogout} />
-      </Dialog.Container>
-    </>
+    <Pressable
+      onPress={showAlert}
+      className="flex flex-row items-center justify-between gap-6 p-4 px-6"
+    >
+      <SimpleLineIcons name="logout" size={24} />
+      <View className="flex flex-1 flex-col">
+        <Text className="text-lg font-medium">Sair</Text>
+        <Text className="text-foreground/70">Desconecte-se do aplicativo.</Text>
+      </View>
+    </Pressable>
   )
 }
 

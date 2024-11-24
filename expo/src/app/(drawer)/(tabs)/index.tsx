@@ -31,7 +31,7 @@ export default function Index() {
             ativistas, defensores do meio ambiente, empresas e a sociedade civil para discutir e
             acelerar ações em prol de um planeta mais sustentável
           </Text>
-          <View className="h-48 w-40 rounded-2xl bg-zinc-200"></View>
+          <View className="mt-4 h-40 w-40 rounded-2xl bg-zinc-200"></View>
         </View>
       </ScrollView>
     </View>

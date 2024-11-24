@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react"
 import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import { Link } from "expo-router"
@@ -44,13 +45,11 @@ export default function PointsPage() {
   const { data: userExtract } = api.user.getUserExtract.useQuery(undefined, { enabled: !!user })
   const keys = Object.keys(userExtract ?? {})
 
-  if (!user) return null
-
   return (
     <View className="flex-1 bg-white">
       <View className="items-center bg-emerald-700 p-4">
         <Text className="text-lg text-white">Pontuação atual</Text>
-        <Text className="text-6xl font-bold text-white">{user.totalPoints}</Text>
+        <Text className="text-6xl font-bold text-white">{user!.totalPoints}</Text>
       </View>
 
       <View className="my-4 flex-row justify-around">
@@ -116,9 +115,13 @@ export function ExtractItemView({ extract }: { extract: UserExtract }) {
             <Text className="text-base">{EXTRACT_TYPE[extract.type]}</Text>
             <Text className="text-gray-500">Data: {formatDatePTBR(extract.createdAt)}</Text>
           </View>
-          <TouchableOpacity>
-            <Text className="text-emerald-700">→</Text>
-          </TouchableOpacity>
+          <Link asChild href={`transactions/${extract.id}?type=p2p`}>
+            <TouchableOpacity>
+              <Text className="text-emerald-700">
+                <AntDesign name="arrowright" size={16} />
+              </Text>
+            </TouchableOpacity>
+          </Link>
         </View>
       )
     case "reward":
@@ -130,7 +133,9 @@ export function ExtractItemView({ extract }: { extract: UserExtract }) {
             <Text className="text-gray-500">Data: {formatDatePTBR(extract.createdAt)}</Text>
           </View>
           <TouchableOpacity>
-            <Text className="text-emerald-700">→</Text>
+            <Text className="text-emerald-700">
+              <AntDesign name="arrowright" size={16} />
+            </Text>
           </TouchableOpacity>
         </View>
       )
@@ -142,9 +147,13 @@ export function ExtractItemView({ extract }: { extract: UserExtract }) {
             <Text className="text-base">{extract.type}</Text>
             <Text className="text-gray-500">Data: {formatDatePTBR(extract.createdAt)}</Text>
           </View>
-          <TouchableOpacity>
-            <Text className="text-emerald-700">→</Text>
-          </TouchableOpacity>
+          <Link asChild href={`transactions/${extract.id}?type=recycling`}>
+            <TouchableOpacity>
+              <Text className="text-emerald-700">
+                <AntDesign name="arrowright" size={16} />
+              </Text>
+            </TouchableOpacity>
+          </Link>
         </View>
       )
   }

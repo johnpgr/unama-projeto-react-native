@@ -1,8 +1,9 @@
 import { TRPCError } from "@trpc/server"
 import { desc, eq, or } from "drizzle-orm"
+import { z } from "zod"
 
 import { db } from "../../drizzle/index.ts"
-import { protectedProcedure } from "../../trpc/index.ts"
+import { protectedProcedure, publicProcedure } from "../../trpc/index.ts"
 import { getUserExtract } from "./user.queries.ts"
 
 export const userRouter = {
@@ -46,4 +47,17 @@ export const userRouter = {
 
     return groupped
   }),
+
+  getPublicUserInfo: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input }) => {
+      return await db.query.User.findFirst({
+        where: (user) => eq(user.id, input.userId),
+        columns: {
+          id: true,
+          fullName: true,
+          imageUrl: true,
+        },
+      })
+    }),
 }

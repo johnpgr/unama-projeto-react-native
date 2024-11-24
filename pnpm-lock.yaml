@@ -246,9 +246,6 @@ importers:
       react-native-currency-input:
         specifier: ^1.1.1
         version: 1.1.1(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1))(react@18.3.1)
-      react-native-dialog:
-        specifier: ^9.3.0
-        version: 9.3.0(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1))
       react-native-gesture-handler:
         specifier: ~2.20.2
         version: 2.20.2(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1))(react@18.3.1)
@@ -5524,11 +5521,6 @@ packages:
     peerDependencies:
       react: '*'
       react-native: '*'
-
-  react-native-dialog@9.3.0:
-    resolution: {integrity: sha512-JEOJY/0AzTM9grIl0BL8o/IJPIJru7k5MPj9POTE9RRezUEtgn0YSvCpTlBtG0obWgOdzg2otMz1OQvMXS0wMQ==}
-    peerDependencies:
-      react-native: '>=0.63.0'
 
   react-native-drawer-layout@4.0.1:
     resolution: {integrity: sha512-395LypsQKNqcaMFHDj41jPXe3m9LbQRF7XKR1BzJh8B/kkc95OTZhwpXzMRBOLUiq4y4yL0loRzQtQRiruG+fQ==}
@@ -12397,10 +12389,6 @@ snapshots:
   react-native-currency-input@1.1.1(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
-      react-native: 0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1)
-
-  react-native-dialog@9.3.0(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1)):
-    dependencies:
       react-native: 0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1)
 
   react-native-drawer-layout@4.0.1(react-native-gesture-handler@2.20.2(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1))(react@18.3.1))(react-native-reanimated@3.16.1(@babel/core@7.26.0)(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1))(react@18.3.1))(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1))(react@18.3.1):

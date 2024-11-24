@@ -1,28 +1,94 @@
 import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs"
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-namespace */
+import type { DrawerNavigationProp } from "@react-navigation/drawer"
+import type { ParamListBase } from "@react-navigation/native"
 import React from "react"
-import { Pressable, Text } from "react-native"
+import { Image, Platform, Pressable, StyleSheet, Text } from "react-native"
 import { Redirect, Tabs, useRouter } from "expo-router"
-import { AntDesign, Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons"
+import { AntDesign, Entypo, FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons"
+import { PlatformPressable } from "@react-navigation/elements"
+import { DrawerActions, useNavigation } from "@react-navigation/native"
 
 import { useAuth } from "~/hooks/auth"
 import { api } from "~/utils/api"
-import { DrawerToggleButton } from "../../_components/DrawerToggleButton"
+import DefaultAvatar from "../../../../assets/avatar_default.png"
+
+export function DrawerToggleButton({
+  tintColor,
+  accessibilityLabel = "Mostrar menu de navegação",
+  ...rest
+}: DrawerToggleButton.Props) {
+  const navigation = useNavigation<DrawerNavigationProp<ParamListBase>>()
+  const { user } = useAuth()
+
+  return (
+    <PlatformPressable
+      {...rest}
+      accessibilityLabel={accessibilityLabel}
+      android_ripple={{ borderless: true }}
+      onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+      style={styles.touchable}
+      hitSlop={Platform.select({
+        ios: undefined,
+        default: { top: 16, right: 16, bottom: 16, left: 16 },
+      })}
+    >
+      <Image
+        style={[styles.icon, tintColor ? { tintColor } : null]}
+        resizeMode="contain"
+        source={user?.imageUrl ? { uri: user.imageUrl } : DefaultAvatar}
+        fadeDuration={0}
+      />
+    </PlatformPressable>
+  )
+}
+
+export namespace DrawerToggleButton {
+  export interface Props {
+    accessibilityLabel?: string
+    pressColor?: string
+    pressOpacity?: number
+    tintColor?: string
+  }
+}
+
+const styles = StyleSheet.create({
+  icon: {
+    height: 32,
+    width: 32,
+    marginVertical: 8,
+    marginHorizontal: 16,
+  },
+  touchable: {
+    // Roundness for iPad hover effect
+    borderRadius: 10,
+  },
+})
 
 export default function TabLayout() {
   const { session, isPending } = useAuth()
   const router = useRouter()
   const utils = api.useUtils()
 
-  api.transaction.onP2PTransaction.useSubscription(undefined, {
+  api.transaction.onTransaction.useSubscription(undefined, {
     onData(data) {
-      router.push(`/scan/received-points?points=${data.pointsTransferred}&sender=${data.senderId}`)
+      if (data.type === "p2p") {
+        router.push(
+          `/points/received-points?transactionType=${data.type}&transactionId=${data.id}&points=${data.points}&sender=${data.senderId}`,
+        )
+      } else {
+        router.push(
+          `/points/received-points?transactionType=${data.type}&transactionId=${data.id}&points=${data.points}`,
+        )
+      }
       void utils.user.getUserExtract.invalidate()
     },
     enabled: !!session,
   })
 
   if (isPending) return null
-  if (!session) return <Redirect href={"/onboarding"} />
+  if (!session) return <Redirect href="/" />
 
   return (
     <Tabs
@@ -48,6 +114,11 @@ export default function TabLayout() {
         options={{
           title: "Pontos",
           tabBarIcon: ({ color }) => <Entypo name="wallet" size={30} color={color} />,
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
         }}
       />
 
@@ -56,6 +127,11 @@ export default function TabLayout() {
         options={{
           title: "Enviar Pontos",
           href: null,
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
         }}
       />
 
@@ -64,6 +140,24 @@ export default function TabLayout() {
         options={{
           title: "Recompensas",
           href: null,
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="points/received-points"
+        options={{
+          title: "Pontos Recebidos",
+          href: null,
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
         }}
       />
 
@@ -78,18 +172,15 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="scan/received-points"
-        options={{
-          title: "Pontos Recebidos",
-          href: null,
-        }}
-      />
-
-      <Tabs.Screen
         name="scan/my-code"
         options={{
           title: "Meu código",
           href: null,
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
         }}
       />
 
@@ -97,6 +188,20 @@ export default function TabLayout() {
         name="chat/index"
         options={{
           title: "Chat",
+          headerStyle: {
+            flexDirection: "row",
+            alignItems: "center",
+          },
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
+          headerRight: () => (
+            <Pressable onPress={() => router.reload()} className="p-4">
+              <FontAwesome name="trash-o" size={24} color="red" />
+            </Pressable>
+          ),
           tabBarIcon: ({ color }) => <Entypo name="chat" size={30} color={color} />,
         }}
       />
@@ -105,14 +210,24 @@ export default function TabLayout() {
         name="notifications/index"
         options={{
           title: "Notificações",
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
           tabBarIcon: ({ color }) => <Ionicons name="notifications" size={30} color={color} />,
         }}
       />
 
       <Tabs.Screen
-        name="my-account/index"
+        name="account/index"
         options={{
           title: "Minha conta",
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
           href: null,
         }}
       />
@@ -134,7 +249,25 @@ export default function TabLayout() {
         name="campaigns/[slug]/index"
         options={{
           href: null,
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
           title: "Campanha",
+        }}
+      />
+
+      <Tabs.Screen
+        name="transactions/[id]"
+        options={{
+          href: null,
+          title: "Detalhes da Transação",
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
         }}
       />
     </Tabs>

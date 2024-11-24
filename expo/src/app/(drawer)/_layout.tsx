@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import type { DrawerContentComponentProps, DrawerNavigationOptions } from "@react-navigation/drawer"
 import type { Href } from "expo-router"
 import React from "react"
-import { Image, Pressable, Text, View } from "react-native"
-import Dialog from "react-native-dialog"
+import { Alert, Image, Pressable, Text, View } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { Redirect, useRouter } from "expo-router"
 import { Drawer } from "expo-router/drawer"
@@ -23,6 +22,7 @@ interface CustomDrawerContentProps extends DrawerContentComponentProps {
 export function CustomDrawerContent(props: CustomDrawerContentProps) {
   const router = useRouter()
 
+  // This function is here due to router.navigate() not working in the drawer
   function navigate(path: Href) {
     router.replace(path)
     setImmediate(() => props.navigation.closeDrawer())
@@ -43,6 +43,12 @@ export function CustomDrawerContent(props: CustomDrawerContentProps) {
         <Text className="mt-2 font-medium text-primary">{props.user.totalPoints} pontos</Text>
         <View className="mt-6 h-[1px] w-full bg-gray-300"></View>
       </View>
+
+      <DrawerItem
+        label="Meu perfil"
+        icon={({ color, size }) => <SimpleLineIcons name="user" size={size} color={color} />}
+        onPress={() => navigate("/account")}
+      />
 
       <DrawerItem
         label="Resgatar recompensas"
@@ -78,39 +84,40 @@ export function CustomDrawerContent(props: CustomDrawerContentProps) {
 }
 
 export function LogoutButton() {
-  const [isVisible, setIsVisible] = React.useState(false)
   const { signOut } = useSignOut()
 
-  function handleLogout() {
-    void signOut()
-    setIsVisible(false)
-  }
-
-  function handleCancel() {
-    setIsVisible(false)
+  function handleLogoutClick() {
+    Alert.alert(
+      "Sair",
+      "Você tem certeza que deseja sair da sua conta?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Sair",
+          onPress: () => void signOut(),
+        },
+      ],
+      { cancelable: true },
+    )
   }
 
   return (
     <>
-      <Pressable className="absolute right-8 top-8" onPress={() => setIsVisible(!isVisible)}>
+      <Pressable className="absolute right-8 top-8" onPress={handleLogoutClick}>
         <Text className="text-destructive">
           <SimpleLineIcons name="logout" size={20} />
         </Text>
       </Pressable>
-      <Dialog.Container visible={isVisible}>
-        <Dialog.Title>Sair</Dialog.Title>
-        <Dialog.Description>Você tem certeza que deseja sair da sua conta?</Dialog.Description>
-        <Dialog.Button label="Cancelar" onPress={handleCancel} />
-        <Dialog.Button label="Sair" onPress={handleLogout} />
-      </Dialog.Container>
     </>
   )
 }
 
 export default function DrawerLayout() {
-  const { user, isPending } = useAuth()
-  if (isPending) return null
-  if (!user) return <Redirect href={"/onboarding"} />
+  const { user } = useAuth()
+  if (!user) return <Redirect href="/" />
 
   return (
     <GestureHandlerRootView>

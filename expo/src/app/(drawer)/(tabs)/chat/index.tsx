@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react"
-import { FlatList, Pressable, Text, TouchableOpacity, View } from "react-native"
-import { useRouter } from "expo-router"
-import { EvilIcons } from "@expo/vector-icons"
+import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import clsx from "clsx"
 
 import { useAuth } from "~/hooks/auth"
 import { api } from "~/utils/api"
 import { formatDatePTBR } from "~/utils/date"
 import { randomString } from "~/utils/random"
-import { TODO } from "~/utils/todo"
 
 const enum UserMessageChoice {
   REQUEST_BALANCE = "Consultar saldo",
@@ -53,7 +50,6 @@ export default function ChatbotScreen() {
   const { data: userExtract } = api.user.getUserExtract.useQuery(undefined, {
     enabled: !!user,
   })
-  const router = useRouter()
   const [messages, setMessages] = React.useState<Message[]>(initialMessages)
   const { mutateAsync: getLLMResponse } = api.chat.lookupTransactionsRegression.useMutation()
 
@@ -165,16 +161,7 @@ export default function ChatbotScreen() {
   }
 
   return (
-    <View className="mt-4 flex-1 flex-col gap-4 px-4">
-      <View className="flex-row items-center justify-between">
-        <Pressable onPress={() => router.back()}>
-          <EvilIcons name="chevron-left" size={40} />
-        </Pressable>
-
-        <Pressable onPress={() => setMessages([])}>
-          <EvilIcons name="trash" size={32} />
-        </Pressable>
-      </View>
+    <View className="flex-1 flex-col gap-4 bg-background px-4 pt-4">
       <FlatList
         className="mb-4"
         data={messages}

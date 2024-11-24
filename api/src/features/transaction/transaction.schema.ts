@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm"
-import { eq, gt, not } from "drizzle-orm/expressions"
+import { desc, eq, gt, not } from "drizzle-orm/expressions"
 import { check, index, integer, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core"
 import { nanoid } from "nanoid"
 
@@ -14,6 +14,7 @@ export const RecyclingTransaction = pgTable(
     userId: varchar()
       .references(() => User.id)
       .notNull(),
+    description: text(),
     weight: integer().notNull(),
     material: text({
       enum: ["plastic", "glass", "metal", "paper", "electronic"],
@@ -52,6 +53,7 @@ export const P2PTransaction = pgTable(
       .references(() => User.id)
       .notNull(),
     points: integer().notNull(),
+    description: text(),
     createdAt: timestamp({ withTimezone: true, precision: 3, mode: "date" }).notNull().defaultNow(),
   },
   (table) => [

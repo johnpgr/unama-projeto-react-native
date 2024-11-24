@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server"
 import { observable } from "@trpc/server/observable"
-import { eq, inArray, sql } from "drizzle-orm"
+import { desc, eq, inArray, sql } from "drizzle-orm"
 import { z } from "zod"
 
 import type { PubSubEvents } from "../../redis/index.ts"
@@ -28,30 +28,64 @@ export const transactionRouter = {
   createRecyclingTransaction: protectedProcedure
     .input(
       z.object({
-        weight: z.number(),
+        weight: z.number().positive("O peso deve ser maior que zero"),
         material: z.enum(["plastic", "glass", "metal", "paper", "electronic"]),
+        description: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       if (ctx.user.userType !== "normal") {
-        throw new Error("Apenas usuários normais podem enviar pontos.")
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Apenas usuários normais podem enviar pontos.",
+        })
       }
 
       const pointsEarned = input.weight * 10
 
-      await db.insert(RecyclingTransaction).values({
-        userId: ctx.user.id,
-        weight: input.weight,
-        material: input.material,
-        points: pointsEarned,
+      let transaction: RecyclingTransaction | undefined
+
+      await db.transaction(async (t) => {
+        await t
+          .update(User)
+          .set({
+            totalPoints: sql`${User.totalPoints} + ${pointsEarned}`,
+          })
+          .where(eq(User.id, ctx.user.id))
+
+        const [newTransaction] = await t
+          .insert(RecyclingTransaction)
+          .values({
+            userId: ctx.user.id,
+            weight: input.weight,
+            material: input.material,
+            points: pointsEarned,
+            description: input.description,
+          })
+          .returning()
+
+        transaction = newTransaction
       })
 
-      await db
-        .update(User)
-        .set({
-          totalPoints: sql`${User.totalPoints} + ${pointsEarned}`,
-        })
-        .where(eq(User.id, ctx.user.id))
+      if (!transaction) return
+
+      await redis.publish("notifyTransaction", {
+        type: "recycling",
+        id: transaction.id,
+        receiverId: transaction.userId,
+        points: transaction.points,
+        description: transaction.description,
+        material: transaction.material,
+        weight: transaction.weight,
+      })
+
+      return {
+        id: transaction.id,
+        points: pointsEarned,
+        material: input.material,
+        weight: input.weight,
+        userId: ctx.user.id,
+      }
     }),
 
   /**
@@ -83,6 +117,7 @@ export const transactionRouter = {
     .input(
       z.object({
         receiverId: z.string().min(1, "ID do receptor é obrigatório"),
+        description: z.string().optional(),
         amountPoints: z.number().positive("O valor inserido não é válido"),
       }),
     )
@@ -155,16 +190,19 @@ export const transactionRouter = {
             from: sender.id,
             to: input.receiverId,
             points: input.amountPoints,
+            description: input.description,
           })
           .returning()
 
         if (!transaction) return
 
-        await redis.publish("sendPointsP2P", {
+        await redis.publish("notifyTransaction", {
+          type: "p2p",
           id: transaction.id,
-          pointsTransferred: input.amountPoints,
+          points: transaction.points,
           senderId: transaction.from,
           receiverId: transaction.to,
+          description: transaction.description,
         })
       })
 
@@ -177,17 +215,68 @@ export const transactionRouter = {
       }
     }),
 
-  onP2PTransaction: protectedProcedure.subscription(({ ctx }) => {
-    return observable<Parameters<PubSubEvents["sendPointsP2P"]>[0]>((emit) => {
-      void redis.subscribe("sendPointsP2P", (transaction) => {
+  onTransaction: protectedProcedure.subscription(({ ctx }) => {
+    return observable<Parameters<PubSubEvents["notifyTransaction"]>[0]>((emit) => {
+      void redis.subscribe("notifyTransaction", (transaction) => {
         if (ctx.user.id === transaction.receiverId) {
           emit.next(transaction)
         }
       })
 
       return () => {
-        void redis.unsubscribe("sendPointsP2P")
+        void redis.unsubscribe("notifyTransaction")
       }
     })
   }),
+
+  getTransactionDetails: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        type: z.enum(["recycling", "p2p"]),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const transaction =
+        input.type === "p2p"
+          ? await db.query.P2PTransaction.findFirst({
+              where: (t) => eq(t.id, input.id),
+            })
+          : await db.query.RecyclingTransaction.findFirst({
+              where: (t) => eq(t.id, input.id),
+            })
+
+      if (!transaction) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Transação não encontrada",
+        })
+      }
+
+      if (
+        // "to" in transaction represents a P2P transaction
+        "to" in transaction &&
+        // if current user is not involved in this transaction, throw unauthorized error.
+        transaction.from !== ctx.user.id &&
+        transaction.to !== ctx.user.id
+      ) {
+        console.log({ to: transaction.to, from: transaction.from, user: ctx.user.id })
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Você não tem permissão para acessar esta transação",
+        })
+      }
+
+      if ("to" in transaction) {
+        return {
+          ...transaction,
+          type: "p2p",
+        } as const
+      }
+
+      return {
+        ...transaction,
+        type: "recycling",
+      } as const
+    }),
 }

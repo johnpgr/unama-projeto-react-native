@@ -1,10 +1,6 @@
 import React from "react"
-import { Text, View } from "react-native"
+import { View } from "react-native"
 
 export default function NotificationsScreen() {
-  return (
-    <View>
-      <Text>NotificationsScreen</Text>
-    </View>
-  )
+  return <View className="flex-1 bg-background p-4"></View>
 }
