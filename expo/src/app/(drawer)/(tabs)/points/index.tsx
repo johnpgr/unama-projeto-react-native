@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react"
 import { FlatList, Text, TouchableOpacity, View } from "react-native"
-import { Link } from "expo-router"
+import { Link, useRouter } from "expo-router"
 import { AntDesign } from "@expo/vector-icons"
 import { FlashList } from "@shopify/flash-list"
 
@@ -44,7 +44,7 @@ export default function PointsPage() {
 
   const { data: userExtract } = api.user.getUserExtract.useQuery(undefined, { enabled: !!user })
   const keys = Object.keys(userExtract ?? {})
-
+  const router = useRouter()
   return (
     <View className="flex-1 bg-white">
       <View className="items-center bg-emerald-700 p-4">
@@ -71,6 +71,16 @@ export default function PointsPage() {
             <Text>Resgatar</Text>
           </TouchableOpacity>
         </Link>
+
+        <TouchableOpacity
+          className="flex min-w-24 flex-col items-center justify-center rounded-lg bg-gray-200 p-2"
+          onPress={() => {
+            router.push("./points/trade")
+          }}
+        >
+          <AntDesign name="trademark" size={16} />
+          <Text>Ofertas</Text>
+        </TouchableOpacity>
       </View>
       <View className="flex flex-1 flex-col gap-4">
         <Text className="px-4 text-lg font-medium">Histórico</Text>
@@ -115,7 +125,7 @@ export function ExtractItemView({ extract }: { extract: UserExtract }) {
             <Text className="text-base">{EXTRACT_TYPE[extract.type]}</Text>
             <Text className="text-gray-500">Data: {formatDatePTBR(extract.createdAt)}</Text>
           </View>
-          <Link asChild href={`transactions/${extract.id}?type=p2p`}>
+          <Link asChild href={`/transactions/${extract.id}?type=p2p`}>
             <TouchableOpacity>
               <Text className="text-emerald-700">
                 <AntDesign name="arrowright" size={16} />
@@ -147,7 +157,7 @@ export function ExtractItemView({ extract }: { extract: UserExtract }) {
             <Text className="text-base">{extract.type}</Text>
             <Text className="text-gray-500">Data: {formatDatePTBR(extract.createdAt)}</Text>
           </View>
-          <Link asChild href={`transactions/${extract.id}?type=recycling`}>
+          <Link asChild href={`/transactions/${extract.id}?type=recycling`}>
             <TouchableOpacity>
               <Text className="text-emerald-700">
                 <AntDesign name="arrowright" size={16} />

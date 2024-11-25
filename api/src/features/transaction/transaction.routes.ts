@@ -3,13 +3,99 @@ import { observable } from "@trpc/server/observable"
 import { desc, eq, inArray, sql } from "drizzle-orm"
 import { z } from "zod"
 
+import type { NewTradeOffer } from "../../drizzle/schema.ts"
 import type { PubSubEvents } from "../../redis/index.ts"
 import { db } from "../../drizzle/index.ts"
-import { P2PTransaction, RecyclingTransaction, User } from "../../drizzle/schema.ts"
+import { P2PTransaction, RecyclingTransaction, TradeOffer, User } from "../../drizzle/schema.ts"
 import { redis } from "../../redis/index.ts"
 import { protectedProcedure } from "../../trpc/index.ts"
 
 export const transactionRouter = {
+  createTradeOffer: protectedProcedure
+    .input(
+      z.object({
+        quantity: z.number().positive(),
+        itemType: z.enum(["plastic", "glass", "metal", "paper", "electronic"]),
+        location: z
+          .object({
+            latitude: z.string(),
+            longitude: z.string(),
+          })
+          .optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const newOffer: NewTradeOffer = {
+        user_id: ctx.user.id,
+        quantity: input.quantity,
+        item_type: input.itemType,
+        latitude: input.location?.latitude,
+        longitude: input.location?.longitude,
+      }
+
+      const offer = await db.insert(TradeOffer).values(newOffer).returning()
+
+      return offer[0]
+    }),
+  acceptTradeOffer: protectedProcedure
+    .input(
+      z.object({
+        offerId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const offer = await db.query.TradeOffer.findFirst({
+        where: (offer) => eq(offer.id, input.offerId),
+      })
+
+      if (!offer) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Trade offer not found",
+        })
+      }
+
+      if (offer.status !== "pending") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "This trade offer is no longer available",
+        })
+      }
+
+      if (offer.user_id === ctx.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You cannot accept your own trade offer",
+        })
+      }
+
+      const [updatedOffer] = await db
+        .update(TradeOffer)
+        .set({
+          status: "accepted",
+          accepted_by: ctx.user.id,
+        })
+        .where(eq(TradeOffer.id, input.offerId))
+        .returning()
+
+      return updatedOffer
+    }),
+
+  getTradeOffers: protectedProcedure.query(async () => {
+    const offers = await db.query.TradeOffer.findMany({
+      with: {
+        user: {
+          columns: {
+            id: true,
+            fullName: true,
+          },
+        },
+      },
+      orderBy: desc(TradeOffer.created_at),
+    })
+
+    return offers
+  }),
   /**
    * Procedimento para criar uma transação de reciclagem.
    *
