@@ -50,7 +50,6 @@ export default function IndexScreen() {
         <Link href="/login">
           <View className="flex flex-row items-center justify-center rounded-[2rem] bg-primary p-4">
             <Text className="text-lg font-medium text-white">Vamos Começar</Text>
-            <Ionicons name="chevron-forward-outline" size={24} color={"white"} />
           </View>
         </Link>
       </View>
