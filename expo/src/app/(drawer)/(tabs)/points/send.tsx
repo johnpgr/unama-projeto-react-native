@@ -38,27 +38,22 @@ export default function SendPointsScreen() {
     error,
     isSuccess,
   } = api.transaction.createP2PTransaction.useMutation({
-    onSuccess: () => {
-      utils.user.getUserExtract
-        .invalidate()
-        .then(() => {
-          router.push("/(drawer)/(tabs)/points/sucesspage")
-        })
-        .catch((error) => {
-          console.error("Failed to invalidate user extract:", error)
-        })
+    onSuccess: async () => {
+      await utils.user.getUserExtract.invalidate()
+      router.navigate("/(drawer)/(tabs)/points/success")
     },
   })
+
+  function resetForm() {
+    form.reset({
+      receiverId: typeof receiverId === "string" ? receiverId : "",
+      amountPoints: 0,
+    })
+    setIsAgreed(false)
+  }
+
   useFocusEffect(
     React.useCallback(() => {
-      const resetForm = () => {
-        form.reset({
-          receiverId: typeof receiverId === "string" ? receiverId : "",
-          amountPoints: 0,
-        })
-        setIsAgreed(false)
-      }
-
       return () => resetForm()
     }, []),
   )

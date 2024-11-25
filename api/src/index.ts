@@ -13,6 +13,7 @@ import { healthRouter } from "./features/health/health.routes.ts"
 import { notificationRouter } from "./features/notification/notification.routes.ts"
 import { pointsRouter } from "./features/points/points.routes.ts"
 import { rewardRouter } from "./features/reward/reward.routes.ts"
+import { tradeOfferRouter } from "./features/trade-offer/trade-offer.routes.ts"
 import { transactionRouter } from "./features/transaction/transaction.routes.ts"
 import { userRouter } from "./features/user/user.routes.ts"
 import { createContext, createTRPCRouter } from "./trpc/index.ts"
@@ -22,6 +23,7 @@ export const appRouter = createTRPCRouter({
   auth: authRouter,
   user: userRouter,
   transaction: transactionRouter,
+  tradeOffer: tradeOfferRouter,
   chat: chatRouter,
   points: pointsRouter,
   notification: notificationRouter,

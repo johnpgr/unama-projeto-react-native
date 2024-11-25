@@ -46,7 +46,7 @@ function AddRewards() {
     defaultValues: { rewardName: "", points: 0 },
   })
   const { errors } = formState
-  const { mutateAsync, isSuccess, error } = api.reward.createReward.useMutation()
+  const { mutateAsync: createReward, isSuccess, error } = api.reward.createReward.useMutation()
 
   async function onSubmit(data: AddRewardsInput) {
     const amountPoints = data.points
@@ -60,7 +60,7 @@ function AddRewards() {
       throw new Error("O nome do prêmio não pode ser vazio.")
     }
 
-    await mutateAsync({ points: amountPoints, rewardName })
+    await createReward({ points: amountPoints, rewardName })
   }
 
   return (
@@ -246,35 +246,18 @@ export default function RewardsScreen() {
     })
   }
 
-  function RewardList() {
-    switch (true) {
-      case isLoadingRewards || isExchanging || !rewards:
-        return <LoadingSpinner />
-      case rewards?.length === 0:
-        return <EmptyRewardsList />
-      default:
-        return (
-          <ScrollView>
-            <View className="flex-row flex-wrap">
-              {rewards.map((reward) => (
-                <RewardCard
-                  key={reward.id}
-                  reward={reward}
-                  onRedeem={() => handleRedeemReward(reward.id)}
-                />
-              ))}
-            </View>
-          </ScrollView>
-        )
-    }
-  }
   const { user } = useAuth()
 
   return (
     <View className="mt-4 flex-1 bg-gray-100">
       {user?.userType === "normal" ? <AddRewards /> : null}
 
-      <RewardList />
+      <RewardList
+        rewards={rewards ?? []}
+        handleRedeemReward={handleRedeemReward}
+        isLoadingRewards={isLoadingRewards}
+        isExchanging={isExchanging}
+      />
       <Popup
         visible={popupState.isVisible}
         onClose={handleClosePopup}
@@ -283,4 +266,32 @@ export default function RewardsScreen() {
       />
     </View>
   )
+}
+
+function RewardList(props: {
+  rewards: Reward[]
+  handleRedeemReward: (id: string) => Promise<void>
+  isLoadingRewards: boolean
+  isExchanging: boolean
+}) {
+  switch (true) {
+    case props.isLoadingRewards || props.isExchanging:
+      return <LoadingSpinner />
+    case props.rewards.length === 0:
+      return <EmptyRewardsList />
+    default:
+      return (
+        <ScrollView>
+          <View className="flex-row flex-wrap">
+            {props.rewards.map((reward) => (
+              <RewardCard
+                key={reward.id}
+                reward={reward}
+                onRedeem={() => props.handleRedeemReward(reward.id)}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      )
+  }
 }

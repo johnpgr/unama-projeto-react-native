@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
 })
 
 export default function TabLayout() {
-  const { session, isPending } = useAuth()
+  const { session } = useAuth()
   const router = useRouter()
   const utils = api.useUtils()
 
@@ -87,7 +87,6 @@ export default function TabLayout() {
     enabled: !!session,
   })
 
-  if (isPending) return null
   if (!session) return <Redirect href="/" />
 
   return (

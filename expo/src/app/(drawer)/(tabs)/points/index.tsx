@@ -10,26 +10,6 @@ import { useAuth } from "~/hooks/auth"
 import { api } from "~/utils/api"
 import { formatDatePTBR } from "~/utils/date"
 
-// const parseUserReward = (
-//   reward: RouterOutputs["transaction"]["getUserRewards"][number],
-// ): UserRewardNotification => ({
-//   id: reward.id,
-//   points: reward.reward.points,
-//   transactionDate: reward.createdAt,
-//   type: TransactionType.P2REWARD,
-// })
-//
-// const parseP2PRTransaction = (
-//   transaction: RouterOutputs["transaction"]["getUserTransactions"][number],
-// ): P2PNotification => ({
-//   id: transaction.id,
-//   points: transaction.points,
-//   transactionDate: transaction.createdAt,
-//   type: TransactionType.P2P,
-//   from: transaction.from,
-//   to: transaction.to,
-// })
-
 type UserExtract = NonNullable<RouterOutputs["user"]["getUserExtract"][string]>[number]
 
 const EXTRACT_TYPE: Record<UserExtract["type"], string> = {
@@ -41,10 +21,10 @@ const EXTRACT_TYPE: Record<UserExtract["type"], string> = {
 
 export default function PointsPage() {
   const { user } = useAuth()
-
   const { data: userExtract } = api.user.getUserExtract.useQuery(undefined, { enabled: !!user })
   const keys = Object.keys(userExtract ?? {})
   const router = useRouter()
+
   return (
     <View className="flex-1 bg-white">
       <View className="items-center bg-emerald-700 p-4">
@@ -75,7 +55,7 @@ export default function PointsPage() {
         <TouchableOpacity
           className="flex min-w-24 flex-col items-center justify-center rounded-lg bg-gray-200 p-2"
           onPress={() => {
-            router.push("./points/trade")
+            router.navigate("/points/trade")
           }}
         >
           <AntDesign name="trademark" size={16} />

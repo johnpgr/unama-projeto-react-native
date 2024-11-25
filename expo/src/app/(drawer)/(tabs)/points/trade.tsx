@@ -17,50 +17,46 @@ import { api } from "~/utils/api"
 
 interface FormData {
   quantity: string
-  itemType: "plastic" | "glass" | "metal" | "paper" | "electronic"
+  itemType: ItemType
 }
 
 enum ItemType {
   PLASTIC_BOTTLE = "plastic",
   GLASS = "glass",
-  ALUMINUM = "metal",
+  METAL = "metal",
   PAPER = "paper",
   ELECTRONIC = "electronic",
 }
 
-export function TradeOfferScreen() {
+export default function TradeOfferScreen() {
   const [shareLocation, setShareLocation] = useState(false)
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>()
-  const createTradeOffer = api.transaction.createTradeOffer.useMutation()
+  const { mutateAsync: createTradeOffer, isPending } = api.tradeOffer.createTradeOffer.useMutation()
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      await createTradeOffer.mutateAsync({
-        quantity: Number(data.quantity),
-        itemType: data.itemType,
-        location: shareLocation
-          ? {
-              latitude: "0",
-              longitude: "0",
-            }
-          : undefined,
-      })
-    } catch (error) {
-      console.error(error)
-    }
+  async function onSubmit(data: FormData) {
+    await createTradeOffer({
+      quantity: Number(data.quantity),
+      itemType: data.itemType,
+      location: shareLocation
+        ? {
+            latitude: "0",
+            longitude: "0",
+          }
+        : undefined,
+    })
   }
 
   return (
     <ScrollView className="flex-1 bg-white p-4">
-      <Text className="mb-6 text-2xl font-bold">Create Trade Offer</Text>
+      <Text className="mb-6 text-2xl font-bold">Criar oferta de troca</Text>
 
       <View className="space-y-4">
         <View>
-          <Text className="mb-1 text-sm font-medium">Weight/Quantity</Text>
+          <Text className="mb-1 text-sm font-medium">Peso/Quantidade</Text>
           <Controller
             control={control}
             name="quantity"
@@ -76,12 +72,12 @@ export function TradeOfferScreen() {
             )}
           />
           {errors.quantity && (
-            <Text className="mt-1 text-sm text-red-500">Please enter a valid quantity</Text>
+            <Text className="mt-1 text-sm text-red-500">Por favor insira uma quantia válida</Text>
           )}
         </View>
 
         <View>
-          <Text className="mb-1 text-sm font-medium">Item Types</Text>
+          <Text className="mb-1 text-sm font-medium">Tipo</Text>
           <Controller
             control={control}
             name="itemType"
@@ -92,7 +88,7 @@ export function TradeOfferScreen() {
                   <Picker.Item label="Plastic Bottle" value={ItemType.PLASTIC_BOTTLE} />
                   <Picker.Item label="Cardboard" value={ItemType.PAPER} />
                   <Picker.Item label="Glass" value={ItemType.GLASS} />
-                  <Picker.Item label="Aluminum" value={ItemType.ALUMINUM} />
+                  <Picker.Item label="Aluminum" value={ItemType.METAL} />
                 </Picker>
               </View>
             )}
@@ -100,25 +96,26 @@ export function TradeOfferScreen() {
         </View>
 
         <View className="flex-row items-center justify-between">
-          <Text className="text-sm font-medium">Share my location</Text>
+          <Text className="text-sm font-medium">Compartilhar minha localização</Text>
           <Switch value={shareLocation} onValueChange={setShareLocation} />
         </View>
 
-        <TouchableOpacity onPress={handleSubmit(onSubmit)} disabled={createTradeOffer.isPending} />
+        <TouchableOpacity onPress={handleSubmit(onSubmit)} disabled={isPending} />
       </View>
     </ScrollView>
   )
 }
 
 interface TradeOfferListProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ListHeaderComponent?: React.ComponentType<any>
 }
 
 export function TradeOfferList({ ListHeaderComponent }: TradeOfferListProps) {
-  const { data: offers, isLoading } = api.transaction.getTradeOffers.useQuery()
-  const acceptTrade = api.transaction.acceptTradeOffer.useMutation({
+  const { data: offers, isLoading } = api.tradeOffer.getTradeOffers.useQuery()
+  const { mutateAsync: acceptTrade, isPending } = api.tradeOffer.acceptTradeOffer.useMutation({
     onSuccess: () => {
-      Alert.alert("Trade offer accepted successfully!")
+      Alert.alert("Oferta de troca aceita com sucesso!")
     },
     onError: (error) => {
       Alert.alert(error.message)
@@ -127,7 +124,7 @@ export function TradeOfferList({ ListHeaderComponent }: TradeOfferListProps) {
 
   const handleAccept = async (offerId: string) => {
     try {
-      await acceptTrade.mutateAsync({ offerId })
+      await acceptTrade({ offerId })
     } catch (error) {
       console.error(error)
     }
@@ -136,7 +133,7 @@ export function TradeOfferList({ ListHeaderComponent }: TradeOfferListProps) {
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center">
-        <Text>Loading...</Text>
+        <Text>Carregando...</Text>
       </View>
     )
   }
@@ -157,13 +154,13 @@ export function TradeOfferList({ ListHeaderComponent }: TradeOfferListProps) {
           {/* Quantity */}
           <View className="mb-2 flex-row items-center">
             <MaterialIcons name="recycling" size={20} color="black" className="mr-2" />
-            <Text className="text-base">Quantity: {offer.quantity}</Text>
+            <Text className="text-base">Quantidade: {offer.quantity}</Text>
           </View>
 
           {/* Location */}
           <View className="mb-2 flex-row items-center">
             <Entypo name="location" size={20} color="black" className="mr-2" />
-            <Text className="text-base">Location: {offer.latitude || "N/A"}</Text>
+            <Text className="text-base">Localização: {offer.latitude || "N/A"}</Text>
           </View>
 
           {/* Status */}
@@ -178,17 +175,17 @@ export function TradeOfferList({ ListHeaderComponent }: TradeOfferListProps) {
               onPress={() => console.log("Declined")}
               className="rounded-lg bg-red-500 px-4 py-2"
             >
-              <Text className="font-semibold text-white">Decline</Text>
+              <Text className="font-semibold text-white">Recusar</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => handleAccept(offer.id)}
-              disabled={acceptTrade.isPending || offer.status !== "pending"}
+              disabled={isPending || offer.status !== "pending"}
               className={`rounded-lg px-4 py-2 ${
                 offer.status === "pending" ? "bg-green-500" : "bg-gray-400"
               }`}
             >
               <Text className="font-semibold text-white">
-                {acceptTrade.isPending ? "Processing..." : "Accept"}
+                {isPending ? "Processando..." : "Aceitar"}
               </Text>
             </TouchableOpacity>
           </View>
