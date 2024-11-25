@@ -1,7 +1,7 @@
 import type { RedisClientType } from "redis"
 import { createClient } from "redis"
 
-import type { Notification, RecyclingTransaction } from "../drizzle/schema.ts"
+import type { RecyclingTransaction } from "../drizzle/schema.ts"
 import { env } from "../config/env.ts"
 
 export interface PubSubEvents {

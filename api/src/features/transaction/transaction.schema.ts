@@ -5,6 +5,34 @@ import { nanoid } from "nanoid"
 
 import { User } from "../user/user.schema.ts"
 
+export const TradeOffer = pgTable("trade_offer", {
+  id: varchar({ length: 21 })
+    .primaryKey()
+    .$default(() => nanoid()),
+  user_id: varchar("user_id").references(() => User.id), // Changed from userId
+  quantity: integer("quantity").notNull(),
+  item_type: text({
+    enum: ["plastic", "glass", "metal", "paper", "electronic"],
+  }).notNull(), // Changed from itemType
+  latitude: varchar("latitude"),
+  longitude: varchar("longitude"),
+  created_at: timestamp("created_at").defaultNow().notNull(), // Changed from createdAt
+  status: text({ enum: ["pending", "accepted", "rejected"] })
+    .notNull()
+    .default("pending"),
+  accepted_by: varchar("accepted_by").references(() => User.id),
+})
+export const TradeOfferRelations = relations(TradeOffer, ({ one }) => ({
+  user: one(User, {
+    fields: [TradeOffer.user_id],
+    references: [User.id],
+  }),
+}))
+
+// 2. Type definitions
+export type TradeOffer = typeof TradeOffer.$inferSelect
+export type NewTradeOffer = typeof TradeOffer.$inferInsert
+
 export const RecyclingTransaction = pgTable(
   "recycling_transaction",
   {
