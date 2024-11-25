@@ -11,7 +11,7 @@ import { sessionService } from "../auth.session.ts"
 export const googleAuth = new Google(
   env.AUTH_GOOGLE_ID,
   env.AUTH_GOOGLE_SECRET,
-  `${env.APP_URL}/auth/google/callback`,
+  `${env.APP_URL}/oauth/google/callback`,
 )
 
 export async function getGoogleAuthorizationUrl(state: string, codeVerifier: string): Promise<URL> {
