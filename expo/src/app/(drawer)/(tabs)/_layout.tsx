@@ -269,6 +269,31 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="points/success"
+        options={{
+          href: null,
+          title: "Pontos enviados",
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="points/trade"
+        options={{
+          href: null,
+          title: "Criar oferta",
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} className="p-4">
+              <AntDesign name="arrowleft" size={24} />
+            </Pressable>
+          ),
+        }}
+      />
     </Tabs>
   )
 }

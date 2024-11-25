@@ -48,5 +48,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         cameraPermission: "Permitir que ECOPoints acesse a sua camera",
       },
     ],
+    [
+      "expo-location",
+      {
+        locationAlwaysAndWhenInUsePermission: "Permitir que $(PRODUCT_NAME) use sua localização.",
+      },
+    ],
   ],
 })

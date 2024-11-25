@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native"
+import * as Location from "expo-location"
 import { Entypo, FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons"
 import { Picker } from "@react-native-picker/picker"
 import { Controller, useForm } from "react-hook-form"
@@ -30,6 +31,8 @@ enum ItemType {
 
 export default function TradeOfferScreen() {
   const [shareLocation, setShareLocation] = useState(false)
+  const [location, setLocation] = useState<Location.LocationObject | null>(null)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const {
     control,
     handleSubmit,
@@ -41,33 +44,48 @@ export default function TradeOfferScreen() {
     await createTradeOffer({
       quantity: Number(data.quantity),
       itemType: data.itemType,
-      location: shareLocation
-        ? {
-            latitude: "0",
-            longitude: "0",
-          }
-        : undefined,
+      location:
+        shareLocation && location
+          ? {
+              latitude: location.coords.latitude.toString(),
+              longitude: location.coords.longitude.toString(),
+            }
+          : undefined,
     })
   }
 
+  React.useEffect(() => {
+    void (async () => {
+      if (shareLocation) {
+        const { granted } = await Location.requestForegroundPermissionsAsync()
+        if (!granted) {
+          setErrorMsg("Permissão para acessar localização negada")
+          setShareLocation(false)
+          return
+        }
+
+        const currentLocation = await Location.getCurrentPositionAsync({})
+        setLocation(currentLocation)
+      }
+    })()
+  }, [shareLocation])
+
   return (
     <ScrollView className="flex-1 bg-white p-4">
-      <Text className="mb-6 text-2xl font-bold">Criar oferta de troca</Text>
-
-      <View className="space-y-4">
-        <View>
-          <Text className="mb-1 text-sm font-medium">Peso/Quantidade</Text>
+      <View className="flex flex-col gap-4">
+        <View className="flex flex-col gap-2">
+          <Text className="text-sm font-medium">Peso/Quantidade</Text>
           <Controller
             control={control}
             name="quantity"
             rules={{ required: true, min: 1 }}
             render={({ field: { onChange, value } }) => (
               <TextInput
-                className="rounded-md border border-gray-300 p-2"
+                className="rounded-md border border-gray-300 p-4"
                 keyboardType="numeric"
                 onChangeText={onChange}
                 value={value}
-                placeholder="Enter quantity"
+                placeholder="Insira a quantidade"
               />
             )}
           />
@@ -76,8 +94,8 @@ export default function TradeOfferScreen() {
           )}
         </View>
 
-        <View>
-          <Text className="mb-1 text-sm font-medium">Tipo</Text>
+        <View className="flex flex-col gap-2">
+          <Text className="text-sm font-medium">Tipo</Text>
           <Controller
             control={control}
             name="itemType"
@@ -85,10 +103,11 @@ export default function TradeOfferScreen() {
             render={({ field: { onChange, value } }) => (
               <View className="rounded-md border border-gray-300">
                 <Picker selectedValue={value} onValueChange={onChange}>
-                  <Picker.Item label="Plastic Bottle" value={ItemType.PLASTIC_BOTTLE} />
-                  <Picker.Item label="Cardboard" value={ItemType.PAPER} />
-                  <Picker.Item label="Glass" value={ItemType.GLASS} />
-                  <Picker.Item label="Aluminum" value={ItemType.METAL} />
+                  <Picker.Item label="Garrafa Plástica" value={ItemType.PLASTIC_BOTTLE} />
+                  <Picker.Item label="Papelão" value={ItemType.PAPER} />
+                  <Picker.Item label="Vidro" value={ItemType.GLASS} />
+                  <Picker.Item label="Alumínio" value={ItemType.METAL} />
+                  <Picker.Item label="Eletrônico" value={ItemType.ELECTRONIC} />
                 </Picker>
               </View>
             )}
@@ -99,6 +118,7 @@ export default function TradeOfferScreen() {
           <Text className="text-sm font-medium">Compartilhar minha localização</Text>
           <Switch value={shareLocation} onValueChange={setShareLocation} />
         </View>
+        {errorMsg && <Text className="text-red-500">{errorMsg}</Text>}
 
         <TouchableOpacity onPress={handleSubmit(onSubmit)} disabled={isPending} />
       </View>
@@ -160,7 +180,7 @@ export function TradeOfferList({ ListHeaderComponent }: TradeOfferListProps) {
           {/* Location */}
           <View className="mb-2 flex-row items-center">
             <Entypo name="location" size={20} color="black" className="mr-2" />
-            <Text className="text-base">Localização: {offer.latitude || "N/A"}</Text>
+            <Text className="text-base">Localização: {offer.latitude ?? "N/A"}</Text>
           </View>
 
           {/* Status */}
